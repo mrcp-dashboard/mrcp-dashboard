@@ -22,7 +22,6 @@ main{max-width:1400px;margin:0 auto;padding:28px 24px;}
 .sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
 .session-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-decoration:none;color:var(--text);transition:all .2s;display:block;}
 .session-card:hover{border-color:var(--accent);transform:translateY(-2px);}
-.session-card-inner{cursor:default;}
 .session-date{font-size:16px;font-weight:700;margin-bottom:6px;}
 .session-meta{font-size:11px;color:var(--muted);margin-bottom:12px;}
 .session-podium{display:flex;gap:8px;}
@@ -45,7 +44,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 <header>
   <div><div class="logo">MRCP <span>Dashboard</span></div>
   <div class="subtitle">Mini Racing Club Palois &mdash; Suivi des performances</div></div>
-  <div class="badge">Mis a jour le 05/05/2026 a 22:27</div>
+  <div class="badge">Mis a jour le 05/05/2026 a 22:36</div>
 </header>
 <main>
 <div class="section-title">Resume global</div>
@@ -54,7 +53,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 <div class="sessions-grid" id="sessionsGrid"></div>
 <div class="section-title">Rapports detailles</div>
 <div class="files-section" id="filesSection"></div>
-<div class="section-title">Evolution du meilleur tour &mdash; Tous les pilotes</div>
+<div class="section-title">Evolution du meilleur tour</div>
 <div class="chart-card"><canvas id="evoGlobal" height="160"></canvas></div>
 <div class="section-title">Evolution par pilote</div>
 <div class="evo-grid" id="evoGrid"></div>
@@ -69,18 +68,16 @@ var FILES    = ["session_mrcp_01052026.html", "session_mrcp_03052026.html", "ses
 function fmt(s){var m=Math.floor(s/60),sec=s-m*60,ss=sec.toFixed(3);while(ss.length<6)ss='0'+ss;return m+':'+ss;}
 function sk(d){try{var p=d.split('/');return p[2]+'-'+p[1]+'-'+p[0];}catch(e){return d;}}
 
-// SUMMARY
 var allPilots=new Set(Object.values(HISTORY).map(function(p){return p.name;}));
 var globalBest=999,globalBestName='';
 Object.values(HISTORY).forEach(function(p){p.sessions.forEach(function(s){if(s.best<globalBest){globalBest=s.best;globalBestName=p.name;}});});
 var totalLaps=Object.values(HISTORY).reduce(function(a,p){return a+p.sessions.reduce(function(b,s){return b+s.count;},0);},0);
 document.getElementById('summary').innerHTML=
   '<div class="stat-box"><div class="val">'+SESSIONS.length+'</div><div class="lbl">Sessions</div></div>'+
-  '<div class="stat-box"><div class="val">'+allPilots.size+'</div><div class="lbl">Pilotes differents</div></div>'+
+  '<div class="stat-box"><div class="val">'+allPilots.size+'</div><div class="lbl">Pilotes</div></div>'+
   '<div class="stat-box"><div class="val">'+totalLaps+'</div><div class="lbl">Tours valides</div></div>'+
   '<div class="stat-box"><div class="val" style="font-size:20px">'+(globalBest<999?fmt(globalBest):'--')+'</div><div class="lbl">Record &mdash; '+globalBestName+'</div></div>';
 
-// SESSIONS
 var grid=document.getElementById('sessionsGrid');
 var classes=['gold','silver','bronze'];
 var medals=['&#127945;','&#129352;','&#129353;'];
@@ -91,7 +88,7 @@ SESSIONS.forEach(function(s){
   });
   var tag=s.file?'a':'div';
   var el=document.createElement(tag);
-  el.className='session-card'+(s.file?'':' session-card-inner');
+  el.className='session-card';
   if(s.file) el.href=s.file;
   el.innerHTML='<div class="session-date">&#127937; '+s.date+'</div>'+
     '<div class="session-meta">'+s.pilots+' pilote'+(s.pilots>1?'s':'')+' &middot; '+s.total_laps+' tours</div>'+
@@ -99,19 +96,20 @@ SESSIONS.forEach(function(s){
   grid.appendChild(el);
 });
 
-// FICHIERS
 var filesEl=document.getElementById('filesSection');
 FILES.forEach(function(f){
   var a=document.createElement('a');a.className='file-link';a.href=f;
-  var name=f.replace('session_mrcp_','').replace('.html','').replace(/_/g,' ');
-  a.innerHTML='<span style="font-size:20px">&#128196;</span><div><div style="font-weight:700;font-size:13px">Rapport '+name+'</div></div>';
+  var name=f.replace('session_mrcp_','').replace('.html','');
+  a.innerHTML='<span style="font-size:20px">&#128196;</span><div><div style="font-weight:700;font-size:13px">Session '+name+'</div></div>';
   filesEl.appendChild(a);
 });
 
-// EVO GLOBAL
 var pidsEvo=Object.keys(HISTORY).filter(function(pid){return HISTORY[pid].sessions.length>=2;});
 if(pidsEvo.length){
-  var allD=[...new Set(pidsEvo.reduce(function(acc,pid){return acc.concat(HISTORY[pid].sessions.map(function(s){return s.date;}));},[] ))].sort(function(a,b){return sk(a).localeCompare(sk(b));});
+  var allD=[];
+  var dset={};
+  pidsEvo.forEach(function(pid){HISTORY[pid].sessions.forEach(function(s){dset[s.date]=1;});});
+  allD=Object.keys(dset).sort(function(a,b){return sk(a).localeCompare(sk(b));});
   new Chart(document.getElementById('evoGlobal'),{type:'line',
     data:{labels:allD,datasets:pidsEvo.map(function(pid,i){
       var p=HISTORY[pid];
@@ -123,10 +121,9 @@ if(pidsEvo.length){
       scales:{x:{ticks:{color:'#7b82a8',font:{size:9}},grid:{color:'#1e2136'}},
         y:{ticks:{color:'#7b82a8',callback:function(v){return fmt(v);}},grid:{color:'#1e2136'}}}}});
 }else{
-  document.getElementById('evoGlobal').parentElement.innerHTML='<div class="empty-msg">Pas encore assez de sessions pour afficher l-evolution.</div>';
+  document.getElementById('evoGlobal').parentElement.innerHTML='<div class="empty-msg">Pas encore assez de sessions.</div>';
 }
 
-// EVO PAR PILOTE
 var evoGrid=document.getElementById('evoGrid');
 var hasEvo=false;
 Object.keys(HISTORY).forEach(function(pid,idx){
@@ -148,7 +145,7 @@ Object.keys(HISTORY).forEach(function(pid,idx){
       scales:{x:{ticks:{color:'#7b82a8',font:{size:8}},grid:{color:'#1e2136'}},
         y:{ticks:{color:'#7b82a8',callback:function(v){return fmt(v);}},grid:{color:'#1e2136'}}}}});
 });
-if(!hasEvo) evoGrid.innerHTML='<div class="empty-msg">Pas encore assez de sessions pour l-evolution individuelle.</div>';
+if(!hasEvo) evoGrid.innerHTML='<div class="empty-msg">Pas encore assez de sessions.</div>';
 </script>
 </body>
 </html>
