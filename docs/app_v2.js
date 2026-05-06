@@ -4,6 +4,8 @@ let PILOT_NAMES = {};
 let LOCAL_NAMES = {};
 let TRACK_FILTER = localStorage.getItem('mrcp_track_filter') || 'all'; // all | TT1/8 | TT1/10
 let FAVORITES = new Set();
+let LAP_OVERRIDES = { excluded: {}, forced_track: {} };
+let ADMIN_MODE = localStorage.getItem('mrcp_admin_mode') === '1';
 
 function setTrackFilter(track) {
   TRACK_FILTER = track || 'all';
@@ -13,6 +15,100 @@ function setTrackFilter(track) {
 function trackBadge(track) {
   if (!track || track === 'all') return 'Toutes pistes';
   return track;
+}
+
+function loadLapOverrides() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('mrcp_lap_overrides') || '{}');
+    LAP_OVERRIDES = {
+      excluded: raw.excluded && typeof raw.excluded === 'object' ? raw.excluded : {},
+      forced_track: raw.forced_track && typeof raw.forced_track === 'object' ? raw.forced_track : {}
+    };
+  } catch (_) { LAP_OVERRIDES = { excluded: {}, forced_track: {} }; }
+}
+function saveLapOverrides() {
+  localStorage.setItem('mrcp_lap_overrides', JSON.stringify(LAP_OVERRIDES, null, 2));
+}
+function lapKey(activityId, transponder, lapNo, startTime, lapTime) {
+  return [activityId, normalizeTransponder(transponder), lapNo ?? '', startTime ?? '', Number(lapTime).toFixed(3)].join('|');
+}
+function lapIdFromContext(activity, participant, lap) {
+  return lapKey(activity?.id || activity?.activity_id || '', participant?.transponder || '', lap?.lap_no || '', lap?.start_time || '', lap?.lap_time);
+}
+function lapIsExcludedById(id) { return !!LAP_OVERRIDES.excluded[id]; }
+function forcedTrackById(id) { return LAP_OVERRIDES.forced_track[id] || null; }
+function effectiveLapTrack(lap, id) {
+  return forcedTrackById(id) || lap?.track || inferTrackFromSeconds(lap?.lap_time);
+}
+function adminBadge() {
+  return ADMIN_MODE ? '<span class="badge admin-badge">Admin</span>' : '';
+}
+function requireAdmin() {
+  if (ADMIN_MODE) return true;
+  const pin = prompt('Code admin local ?');
+  // Ce code n’est pas une vraie sécurité serveur : il cache juste les boutons aux visiteurs classiques.
+  if (pin === 'mrcp') {
+    ADMIN_MODE = true;
+    localStorage.setItem('mrcp_admin_mode', '1');
+    return true;
+  }
+  alert('Code incorrect.');
+  return false;
+}
+function exitAdmin() {
+  ADMIN_MODE = false;
+  localStorage.removeItem('mrcp_admin_mode');
+  route();
+}
+function setLapExcluded(id, label) {
+  if (!requireAdmin()) return;
+  const reason = prompt('Pourquoi exclure ce tour des records/podiums ?', label || 'Erreur chrono / mauvaise piste');
+  if (reason === null) return;
+  LAP_OVERRIDES.excluded[id] = { reason: reason || 'Exclu par admin', at: new Date().toISOString() };
+  saveLapOverrides();
+  route();
+}
+function restoreLap(id) {
+  if (!requireAdmin()) return;
+  delete LAP_OVERRIDES.excluded[id];
+  delete LAP_OVERRIDES.forced_track[id];
+  saveLapOverrides();
+  route();
+}
+function forceLapTrack(id, track) {
+  if (!requireAdmin()) return;
+  LAP_OVERRIDES.forced_track[id] = track;
+  delete LAP_OVERRIDES.excluded[id];
+  saveLapOverrides();
+  route();
+}
+function exportLapOverrides() {
+  downloadText('lap_overrides.json', JSON.stringify(LAP_OVERRIDES, null, 2), 'application/json;charset=utf-8');
+}
+function importLapOverridesFromText() {
+  if (!requireAdmin()) return;
+  const current = JSON.stringify(LAP_OVERRIDES, null, 2);
+  const next = prompt('Colle le contenu JSON lap_overrides.json', current);
+  if (next === null) return;
+  try {
+    const parsed = JSON.parse(next);
+    LAP_OVERRIDES = {
+      excluded: parsed.excluded && typeof parsed.excluded === 'object' ? parsed.excluded : {},
+      forced_track: parsed.forced_track && typeof parsed.forced_track === 'object' ? parsed.forced_track : {}
+    };
+    saveLapOverrides();
+    route();
+  } catch (e) { alert('JSON invalide.'); }
+}
+function adminLapButtons(row) {
+  if (!ADMIN_MODE || !row?.lap_id) return '';
+  const id = escapeHtml(row.lap_id);
+  const ex = lapIsExcludedById(row.lap_id);
+  return `<div class="admin-actions">
+    ${ex ? `<button class="button danger" onclick="restoreLap('${id}')">Restaurer</button>` : `<button class="button danger" onclick="setLapExcluded('${id}', '${escapeHtml(row.pilot_name || '')} ${fmtTime(row.lap_time)}')">Exclure</button>`}
+    <button class="button" onclick="forceLapTrack('${id}', 'TT1/10')">Forcer TT1/10</button>
+    <button class="button" onclick="forceLapTrack('${id}', 'TT1/8')">Forcer TT1/8</button>
+  </div>`;
 }
 function loadFavorites() {
   try { FAVORITES = new Set(JSON.parse(localStorage.getItem('mrcp_favorite_transponders') || '[]').map(normalizeTransponder)); }
@@ -68,13 +164,17 @@ function participantMatchesTrack(p) {
   return tracksForParticipant(p).includes(TRACK_FILTER);
 }
 
-function lapMatchesTrack(lap) {
+function lapMatchesTrack(lap, id) {
+  if (lapIsExcludedById(id)) return false;
   if (TRACK_FILTER === 'all') return true;
-  return (lap.track || inferTrackFromSeconds(lap.lap_time)) === TRACK_FILTER;
+  return effectiveLapTrack(lap, id) === TRACK_FILTER;
 }
-function lapsForParticipant(p) {
+function lapsForParticipant(p, activity) {
   const laps = Array.isArray(p?.laps) ? p.laps : [];
-  return laps.filter(lapMatchesTrack);
+  return laps.map(l => {
+    const id = lapIdFromContext(activity, p, l);
+    return {...l, lap_id: id, track: effectiveLapTrack(l, id), excluded: lapIsExcludedById(id)};
+  }).filter(l => lapMatchesTrack(l, l.lap_id));
 }
 function metricsFromLaps(laps) {
   const times = laps.map(l => Number(l.lap_time)).filter(Number.isFinite);
@@ -84,14 +184,14 @@ function metricsFromLaps(laps) {
   const variance = times.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / times.length;
   return {laps_count: times.length, best_lap: best, avg_lap: avg, consistency: Math.sqrt(variance)};
 }
-function participantMetrics(p) {
-  const laps = lapsForParticipant(p);
+function participantMetrics(p, activity) {
+  const laps = lapsForParticipant(p, activity);
   const m = metricsFromLaps(laps);
   return {...m, laps};
 }
 function sessionParticipantsForDisplay(s) {
   return (s.participants || [])
-    .map(p => ({...p, _metrics: participantMetrics(p)}))
+    .map(p => ({...p, _metrics: participantMetrics(p, s)}))
     .filter(p => p._metrics.laps_count > 0)
     .sort((a, b) => (a._metrics.best_lap || 9999) - (b._metrics.best_lap || 9999));
 }
@@ -102,9 +202,12 @@ function allLapsFlat() {
       const pilotName = p.pilot_name || p.name || `Inconnu #${p.transponder}`;
       const pilotSlug = p.pilot_slug || slugText(pilotName + '-' + normalizeTransponder(p.transponder));
       (p.laps || []).forEach(l => {
-        const track = l.track || inferTrackFromSeconds(l.lap_time);
+        const id = lapIdFromContext(a, p, l);
+        if (lapIsExcludedById(id)) return;
+        const track = effectiveLapTrack(l, id);
         if (TRACK_FILTER !== 'all' && track !== TRACK_FILTER) return;
         rows.push({
+          lap_id: id,
           activity_id: a.id,
           date: a.date,
           date_fr: a.date_fr,
@@ -149,20 +252,35 @@ function pilotActivitiesFor(p) {
   if (TRACK_FILTER === 'all') return acts;
   return acts.filter(a => tracksForActivity(a).includes(TRACK_FILTER));
 }
+function lapsForPilotGlobal(p) {
+  const t = normalizeTransponder(p?.transponder);
+  const rows = [];
+  (DB?.activities || []).forEach(a => {
+    (a.participants || []).forEach(part => {
+      if (normalizeTransponder(part.transponder) !== t) return;
+      (part.laps || []).forEach(l => {
+        const id = lapIdFromContext(a, part, l);
+        if (lapIsExcludedById(id)) return;
+        const track = effectiveLapTrack(l, id);
+        if (TRACK_FILTER !== 'all' && track !== TRACK_FILTER) return;
+        const sec = Number(l.lap_time);
+        if (!Number.isFinite(sec)) return;
+        rows.push({activity_id:a.id, date:a.date, date_fr:a.date_fr, lap_time:sec, track, lap_id:id});
+      });
+    });
+  });
+  return rows;
+}
 function pilotBestFor(p) {
-  if (TRACK_FILTER === 'all') return p.best_lap;
-  const trackBest = p.tracks?.[TRACK_FILTER]?.best_lap;
-  if (trackBest !== undefined && trackBest !== null) return trackBest;
-  const vals = pilotActivitiesFor(p).map(a => Number(a.best_lap)).filter(Number.isFinite);
-  return vals.length ? Math.min(...vals) : null;
+  const laps = lapsForPilotGlobal(p);
+  if (!laps.length) return null;
+  return Math.min(...laps.map(l => Number(l.lap_time)));
 }
 function pilotTotalFor(p) {
-  if (TRACK_FILTER === 'all') return p.total_laps || 0;
-  return p.tracks?.[TRACK_FILTER]?.total_laps || pilotActivitiesFor(p).reduce((sum, a) => sum + (a.laps_count || 0), 0);
+  return lapsForPilotGlobal(p).length;
 }
 function pilotSessionsFor(p) {
-  if (TRACK_FILTER === 'all') return p.activities_count || 0;
-  return p.tracks?.[TRACK_FILTER]?.activities_count || pilotActivitiesFor(p).length;
+  return new Set(lapsForPilotGlobal(p).map(l => l.activity_id)).size;
 }
 function avgBestLapFor(p) {
   const acts = pilotActivitiesFor(p).filter(a => Number.isFinite(Number(a.best_lap)));
@@ -170,7 +288,7 @@ function avgBestLapFor(p) {
   return acts.reduce((sum, a) => sum + Number(a.best_lap), 0) / acts.length;
 }
 function filteredPilots() {
-  return (DB?.pilots || []).filter(p => TRACK_FILTER === 'all' || pilotActivitiesFor(p).length > 0);
+  return (DB?.pilots || []).filter(p => TRACK_FILTER === 'all' || lapsForPilotGlobal(p).length > 0);
 }
 function filteredActivities() {
   return (DB?.activities || []).filter(activityMatchesTrack);
@@ -353,6 +471,7 @@ function route() {
   if (parts[0] === 'compare') return renderCompare();
   if (parts[0] === 'favoris') return renderFavorites();
   if (parts[0] === 'edition') return renderEdition();
+  if (parts[0] === 'admin') return renderAdminRecords();
   renderHome();
 }
 
@@ -363,6 +482,7 @@ async function init() {
     DB = await res.json();
     loadLocalNames();
     loadFavorites();
+    loadLapOverrides();
     await loadPilotNamesFile();
     applyPilotNames();
     subtitle.textContent = `${DB.summary.activities_count} sessions • ${DB.summary.pilots_count} pilotes • ${DB.summary.laps_count} tours • Filtre: ${trackBadge(TRACK_FILTER)} • MAJ ${new Date(DB.generated_at).toLocaleString('fr-FR')}`;
@@ -482,8 +602,8 @@ function renderSession(id) {
       ${parts.map((p, idx) => `<tr><td>${idx + 1}</td><td><span class="badge">${escapeHtml(TRACK_FILTER === 'all' ? (p.track || tracksForParticipant(p).join(', ')) : TRACK_FILTER)}</span></td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p._metrics.laps_count}</td><td class="best">${fmtTime(p._metrics.best_lap)}</td><td>${fmtTime(p._metrics.avg_lap)}</td><td>${fmtTime(p._metrics.consistency)}</td></tr>`).join('')}
       </tbody></table>`;
     details.innerHTML = parts.map((p, idx) => `<details><summary>#${idx + 1} — ${escapeHtml(p.pilot_name)} — ${p._metrics.laps_count} tours — best ${fmtTime(p._metrics.best_lap)}</summary>
-        <table><thead><tr><th>Tour</th><th>Piste</th><th>Heure</th><th>Temps</th><th>Vitesse</th></tr></thead><tbody>
-        ${p._metrics.laps.map(l => `<tr><td>${l.lap_no}</td><td><span class="badge">${escapeHtml(l.track || inferTrackFromSeconds(l.lap_time))}</span></td><td>${escapeHtml(l.start_time)}</td><td class="best">${fmtTime(l.lap_time)}</td><td>${escapeHtml(l.speed)}</td></tr>`).join('')}
+        <table><thead><tr><th>Tour</th><th>Piste</th><th>Heure</th><th>Temps</th><th>Vitesse</th>${ADMIN_MODE ? '<th>Admin</th>' : ''}</tr></thead><tbody>
+        ${p._metrics.laps.map(l => `<tr><td>${l.lap_no}</td><td><span class="badge">${escapeHtml(l.track || inferTrackFromSeconds(l.lap_time))}</span></td><td>${escapeHtml(l.start_time)}</td><td class="best">${fmtTime(l.lap_time)}</td><td>${escapeHtml(l.speed)}</td>${ADMIN_MODE ? `<td>${adminLapButtons({lap_id:l.lap_id, pilot_name:p.pilot_name, lap_time:l.lap_time})}</td>` : ''}</tr>`).join('')}
         </tbody></table></details>`).join('');
   }
   q.addEventListener('input', draw); draw();
@@ -727,8 +847,8 @@ function renderChronos() {
   }
   function draw() {
     const rows = filteredRows().slice(0, 300);
-    box.innerHTML = `<p class="muted">${filteredRows().length} tour(s) trouvé(s), top ${rows.length} affiché(s).</p><table><thead><tr><th>#</th><th>Temps</th><th>Piste</th><th>Pilote</th><th>Date</th><th>Session</th><th>Tour</th><th>Heure</th></tr></thead><tbody>
-      ${rows.map((r,i) => `<tr><td>${i+1}</td><td class="best">${fmtTime(r.lap_time)}</td><td><span class="badge">${escapeHtml(r.track)}</span></td><td>${pilotNameCell(r.pilot_name, r.pilot_slug, r.transponder)}</td><td>${escapeHtml(r.date_fr)}</td><td><a href="#/session/${r.activity_id}">Voir</a></td><td>${escapeHtml(r.lap_no)}</td><td>${escapeHtml(r.start_time)}</td></tr>`).join('')}
+    box.innerHTML = `<p class="muted">${filteredRows().length} tour(s) trouvé(s), top ${rows.length} affiché(s).</p><table><thead><tr><th>#</th><th>Temps</th><th>Piste</th><th>Pilote</th><th>Date</th><th>Session</th><th>Tour</th><th>Heure</th>${ADMIN_MODE ? '<th>Admin</th>' : ''}</tr></thead><tbody>
+      ${rows.map((r,i) => `<tr><td>${i+1}</td><td class="best">${fmtTime(r.lap_time)}</td><td><span class="badge">${escapeHtml(r.track)}</span></td><td>${pilotNameCell(r.pilot_name, r.pilot_slug, r.transponder)}</td><td>${escapeHtml(r.date_fr)}</td><td><a href="#/session/${r.activity_id}">Voir</a></td><td>${escapeHtml(r.lap_no)}</td><td>${escapeHtml(r.start_time)}</td>${ADMIN_MODE ? `<td>${adminLapButtons(r)}</td>` : ''}</tr>`).join('')}
     </tbody></table>`;
   }
   document.getElementById('copyTopChronos').addEventListener('click', () => {
@@ -737,6 +857,48 @@ function renderChronos() {
     navigator.clipboard.writeText(csv.map(row => row.map(csvEscape).join(';')).join('\n')).then(()=>alert('Top 100 copié en CSV.'));
   });
   q.addEventListener('input', draw); draw();
+}
+
+
+function renderAdminRecords() {
+  setTitle('Admin records');
+  if (!ADMIN_MODE && !requireAdmin()) return renderHome();
+  const allRaw = [];
+  (DB?.activities || []).forEach(a => {
+    (a.participants || []).forEach(p => {
+      const pilotName = p.pilot_name || p.name || `Inconnu #${p.transponder}`;
+      const pilotSlug = p.pilot_slug || slugText(pilotName + '-' + normalizeTransponder(p.transponder));
+      (p.laps || []).forEach(l => {
+        const id = lapIdFromContext(a, p, l);
+        const baseTrack = l.track || inferTrackFromSeconds(l.lap_time);
+        const track = effectiveLapTrack(l, id);
+        const sec = Number(l.lap_time);
+        if (!Number.isFinite(sec)) return;
+        allRaw.push({lap_id:id, activity_id:a.id, date_fr:a.date_fr, pilot_name:pilotName, pilot_slug:pilotSlug, transponder:p.transponder, lap_no:l.lap_no, start_time:l.start_time, lap_time:sec, baseTrack, track, excluded:lapIsExcludedById(id), reason:LAP_OVERRIDES.excluded[id]?.reason || ''});
+      });
+    });
+  });
+  const suspicious = allRaw
+    .filter(r => !r.excluded && r.lap_time >= 30 && r.lap_time < 45 && r.track === 'TT1/8')
+    .sort((a,b)=>a.lap_time-b.lap_time)
+    .slice(0,200);
+  const excluded = allRaw.filter(r => r.excluded).sort((a,b)=>a.lap_time-b.lap_time).slice(0,200);
+  const forced = allRaw.filter(r => LAP_OVERRIDES.forced_track[r.lap_id]).sort((a,b)=>a.lap_time-b.lap_time).slice(0,200);
+  app.innerHTML = `<div class="card">
+    <h2>Mode admin — corrections records/podiums ${adminBadge()}</h2>
+    <p class="muted">Ici tu peux exclure un tour des records/podiums ou forcer sa piste. Les données SpeedHive restent intactes : les corrections sont stockées localement dans ce navigateur.</p>
+    <div class="toolbar wrap"><button class="button" onclick="exportLapOverrides()">Exporter lap_overrides.json</button><button class="button" onclick="importLapOverridesFromText()">Importer/coller JSON</button><button class="button danger" onclick="exitAdmin()">Quitter admin</button></div>
+    <p class="muted"><strong>Important :</strong> pour rendre ces corrections permanentes sur ton poste, exporte le JSON et garde-le avec ton projet. Sur GitHub Pages statique, les visiteurs ne verront pas tes corrections locales tant qu’on ne les intègre pas dans le fichier généré.</p>
+  </div>
+  <div class="card"><h2>Suspects TT1/8 proches de 30 s</h2><p class="muted">Tours ≥ 30 s et &lt; 45 s actuellement classés TT1/8. Ce sont souvent des TT1/10 lents.</p>${renderAdminLapTable(suspicious)}</div>
+  <div class="card"><h2>Tours forcés</h2>${forced.length ? renderAdminLapTable(forced) : '<p class="muted">Aucun tour forcé.</p>'}</div>
+  <div class="card"><h2>Tours exclus</h2>${excluded.length ? renderAdminLapTable(excluded, true) : '<p class="muted">Aucun tour exclu.</p>'}</div>`;
+}
+function renderAdminLapTable(rows, showReason=false) {
+  if (!rows.length) return '<p class="muted">Aucun tour.</p>';
+  return `<table><thead><tr><th>Temps</th><th>Piste</th><th>Pilote</th><th>Date</th><th>Tour</th>${showReason ? '<th>Raison</th>' : ''}<th>Actions</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td class="best">${fmtTime(r.lap_time)}</td><td><span class="badge">${escapeHtml(r.track)}</span>${r.baseTrack !== r.track ? `<br><span class="muted small">base ${escapeHtml(r.baseTrack)}</span>` : ''}</td><td>${pilotNameCell(r.pilot_name, r.pilot_slug, r.transponder)}</td><td><a href="#/session/${r.activity_id}">${escapeHtml(r.date_fr)}</a></td><td>${escapeHtml(r.lap_no)}</td>${showReason ? `<td>${escapeHtml(r.reason)}</td>` : ''}<td>${adminLapButtons(r)}</td></tr>`).join('')}
+  </tbody></table>`;
 }
 
 function renderCompare() {
