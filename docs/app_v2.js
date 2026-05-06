@@ -48,7 +48,10 @@ function pilotActivitiesFor(p) {
 }
 function pilotBestFor(p) {
   if (TRACK_FILTER === 'all') return p.best_lap;
-  return p.tracks?.[TRACK_FILTER]?.best_lap ?? Math.min(...pilotActivitiesFor(p).map(a => Number(a.best_lap)).filter(Number.isFinite), Infinity) || null;
+  const trackBest = p.tracks?.[TRACK_FILTER]?.best_lap;
+  if (trackBest !== undefined && trackBest !== null) return trackBest;
+  const vals = pilotActivitiesFor(p).map(a => Number(a.best_lap)).filter(Number.isFinite);
+  return vals.length ? Math.min(...vals) : null;
 }
 function pilotTotalFor(p) {
   if (TRACK_FILTER === 'all') return p.total_laps || 0;
@@ -57,6 +60,11 @@ function pilotTotalFor(p) {
 function pilotSessionsFor(p) {
   if (TRACK_FILTER === 'all') return p.activities_count || 0;
   return p.tracks?.[TRACK_FILTER]?.activities_count || pilotActivitiesFor(p).length;
+}
+function avgBestLapFor(p) {
+  const acts = pilotActivitiesFor(p).filter(a => Number.isFinite(Number(a.best_lap)));
+  if (!acts.length) return null;
+  return acts.reduce((sum, a) => sum + Number(a.best_lap), 0) / acts.length;
 }
 function filteredPilots() {
   return (DB?.pilots || []).filter(p => TRACK_FILTER === 'all' || pilotActivitiesFor(p).length > 0);
@@ -225,7 +233,7 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.5` : 'MRCP Dashboard V2.5'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.7` : 'MRCP Dashboard V2.7'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -379,7 +387,7 @@ function renderPilot(slug) {
         <div class="card"><div class="muted">Sessions</div><div class="stat">${pilotSessionsFor(p)}</div></div>
         <div class="card"><div class="muted">Tours</div><div class="stat">${pilotTotalFor(p)}</div></div>
         <div class="card"><div class="muted">Meilleur</div><div class="stat">${fmtTime(pilotBestFor(p))}</div></div>
-        <div class="card"><div class="muted">Moy. meilleurs</div><div class="stat">${fmtTime(p.avg_best_lap)}</div></div>
+        <div class="card"><div class="muted">Moy. meilleurs</div><div class="stat">${fmtTime(avgBestLapFor(p))}</div></div>
       </div>
       <h3>Progression des meilleurs tours</h3>
       <canvas id="pilotChart" height="120"></canvas>
@@ -508,15 +516,15 @@ function renderCompare() {
 }
 
 function comparePilotCard(p) {
-  const regs = p.activities.map(a => a.consistency).filter(x => Number.isFinite(Number(x)) && Number(x) > 0);
+  const regs = pilotActivitiesFor(p).map(a => a.consistency).filter(x => Number.isFinite(Number(x)) && Number(x) > 0);
   const avgReg = regs.length ? regs.reduce((s,x)=>s+Number(x),0)/regs.length : null;
   return `<div class="card"><h3>${pilotNameCell(p.name, p.slug, p.transponder)}</h3>
     <p><span class="badge">${escapeHtml(p.transponder)}</span></p>
     <table><tbody>
-      <tr><th>Meilleur tour</th><td class="best">${fmtTime(p.best_lap)}</td></tr>
+      <tr><th>Meilleur tour</th><td class="best">${fmtTime(pilotBestFor(p))}</td></tr>
       <tr><th>Sessions</th><td>${pilotSessionsFor(p)}</td></tr>
       <tr><th>Tours</th><td>${pilotTotalFor(p)}</td></tr>
-      <tr><th>Moy. meilleurs</th><td>${fmtTime(p.avg_best_lap)}</td></tr>
+      <tr><th>Moy. meilleurs</th><td>${fmtTime(avgBestLapFor(p))}</td></tr>
       <tr><th>Régularité moyenne</th><td>${fmtTime(avgReg)}</td></tr>
     </tbody></table></div>`;
 }

@@ -26,9 +26,6 @@ OUT_FILE = OUT_DIR / "data_v2.json"
 
 LAP_MIN = 15.0
 LAP_MAX = 120.0
-TRACK_SPLIT_SECONDS = 30.0
-TRACK_SHORT = "TT1/10"
-TRACK_LONG = "TT1/8"
 CLUB_NAME = "Mini Racing Club Palois"
 
 
@@ -53,10 +50,6 @@ def parse_laptime(value: str | None) -> float | None:
         return float(value)
     except Exception:
         return None
-
-
-def track_for_lap(lap_seconds: float) -> str:
-    return TRACK_SHORT if lap_seconds < TRACK_SPLIT_SECONDS else TRACK_LONG
 
 
 def parse_date(value: str | None) -> str | None:
@@ -169,7 +162,6 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[s
                 "start_time": (row.get("Start time") or "").strip(),
                 "lap_no": int(float(row.get("Lap") or 0)),
                 "lap_time": round(lap_time, 3),
-                "track": track_for_lap(lap_time),
                 "speed": (row.get("Speed") or "").replace('"', '').strip(),
             })
 
@@ -182,16 +174,10 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[s
     for t, laps in by_pilot.items():
         times = [x["lap_time"] for x in laps]
         best = min(times)
-        track_counts = defaultdict(int)
-        for x in laps:
-            track_counts[x.get("track") or track_for_lap(x["lap_time"])] += 1
-        main_track = max(track_counts.items(), key=lambda kv: (kv[1], kv[0]))[0]
         participants.append({
             "transponder": t,
             "pilot_name": laps[0]["pilot_name"],
             "pilot_slug": slugify(laps[0]["pilot_name"]),
-            "track": main_track,
-            "tracks": sorted(track_counts.keys()),
             "laps_count": len(times),
             "best_lap": round(best, 3),
             "avg_lap": round(sum(times) / len(times), 3),
@@ -204,19 +190,11 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[s
         p["rank"] = i
 
     best_participant = participants[0] if participants else None
-    activity_track_counts = defaultdict(int)
-    for e in entries:
-        activity_track_counts[e.get("track") or track_for_lap(e["lap_time"])] += 1
-    activity_tracks = sorted(activity_track_counts.keys())
-    activity_track = activity_tracks[0] if len(activity_tracks) == 1 else "Mixte"
     return {
         "id": activity_id,
         "date": date,
         "date_fr": fmt_date_fr(date),
         "source_file": path.name,
-        "track": activity_track,
-        "tracks": activity_tracks,
-        "track_counts": dict(activity_track_counts),
         "pilot_count": len(participants),
         "laps_count": len(entries),
         "best_lap": best_participant["best_lap"] if best_participant else None,
@@ -248,7 +226,6 @@ def build() -> dict[str, Any]:
                 "activities": [],
                 "total_laps": 0,
                 "best_lap": None,
-                "tracks": {},
             })
             p["activities"].append({
                 "activity_id": activity["id"],
@@ -259,15 +236,8 @@ def build() -> dict[str, Any]:
                 "best_lap": part["best_lap"],
                 "avg_lap": part["avg_lap"],
                 "consistency": part["consistency"],
-                "track": part.get("track"),
             })
             p["total_laps"] += part["laps_count"]
-            tr = part.get("track") or (TRACK_SHORT if part["best_lap"] < TRACK_SPLIT_SECONDS else TRACK_LONG)
-            ts = p["tracks"].setdefault(tr, {"activities_count": 0, "total_laps": 0, "best_lap": None})
-            ts["activities_count"] += 1
-            ts["total_laps"] += part["laps_count"]
-            if ts["best_lap"] is None or part["best_lap"] < ts["best_lap"]:
-                ts["best_lap"] = part["best_lap"]
             if p["best_lap"] is None or part["best_lap"] < p["best_lap"]:
                 p["best_lap"] = part["best_lap"]
 
@@ -295,15 +265,11 @@ def build() -> dict[str, Any]:
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "club_name": CLUB_NAME,
         "source": "SpeedHive Practice 4308",
-        "filters": {"lap_min": LAP_MIN, "lap_max": LAP_MAX, "track_split_seconds": TRACK_SPLIT_SECONDS, "tracks": [TRACK_LONG, TRACK_SHORT]},
+        "filters": {"lap_min": LAP_MIN, "lap_max": LAP_MAX},
         "summary": {
             "activities_count": len(activities),
             "pilots_count": len(pilots_list),
             "laps_count": sum(a["laps_count"] for a in activities),
-            "tracks": {
-                TRACK_LONG: {"laps_count": sum(a.get("track_counts", {}).get(TRACK_LONG, 0) for a in activities)},
-                TRACK_SHORT: {"laps_count": sum(a.get("track_counts", {}).get(TRACK_SHORT, 0) for a in activities)},
-            },
         },
         "records": records,
         "activities": activities,
