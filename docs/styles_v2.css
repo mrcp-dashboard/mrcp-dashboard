@@ -71,3 +71,9 @@ code { background:#0b1224; border:1px solid var(--line); padding:2px 6px; border
 .podium-inline { margin:16px 0; }
 .podium-inline .podium { max-width:900px; }
 @media (max-width: 850px) { .podium-grid, .podium { grid-template-columns:1fr; } .place-1 { transform:none; } }
+
+.admin-badge { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.45); color: #fecaca; }
+.admin-actions { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.button.danger { border-color: rgba(239,68,68,.5); color:#fecaca; }
+.button.danger:hover { background: rgba(239,68,68,.15); }
+.small { font-size: .82rem; }
