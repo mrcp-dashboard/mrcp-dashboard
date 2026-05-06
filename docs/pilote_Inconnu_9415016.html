@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inconnu #9415016 — MRCP Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0d0f14; --surface:#161a23; --surface-2:#1f2532; --line:#2a3142;
+  --text:#e8ecf3; --muted:#8a93a6; --accent:#ff5722; --accent-2:#ffc107;
+  --good:#4caf50; --warn:#ff9800; --bad:#f44336;
+  --shadow:0 4px 20px rgba(0,0,0,.4);
+  --radius:10px;
+}
+[data-theme="light"]{
+  --bg:#f5f6f8; --surface:#ffffff; --surface-2:#eef0f4; --line:#dde0e7;
+  --text:#1a1d23; --muted:#5c6573; --accent:#e64a19; --accent-2:#f57c00;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);line-height:1.4;min-height:100vh}
+.mono{font-family:'JetBrains Mono',monospace}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Header */
+.topbar{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff}
+.brand-name{font-size:18px;font-weight:700;letter-spacing:.5px}
+.brand-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.theme-btn{background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:18px;line-height:1;transition:all .2s}
+.theme-btn:hover{border-color:var(--accent)}
+.share-btn{background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;transition:all .2s}
+.share-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Tabs nav */
+.tabs{background:var(--surface);border-bottom:1px solid var(--line);padding:0 20px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{background:transparent;border:none;color:var(--muted);padding:14px 18px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:1px;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* Layout */
+.container{max-width:1400px;margin:0 auto;padding:24px 20px}
+.tab-content{display:none;animation:fadeIn .3s ease-out}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:20px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 16px;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.card h3{margin:0 0 12px;font-size:15px;font-weight:600;color:var(--text)}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+
+/* Stat tile */
+.stat{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:16px;position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent)}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* Table */
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th,.table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.table th{background:var(--surface-2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.table tbody tr{transition:background .15s}
+.table tbody tr:hover{background:var(--surface-2)}
+.table .num{font-family:'JetBrains Mono',monospace;text-align:right}
+.rank{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;font-weight:700;font-size:12px;background:var(--surface-2);color:var(--muted)}
+.rank.r1{background:linear-gradient(135deg,#ffd700,#ffaa00);color:#1a1d23}
+.rank.r2{background:linear-gradient(135deg,#c0c4cc,#9ea2ab);color:#1a1d23}
+.rank.r3{background:linear-gradient(135deg,#cd7f32,#a8651f);color:#fff}
+
+/* Session card */
+.session-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.session-card:hover{border-color:var(--accent);transform:translateY(-2px);text-decoration:none}
+.session-card.disabled{cursor:not-allowed;opacity:.55}
+.session-card.disabled:hover{border-color:var(--line);transform:none}
+.session-date{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--accent)}
+.session-meta{font-size:13px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.session-best{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--accent-2)}
+
+/* Pilot card */
+.pilot-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s;display:block}
+.pilot-card:hover{border-color:var(--accent);transform:translateY(-2px);text-decoration:none}
+.pilot-name{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text)}
+.pilot-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;font-size:12px}
+.pilot-stat-label{color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-size:10px}
+.pilot-stat-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent-2)}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.footer{text-align:center;padding:30px 20px;color:var(--muted);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+
+/* Charts */
+.chart-wrap{position:relative;height:340px}
+
+/* Toast for share */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:12px 20px;border-radius:8px;box-shadow:var(--shadow);transform:translateY(100px);opacity:0;transition:all .3s;font-weight:600;z-index:100}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Responsive */
+@media(max-width:768px){
+  .topbar{padding:10px 14px}
+  .container{padding:16px 12px}
+  .brand-name{font-size:15px}
+  .brand-sub{display:none}
+  .tab-btn{padding:12px 12px;font-size:12px}
+  .stat-value{font-size:20px}
+  .table{font-size:12px}
+  .table th,.table td{padding:8px 6px}
+  .session-card{flex-direction:column;align-items:flex-start}
+  .chart-wrap{height:260px}
+}
+</style>
+</head>
+<body data-theme="dark">
+
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">M</div>
+    <div>
+      <div class="brand-name">MRCP Dashboard</div>
+      <div class="brand-sub">Mini Racing Club Palois</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a href="index.html" class="share-btn">← Accueil</a>
+    <button class="theme-btn" id="themeBtn" title="Theme">☀</button>
+  </div>
+</div>
+
+
+<div class="container">
+  <div class="card" style="background:linear-gradient(135deg, var(--surface), var(--surface-2))">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px">Fiche pilote</div>
+        <h1 style="margin:4px 0 0;font-size:32px;font-weight:700;letter-spacing:-.5px">Inconnu #9415016</h1>
+        <div style="color:var(--muted);font-size:13px;margin-top:4px">Transpondeur <span class="mono">9415016</span></div>
+      </div>
+      <button class="share-btn" id="shareBtn">🔗 Partager</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Statistiques globales</h2>
+    <div class="grid grid-4" id="globalStats"></div>
+  </div>
+
+  <div class="card">
+    <h2>📈 Progression — Meilleur tour par session</h2>
+    <div class="chart-wrap"><canvas id="progressChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Comparaison avec la moyenne du club</h2>
+    <div class="chart-wrap"><canvas id="compareChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>🗓 Historique des sessions</h2>
+    <div id="sessionsTable"></div>
+  </div>
+</div>
+
+<div class="footer">MRCP Dashboard · Inconnu #9415016 · Genere le 06/05/2026 a 20:34</div>
+<div class="toast" id="toast">Lien copie !</div>
+
+<script>
+const PILOT = {"id": "9415016", "name": "Inconnu #9415016", "slug": "Inconnu_9415016", "sessions": [{"date": "18/04/2026", "best": 32.52, "mean": 35.379, "std": 3.073, "count": 158}, {"date": "19/04/2026", "best": 32.643, "mean": 34.73, "std": 2.648, "count": 102}, {"date": "29/04/2026", "best": 33.52, "mean": 36.04, "std": 2.387, "count": 40}, {"date": "01/05/2026", "best": 32.024, "mean": 34.008, "std": 2.628, "count": 59}], "best": 32.024, "mean_best": 32.677, "mean_avg": 35.039, "total_laps": 359, "sessions_count": 4};
+const PILOT_LAPS = {"18/04/2026": [35.198, 36.294, 33.779, 34.204, 34.602, 37.178, 40.122, 36.917, 35.172, 37.409, 33.817, 34.999, 34.884, 37.037, 33.182, 32.855, 33.779, 34.26, 33.722, 33.343, 44.394, 38.93, 33.364, 32.865, 32.895, 33.411, 33.298, 33.405, 33.339, 35.156, 33.819, 33.406, 33.823, 33.263, 33.516, 33.731, 33.221, 32.733, 37.059, 37.156, 36.716, 33.125, 32.851, 35.238, 34.531, 33.068, 38.854, 45.992, 33.337, 34.458, 34.161, 32.846, 48.935, 34.128, 41.07, 33.02, 34.863, 40.07, 47.348, 43.269, 34.927, 40.294, 34.514, 33.641, 33.338, 34.756, 34.337, 36.604, 34.151, 37.044, 35.49, 34.49, 36.692, 35.755, 33.32, 33.51, 34.228, 33.264, 34.391, 34.016, 33.438, 34.321, 33.572, 33.362, 41.049, 39.017, 33.833, 42.81, 34.087, 41.47, 35.424, 33.607, 32.571, 33.628, 34.406, 33.434, 37.072, 33.765, 33.373, 33.137, 37.943, 33.764, 33.07, 32.789, 38.325, 38.653, 33.661, 33.796, 34.58, 34.782, 35.462, 33.357, 34.526, 37.403, 34.091, 33.058, 32.992, 35.798, 35.692, 33.972, 33.424, 32.982, 33.891, 37.268, 37.068, 33.691, 34.294, 34.278, 33.072, 40.724, 33.098, 33.329, 37.26, 46.363, 33.791, 33.133, 34.273, 34.045, 34.499, 35.524, 32.52, 34.428, 33.651, 34.565, 36.69, 32.918, 35.514, 34.093, 34.984, 42.711, 36.305, 42.364, 34.334, 35.625, 34.905, 33.181, 34.067, 33.782], "19/04/2026": [36.992, 46.644, 40.852, 37.275, 37.195, 37.099, 37.492, 35.363, 36.579, 35.828, 34.688, 36.348, 34.336, 33.998, 34.036, 34.133, 33.807, 34.296, 33.828, 35.502, 33.944, 35.065, 43.38, 33.185, 37.049, 32.643, 37.021, 33.414, 33.23, 33.454, 33.311, 33.311, 33.367, 33.76, 34.137, 34.813, 34.503, 34.289, 33.969, 33.441, 34.161, 33.211, 34.604, 32.895, 33.652, 33.657, 45.215, 33.64, 33.081, 33.205, 33.649, 33.443, 33.311, 35.599, 33.611, 33.887, 33.973, 33.387, 34.13, 33.827, 33.428, 33.104, 33.726, 34.904, 33.128, 34.412, 44.5, 34.035, 33.467, 34.255, 33.345, 33.528, 33.423, 33.324, 33.615, 33.164, 33.503, 33.507, 33.378, 33.174, 43.652, 33.134, 33.08, 33.594, 33.188, 33.425, 37.299, 33.726, 32.981, 33.581, 33.175, 33.156, 34.861, 33.079, 34.872, 37.422, 34.033, 33.516, 33.574, 32.823, 33.568, 34.096], "29/04/2026": [40.284, 36.4, 35.687, 36.103, 36.53, 34.193, 34.836, 35.839, 38.994, 35.636, 35.494, 38.813, 35.568, 35.056, 38.494, 37.933, 39.22, 35.509, 34.403, 33.665, 34.525, 34.303, 34.074, 33.52, 39.292, 35.117, 33.938, 34.697, 34.477, 34.969, 34.31, 35.105, 34.249, 35.492, 46.046, 34.701, 38.734, 35.2, 36.185, 34.017], "01/05/2026": [37.423, 34.107, 34.278, 35.858, 34.426, 34.206, 34.209, 34.332, 35.35, 33.887, 33.856, 33.465, 35.025, 33.334, 32.977, 33.374, 32.933, 32.995, 33.359, 32.943, 34.301, 33.389, 33.802, 33.157, 32.024, 32.139, 32.483, 33.44, 33.038, 32.873, 32.817, 33.539, 33.203, 33.555, 32.9, 34.112, 34.829, 32.772, 33.264, 33.077, 34.288, 33.095, 34.803, 33.276, 33.177, 32.978, 43.398, 32.389, 33.188, 33.171, 32.647, 32.406, 35.174, 34.009, 33.236, 32.391, 49.947, 32.32, 33.551]};
+const CLUB_AVG = 35.658;
+
+function fmtLap(t){
+  if(t==null) return '-';
+  if(t>=60){var m=Math.floor(t/60);return m+':'+(t-60*m).toFixed(3).padStart(6,'0');}
+  return t.toFixed(3);
+}
+function escapeHtml(s){return (''+s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+
+// Stats
+(function(){
+  var el = document.getElementById('globalStats');
+  var h = '';
+  h += '<div class="stat"><div class="stat-label">Meilleur tour</div><div class="stat-value">'+fmtLap(PILOT.best)+'</div></div>';
+  h += '<div class="stat"><div class="stat-label">Moy. meilleurs</div><div class="stat-value">'+fmtLap(PILOT.mean_best)+'</div></div>';
+  h += '<div class="stat"><div class="stat-label">Sessions</div><div class="stat-value">'+PILOT.sessions_count+'</div></div>';
+  h += '<div class="stat"><div class="stat-label">Tours total</div><div class="stat-value">'+PILOT.total_laps+'</div></div>';
+  el.innerHTML = h;
+})();
+
+// Progression chart
+var charts = {};
+function drawCharts(){
+  var sessions = (PILOT.sessions||[]).slice().sort(function(a,b){
+    var pa=a.date.split('/'),pb=b.date.split('/');
+    return new Date(pa[2],pa[1]-1,pa[0]) - new Date(pb[2],pb[1]-1,pb[0]);
+  });
+  var labels = sessions.map(s=>s.date);
+  var bests = sessions.map(s=>s.best);
+  var means = sessions.map(s=>s.mean);
+
+  var isDark = document.body.getAttribute('data-theme') !== 'light';
+  var grid = isDark ? '#2a3142' : '#dde0e7';
+  var text = isDark ? '#e8ecf3' : '#1a1d23';
+
+  if(charts.progress) charts.progress.destroy();
+  var c1 = document.getElementById('progressChart');
+  if(c1){
+    charts.progress = new Chart(c1, {
+      type:'line',
+      data:{labels:labels, datasets:[
+        {label:'Meilleur tour', data:bests, borderColor:'#ff5722', backgroundColor:'#ff572233', tension:.25, pointRadius:5, fill:true},
+        {label:'Moyenne', data:means, borderColor:'#ffc107', backgroundColor:'transparent', tension:.25, pointRadius:4, borderDash:[5,5]}
+      ]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:text,font:{family:'Rajdhani'}}}},
+        scales:{
+          x:{ticks:{color:text},grid:{color:grid}},
+          y:{ticks:{color:text,callback:v=>v.toFixed(2)+'s'},grid:{color:grid}}
+        }
+      }
+    });
+  }
+
+  // Comparaison club
+  if(charts.compare) charts.compare.destroy();
+  var c2 = document.getElementById('compareChart');
+  if(c2 && CLUB_AVG!=null){
+    var clubLine = labels.map(()=>CLUB_AVG);
+    charts.compare = new Chart(c2, {
+      type:'line',
+      data:{labels:labels, datasets:[
+        {label:PILOT.name+' (best)', data:bests, borderColor:'#ff5722', backgroundColor:'#ff572233', tension:.25, pointRadius:5, fill:true},
+        {label:'Moyenne du club', data:clubLine, borderColor:'#4caf50', borderDash:[8,4], pointRadius:0}
+      ]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:text,font:{family:'Rajdhani'}}}},
+        scales:{
+          x:{ticks:{color:text},grid:{color:grid}},
+          y:{ticks:{color:text,callback:v=>v.toFixed(2)+'s'},grid:{color:grid}}
+        }
+      }
+    });
+  } else if(c2){
+    c2.parentElement.innerHTML = '<div class="empty">Moyenne du club indisponible</div>';
+  }
+}
+drawCharts();
+window._refreshCharts = drawCharts;
+
+// Sessions table
+(function(){
+  var el = document.getElementById('sessionsTable');
+  var sessions = (PILOT.sessions||[]).slice().sort(function(a,b){
+    var pa=a.date.split('/'),pb=b.date.split('/');
+    return new Date(pb[2],pb[1]-1,pb[0]) - new Date(pa[2],pa[1]-1,pa[0]);
+  });
+  if(!sessions.length){
+    el.innerHTML = '<div class="empty">Aucune session</div>';
+    return;
+  }
+  var h = '<table class="table"><thead><tr><th>Date</th><th class="num">Best</th><th class="num">Moyenne</th><th class="num">Std</th><th class="num">Tours</th></tr></thead><tbody>';
+  sessions.forEach(function(s){
+    h += '<tr>';
+    h += '<td>'+escapeHtml(s.date)+'</td>';
+    h += '<td class="num">'+fmtLap(s.best)+'</td>';
+    h += '<td class="num">'+fmtLap(s.mean)+'</td>';
+    h += '<td class="num">'+(s.std!=null?s.std.toFixed(3):'-')+'</td>';
+    h += '<td class="num">'+(s.count||0)+'</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+})();
+
+// Share
+document.getElementById('shareBtn').onclick = function(){
+  var url = window.location.href;
+  if(navigator.share){
+    navigator.share({title:'MRCP - '+PILOT.name, url:url}).catch(()=>{});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(function(){
+      var t = document.getElementById('toast'); t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 2200);
+    });
+  }
+};
+
+
+(function(){
+  var saved = localStorage.getItem('mrcp-theme') || 'dark';
+  document.body.setAttribute('data-theme', saved);
+  var btn = document.getElementById('themeBtn');
+  if(btn){
+    btn.textContent = saved === 'dark' ? '☀' : '☾';
+    btn.onclick = function(){
+      var cur = document.body.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      localStorage.setItem('mrcp-theme', next);
+      btn.textContent = next === 'dark' ? '☀' : '☾';
+      // Recolore les charts
+      if(window._refreshCharts) window._refreshCharts();
+    };
+  }
+})();
+
+</script>
+</body>
+</html>
