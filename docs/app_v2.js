@@ -13,30 +13,50 @@ function trackBadge(track) {
   if (!track || track === 'all') return 'Toutes pistes';
   return track;
 }
+function inferTrackFromSeconds(seconds) {
+  const v = Number(seconds);
+  if (!Number.isFinite(v)) return '';
+  return v < 30 ? 'TT1/10' : 'TT1/8';
+}
+function tracksForActivity(a) {
+  if (!a) return [];
+  if (Array.isArray(a.tracks) && a.tracks.length) return a.tracks;
+  if (a.track) return [a.track];
+  if (a.track_counts) return Object.keys(a.track_counts).filter(k => a.track_counts[k] > 0);
+  const inferred = inferTrackFromSeconds(a.best_lap);
+  return inferred ? [inferred] : [];
+}
+function tracksForParticipant(p) {
+  if (!p) return [];
+  if (Array.isArray(p.tracks) && p.tracks.length) return p.tracks;
+  if (p.track) return [p.track];
+  const inferred = inferTrackFromSeconds(p.best_lap);
+  return inferred ? [inferred] : [];
+}
 function activityMatchesTrack(a) {
   if (TRACK_FILTER === 'all') return true;
-  return Array.isArray(a.tracks) ? a.tracks.includes(TRACK_FILTER) : a.track === TRACK_FILTER;
+  return tracksForActivity(a).includes(TRACK_FILTER);
 }
 function participantMatchesTrack(p) {
   if (TRACK_FILTER === 'all') return true;
-  return Array.isArray(p.tracks) ? p.tracks.includes(TRACK_FILTER) : p.track === TRACK_FILTER;
+  return tracksForParticipant(p).includes(TRACK_FILTER);
 }
 function pilotActivitiesFor(p) {
   const acts = p.activities || [];
   if (TRACK_FILTER === 'all') return acts;
-  return acts.filter(a => a.track === TRACK_FILTER);
+  return acts.filter(a => tracksForActivity(a).includes(TRACK_FILTER));
 }
 function pilotBestFor(p) {
   if (TRACK_FILTER === 'all') return p.best_lap;
-  return p.tracks?.[TRACK_FILTER]?.best_lap ?? null;
+  return p.tracks?.[TRACK_FILTER]?.best_lap ?? Math.min(...pilotActivitiesFor(p).map(a => Number(a.best_lap)).filter(Number.isFinite), Infinity) || null;
 }
 function pilotTotalFor(p) {
   if (TRACK_FILTER === 'all') return p.total_laps || 0;
-  return p.tracks?.[TRACK_FILTER]?.total_laps || 0;
+  return p.tracks?.[TRACK_FILTER]?.total_laps || pilotActivitiesFor(p).reduce((sum, a) => sum + (a.laps_count || 0), 0);
 }
 function pilotSessionsFor(p) {
   if (TRACK_FILTER === 'all') return p.activities_count || 0;
-  return p.tracks?.[TRACK_FILTER]?.activities_count || 0;
+  return p.tracks?.[TRACK_FILTER]?.activities_count || pilotActivitiesFor(p).length;
 }
 function filteredPilots() {
   return (DB?.pilots || []).filter(p => TRACK_FILTER === 'all' || pilotActivitiesFor(p).length > 0);
@@ -300,7 +320,7 @@ function renderSessions() {
     const term = norm(q.value);
     const filtered = rows.filter(s => norm(s.date_fr).includes(term) || norm(s.best_pilot).includes(term));
     table.innerHTML = `<p class="muted">${filtered.length} session(s)</p><table><thead><tr><th>Date</th><th>Piste</th><th>Sortie</th><th>Pilotes</th><th>Tours</th><th>Meilleur tour</th><th>Meilleur pilote</th></tr></thead><tbody>
-      ${filtered.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><span class="badge">${escapeHtml(s.track || (s.tracks||[]).join(', '))}</span></td><td><a href="#/session/${s.id}">${activityLabel(s)}</a></td><td>${s.pilot_count}</td><td>${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || 0)}</td><td class="best">${fmtTime(s.best_lap)}</td><td>${escapeHtml(s.best_pilot)}</td></tr>`).join('')}
+      ${filtered.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><span class="badge">${escapeHtml(s.track || tracksForActivity(s).join(', '))}</span></td><td><a href="#/session/${s.id}">${activityLabel(s)}</a></td><td>${s.pilot_count}</td><td>${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || (activityMatchesTrack(s) ? s.laps_count : 0))}</td><td class="best">${fmtTime(s.best_lap)}</td><td>${escapeHtml(s.best_pilot)}</td></tr>`).join('')}
       </tbody></table>`;
   }
   q.addEventListener('input', draw); draw();
@@ -315,7 +335,7 @@ function renderSession(id) {
       <p><a href="#/sessions">← Retour sessions</a></p>
       <h2>Sortie du ${escapeHtml(s.date_fr || 'sans date')}</h2>
       ${trackControls()}
-      <p class="muted">${escapeHtml(s.date_fr)} • ${escapeHtml(s.track || '')} • ${s.pilot_count} pilotes • ${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || 0)} tours</p>
+      <p class="muted">${escapeHtml(s.date_fr)} • ${escapeHtml(s.track || tracksForActivity(s).join(', '))} • ${s.pilot_count} pilotes • ${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || (activityMatchesTrack(s) ? s.laps_count : 0))} tours</p>
       <div class="toolbar"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /></div>
       <div id="sessionTable"></div>
     </div>
@@ -327,7 +347,7 @@ function renderSession(id) {
     const term = norm(q.value);
     const parts = s.participants.filter(participantMatchesTrack).filter(p => norm(p.pilot_name).includes(term) || String(p.transponder).includes(term));
     table.innerHTML = `<table><thead><tr><th>Rang</th><th>Piste</th><th>Pilote</th><th>Transpondeur</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
-      ${parts.map(p => `<tr><td>${p.rank}</td><td><span class="badge">${escapeHtml(p.track || '')}</span></td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.laps_count}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${fmtTime(p.avg_lap)}</td><td>${fmtTime(p.consistency)}</td></tr>`).join('')}
+      ${parts.map(p => `<tr><td>${p.rank}</td><td><span class="badge">${escapeHtml(p.track || tracksForParticipant(p).join(', '))}</span></td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.laps_count}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${fmtTime(p.avg_lap)}</td><td>${fmtTime(p.consistency)}</td></tr>`).join('')}
       </tbody></table>`;
     details.innerHTML = parts.map(p => `<details><summary>${escapeHtml(p.pilot_name)} — ${p.laps_count} tours — best ${fmtTime(p.best_lap)}</summary>
         <table><thead><tr><th>Tour</th><th>Heure</th><th>Temps</th><th>Vitesse</th></tr></thead><tbody>
