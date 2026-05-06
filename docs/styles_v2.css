@@ -43,3 +43,8 @@ canvas { width:100%; max-width:100%; background:#0b1224; border:1px solid var(--
 .edit-btn:hover { border-color:var(--accent); }
 .print-only { display:none; }
 @media print { .topbar, .toolbar, nav { display:none !important; } body { background:white; color:black; } .card { border:1px solid #ddd; box-shadow:none; background:white; } a { color:black; } .print-only { display:block; } }
+
+.wrap { flex-wrap: wrap; }
+.danger { border-color:#7f1d1d !important; background:rgba(127,29,29,.35) !important; }
+.help { margin: 12px 0 18px; }
+code { background:#0b1224; border:1px solid var(--line); padding:2px 6px; border-radius:6px; }

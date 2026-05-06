@@ -79,6 +79,65 @@ function unknownPilots() {
   return DB.pilots.filter(p => /^Inconnu #/i.test(p.name));
 }
 
+function importPilotNamesFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+      const cleaned = {};
+      Object.entries(imported).forEach(([k, v]) => {
+        const t = normalizeTransponder(k);
+        const name = String(v || '').trim();
+        if (t && name) cleaned[t] = name;
+      });
+      LOCAL_NAMES = {...LOCAL_NAMES, ...cleaned};
+      saveLocalNames();
+      applyPilotNames();
+      alert(Object.keys(cleaned).length + ' nom(s) importé(s). Pense à exporter speedhive_pilots.json pour le rendre permanent.');
+      route();
+    } catch (e) {
+      alert('Import impossible : fichier JSON invalide.');
+    }
+  };
+  reader.readAsText(file);
+}
+function copyPilotNamesToClipboard() {
+  const merged = {...PILOT_NAMES, ...LOCAL_NAMES};
+  const text = JSON.stringify(merged, null, 2);
+  navigator.clipboard.writeText(text).then(() => alert('JSON copié dans le presse-papier.'));
+}
+function resetLocalPilotNames() {
+  if (!confirm('Effacer les modifications locales de ce navigateur ?')) return;
+  LOCAL_NAMES = {};
+  saveLocalNames();
+  applyPilotNames();
+  route();
+}
+function bulkEditPilotNames() {
+  const merged = {...PILOT_NAMES, ...LOCAL_NAMES};
+  const current = JSON.stringify(merged, null, 2);
+  const next = prompt('Édition avancée JSON transpondeur → nom. Colle un JSON valide.', current);
+  if (next === null) return;
+  try {
+    const parsed = JSON.parse(next);
+    const cleaned = {};
+    Object.entries(parsed).forEach(([k, v]) => {
+      const t = normalizeTransponder(k);
+      const name = String(v || '').trim();
+      if (t && name) cleaned[t] = name;
+    });
+    LOCAL_NAMES = cleaned;
+    saveLocalNames();
+    applyPilotNames();
+    route();
+  } catch (e) {
+    alert('JSON invalide, aucune modification appliquée.');
+  }
+}
+
+
 
 const app = document.getElementById('app');
 const subtitle = document.getElementById('subtitle');
@@ -96,7 +155,7 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.3` : 'MRCP Dashboard V2.3'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.4` : 'MRCP Dashboard V2.4'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -403,17 +462,43 @@ function renderEdition() {
   setTitle('Édition pilotes');
   const unknown = unknownPilots().sort((a,b)=>String(a.transponder).localeCompare(String(b.transponder)));
   const all = [...DB.pilots].sort((a,b)=>a.name.localeCompare(b.name, 'fr'));
+  const knownCount = Object.keys(PILOT_NAMES).length;
+  const localCount = Object.keys(LOCAL_NAMES).length;
   app.innerHTML = `<div class="card">
     <h2>Édition des noms pilotes</h2>
-    <p class="muted">Les modifications sont enregistrées dans ce navigateur. Clique ensuite sur “Exporter speedhive_pilots.json”, remplace le fichier dans ton projet, relance build_data_v2.py puis push GitHub.</p>
-    <div class="toolbar"><button class="button" onclick="exportPilotNames()">Exporter speedhive_pilots.json</button></div>
+    <p class="muted">Les modifications sont enregistrées d'abord dans ce navigateur. Pour les rendre permanentes, exporte <strong>speedhive_pilots.json</strong>, remplace le fichier dans ton repo, puis push GitHub.</p>
+    <div class="grid">
+      <div class="card"><div class="muted">Noms du fichier</div><div class="stat">${knownCount}</div></div>
+      <div class="card"><div class="muted">Modifs locales</div><div class="stat">${localCount}</div></div>
+      <div class="card"><div class="muted">Inconnus restants</div><div class="stat">${unknown.length}</div></div>
+      <div class="card"><div class="muted">Pilotes détectés</div><div class="stat">${all.length}</div></div>
+    </div>
+    <div class="toolbar wrap">
+      <button class="button" onclick="exportPilotNames()">Exporter speedhive_pilots.json</button>
+      <button class="button" onclick="copyPilotNamesToClipboard()">Copier le JSON</button>
+      <button class="button" onclick="bulkEditPilotNames()">Édition JSON avancée</button>
+      <button class="button danger" onclick="resetLocalPilotNames()">Effacer modifs locales</button>
+      <label class="button">Importer JSON <input type="file" accept="application/json,.json" onchange="importPilotNamesFile(this)" hidden></label>
+    </div>
+    <div class="card help">
+      <strong>Workflow conseillé :</strong> corrige les inconnus avec ✏️ → exporte le JSON → remplace <code>speedhive_pilots.json</code> dans ton dossier → teste → <code>git add . && git commit -m "Maj pilotes" && git push</code>.
+    </div>
     <h3>Pilotes inconnus à compléter (${unknown.length})</h3>
-    ${unknown.length ? `<table><thead><tr><th>Transpondeur</th><th>Nom actuel</th><th>Action</th></tr></thead><tbody>${unknown.map(p => `<tr><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${escapeHtml(p.name)}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}</tbody></table>` : '<p>Aucun pilote inconnu avec les données chargées.</p>'}
+    ${unknown.length ? `<table><thead><tr><th>Transpondeur</th><th>Nom actuel</th><th>Sessions</th><th>Tours</th><th>Action</th></tr></thead><tbody>${unknown.map(p => `<tr><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${escapeHtml(p.name)}</td><td>${p.activities_count}</td><td>${p.total_laps}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}</tbody></table>` : '<p>Aucun pilote inconnu avec les données chargées.</p>'}
     <h3>Tous les pilotes</h3>
-    <table><thead><tr><th>Pilote</th><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Action</th></tr></thead><tbody>
-      ${all.map(p => `<tr><td>${escapeHtml(p.name)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.activities_count}</td><td>${p.total_laps}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}
-    </tbody></table>
+    <div class="toolbar"><input id="qEdit" placeholder="Rechercher un nom ou transpondeur à modifier..." /></div>
+    <div id="editTable"></div>
   </div>`;
+  const q = document.getElementById('qEdit');
+  const box = document.getElementById('editTable');
+  function drawEditTable() {
+    const term = norm(q.value);
+    const rows = all.filter(p => !term || norm(p.name).includes(term) || String(p.transponder).includes(term)).slice(0, 300);
+    box.innerHTML = `<p class="muted">${rows.length} pilote(s) affiché(s)</p><table><thead><tr><th>Pilote</th><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Meilleur</th><th>Action</th></tr></thead><tbody>
+      ${rows.map(p => `<tr><td>${escapeHtml(p.name)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.activities_count}</td><td>${p.total_laps}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  q.addEventListener('input', drawEditTable); drawEditTable();
 }
 
 init();
