@@ -57,3 +57,17 @@ code { background:#0b1224; border:1px solid var(--line); padding:2px 6px; border
 .fav-btn { margin-right:6px; padding:2px 7px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); cursor:pointer; }
 .fav-btn.active { color:#facc15; border-color:#facc15; background:rgba(250,204,21,.10); }
 .fav-btn:hover { border-color:var(--accent); color:var(--text); }
+
+
+.podium-grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:16px; margin-top:16px; }
+.podium { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px; align-items:end; }
+.podium-place { border:1px solid var(--line); border-radius:16px; padding:14px 10px; text-align:center; background:rgba(255,255,255,.035); min-height:120px; display:flex; flex-direction:column; justify-content:center; gap:6px; }
+.place-1 { min-height:150px; transform:translateY(-6px); border-color:rgba(250,204,21,.65); }
+.place-2 { min-height:132px; }
+.place-3 { min-height:118px; }
+.medal { font-size:32px; }
+.podium-name { font-weight:700; line-height:1.2; }
+.podium-score { font-size:20px; font-weight:800; color:var(--good); }
+.podium-inline { margin:16px 0; }
+.podium-inline .podium { max-width:900px; }
+@media (max-width: 850px) { .podium-grid, .podium { grid-template-columns:1fr; } .place-1 { transform:none; } }

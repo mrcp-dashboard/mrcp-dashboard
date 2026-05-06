@@ -336,7 +336,7 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.9` : 'MRCP Dashboard V2.9'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V3.0` : 'MRCP Dashboard V3.0'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -347,6 +347,8 @@ function route() {
   if (parts[0] === 'pilotes') return renderPilots();
   if (parts[0] === 'pilote') return renderPilot(parts[1]);
   if (parts[0] === 'records') return renderRecords();
+  if (parts[0] === 'podiums') return renderPodiums();
+  if (parts[0] === 'graphiques') return renderGraphiques();
   if (parts[0] === 'chronos') return renderChronos();
   if (parts[0] === 'compare') return renderCompare();
   if (parts[0] === 'favoris') return renderFavorites();
@@ -464,15 +466,18 @@ function renderSession(id) {
       ${trackControls()}
       <p class="muted">${escapeHtml(s.date_fr)} • ${escapeHtml(s.track || tracksForActivity(s).join(', '))} • ${s.pilot_count} pilotes • ${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || 0)} tours</p>
       <div class="toolbar wrap"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /><button class="button" onclick="exportSessionCsv('${escapeHtml(s.id)}')">Exporter CSV</button><button class="button" onclick="copyCurrentLink()">Copier lien session</button></div>
+      <div id="sessionPodium"></div>
       <div id="sessionTable"></div>
     </div>
     <div class="card"><h3>Détail tour par tour</h3><p class="muted">Les tours affichés suivent le filtre piste actif.</p><div id="lapDetails"></div></div>`;
   const q = document.getElementById('qSession');
   const table = document.getElementById('sessionTable');
   const details = document.getElementById('lapDetails');
+  const podium = document.getElementById('sessionPodium');
   function draw() {
     const term = norm(q.value);
     const parts = sessionParticipantsForDisplay(s).filter(p => norm(p.pilot_name).includes(term) || String(p.transponder).includes(term));
+    podium.innerHTML = renderSessionPodium(parts);
     table.innerHTML = `<table><thead><tr><th>Rang</th><th>Piste</th><th>Pilote</th><th>Transpondeur</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
       ${parts.map((p, idx) => `<tr><td>${idx + 1}</td><td><span class="badge">${escapeHtml(TRACK_FILTER === 'all' ? (p.track || tracksForParticipant(p).join(', ')) : TRACK_FILTER)}</span></td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p._metrics.laps_count}</td><td class="best">${fmtTime(p._metrics.best_lap)}</td><td>${fmtTime(p._metrics.avg_lap)}</td><td>${fmtTime(p._metrics.consistency)}</td></tr>`).join('')}
       </tbody></table>`;
@@ -585,6 +590,96 @@ function bestProgressions(limit = 10) {
     return {p, first, best, gain};
   }).filter(x => x && x.gain > 0).sort((a,b) => b.gain - a.gain).slice(0, limit);
 }
+
+
+function podiumCard(title, rows, metricFn, unitLabel = '') {
+  const medals = ['🥇','🥈','🥉'];
+  return `<div class="podium-card card"><h3>${escapeHtml(title)}</h3>${rows.length ? `<div class="podium">
+    ${rows.slice(0,3).map((p,i)=>`<div class="podium-place place-${i+1}"><div class="medal">${medals[i]}</div><div class="podium-name">${pilotNameCell(p.name, p.slug, p.transponder)}</div><div class="podium-score">${metricFn(p)}${unitLabel}</div></div>`).join('')}
+  </div>` : '<p class="muted">Pas assez de données.</p>'}</div>`;
+}
+
+function renderSessionPodium(parts) {
+  if (!parts || !parts.length) return '<p class="muted">Aucun tour pour ce filtre piste.</p>';
+  return `<div class="podium-inline"><h3>Podium de la sortie</h3><div class="podium">
+    ${parts.slice(0,3).map((p,i)=>`<div class="podium-place place-${i+1}"><div class="medal">${['🥇','🥈','🥉'][i]}</div><div class="podium-name">${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</div><div class="podium-score">${fmtTime(p._metrics.best_lap)}</div><div class="muted small">${p._metrics.laps_count} tours</div></div>`).join('')}
+  </div></div>`;
+}
+
+function regularityForPilot(p) {
+  const vals = pilotActivitiesFor(p).map(a => Number(a.consistency)).filter(v => Number.isFinite(v) && v > 0);
+  if (!vals.length) return null;
+  return vals.reduce((s,v)=>s+v,0)/vals.length;
+}
+
+function renderPodiums() {
+  setTitle('Podiums');
+  const pilots = filteredPilots();
+  const fastest = [...pilots].filter(p => Number.isFinite(Number(pilotBestFor(p)))).sort(byBestLap);
+  const active = [...pilots].sort((a,b)=>pilotTotalFor(b)-pilotTotalFor(a)).filter(p => pilotTotalFor(p) > 0);
+  const regular = [...pilots].map(p => ({...p, _reg: regularityForPilot(p)})).filter(p => p._reg).sort((a,b)=>a._reg-b._reg);
+  const prog = bestProgressions(3).map(x => ({...x.p, _gain: x.gain}));
+  app.innerHTML = `<div class="card"><h2>Podiums — ${trackBadge(TRACK_FILTER)}</h2>${trackControls()}<p class="muted">Podiums automatiques selon le filtre piste actif.</p></div>
+  <div class="podium-grid">
+    ${podiumCard('Meilleurs tours', fastest, p => fmtTime(pilotBestFor(p)))}
+    ${podiumCard('Plus actifs', active, p => pilotTotalFor(p), ' tours')}
+    ${podiumCard('Plus réguliers', regular, p => fmtTime(p._reg))}
+    ${podiumCard('Meilleures progressions', prog, p => '-' + Number(p._gain).toFixed(3) + ' s')}
+  </div>`;
+}
+
+function drawBarChart(id, rows, opts = {}) {
+  const canvas = document.getElementById(id);
+  if (!canvas || !rows.length) return;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.max(520, rect.width) * dpr;
+  canvas.height = (opts.height || 260) * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = canvas.width / dpr, h = canvas.height / dpr;
+  const padL = 120, padR = 20, padT = 18, padB = 28;
+  const values = rows.map(r => Number(r.value)).filter(Number.isFinite);
+  const max = Math.max(...values, 0.001);
+  const barH = Math.max(14, (h - padT - padB) / rows.length - 8);
+  const textColor = getComputedStyle(document.body).getPropertyValue('--text') || '#e5e7eb';
+  const mutedColor = getComputedStyle(document.body).getPropertyValue('--muted') || '#94a3b8';
+  const accentColor = getComputedStyle(document.body).getPropertyValue('--accent') || '#38bdf8';
+  ctx.clearRect(0,0,w,h);
+  ctx.font = '12px system-ui';
+  rows.forEach((r, i) => {
+    const y = padT + i * (barH + 8);
+    const bw = (Number(r.value) / max) * (w - padL - padR);
+    ctx.fillStyle = mutedColor;
+    ctx.fillText(String(r.label).slice(0,18), 8, y + barH - 3);
+    ctx.fillStyle = accentColor;
+    ctx.fillRect(padL, y, bw, barH);
+    ctx.fillStyle = textColor;
+    ctx.fillText(opts.format ? opts.format(r.value) : String(r.value), padL + bw + 6, y + barH - 3);
+  });
+}
+
+function renderGraphiques() {
+  setTitle('Graphiques');
+  const fastest = filteredPilots().filter(p=>Number.isFinite(Number(pilotBestFor(p)))).sort(byBestLap).slice(0,10);
+  const active = filteredPilots().sort((a,b)=>pilotTotalFor(b)-pilotTotalFor(a)).slice(0,10);
+  const progressions = bestProgressions(10);
+  const sessions = filteredActivities().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))).slice(-30);
+  app.innerHTML = `<div class="card"><h2>Graphiques — ${trackBadge(TRACK_FILTER)}</h2>${trackControls()}<p class="muted">Première version graphique simple, sans librairie externe, compatible GitHub Pages.</p></div>
+  <div class="two-col">
+    <div class="card"><h3>Top 10 meilleurs tours</h3><canvas id="chartFastest" height="220"></canvas></div>
+    <div class="card"><h3>Top 10 volume de tours</h3><canvas id="chartActive" height="220"></canvas></div>
+  </div>
+  <div class="two-col">
+    <div class="card"><h3>Meilleures progressions</h3><canvas id="chartProgress" height="220"></canvas></div>
+    <div class="card"><h3>Volume des 30 dernières sorties</h3><canvas id="chartSessions" height="220"></canvas></div>
+  </div>`;
+  drawBarChart('chartFastest', fastest.map(p=>({label:p.name, value:Number(pilotBestFor(p))})), {format:fmtTime});
+  drawBarChart('chartActive', active.map(p=>({label:p.name, value:pilotTotalFor(p)})), {format:v=>String(Math.round(v))});
+  drawBarChart('chartProgress', progressions.map(r=>({label:r.p.name, value:Number(r.gain)})), {format:v=>'-'+Number(v).toFixed(3)+' s'});
+  drawBarChart('chartSessions', sessions.map(s=>({label:s.date_fr || s.id, value: TRACK_FILTER === 'all' ? Number(s.laps_count || 0) : Number(s.track_counts?.[TRACK_FILTER] || 0)})), {format:v=>String(Math.round(v))});
+}
+
 
 function renderRecords() {
   setTitle('Records');
