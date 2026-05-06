@@ -41,6 +41,83 @@ function participantMatchesTrack(p) {
   if (TRACK_FILTER === 'all') return true;
   return tracksForParticipant(p).includes(TRACK_FILTER);
 }
+
+function lapMatchesTrack(lap) {
+  if (TRACK_FILTER === 'all') return true;
+  return (lap.track || inferTrackFromSeconds(lap.lap_time)) === TRACK_FILTER;
+}
+function lapsForParticipant(p) {
+  const laps = Array.isArray(p?.laps) ? p.laps : [];
+  return laps.filter(lapMatchesTrack);
+}
+function metricsFromLaps(laps) {
+  const times = laps.map(l => Number(l.lap_time)).filter(Number.isFinite);
+  if (!times.length) return {laps_count: 0, best_lap: null, avg_lap: null, consistency: null};
+  const best = Math.min(...times);
+  const avg = times.reduce((s, v) => s + v, 0) / times.length;
+  const variance = times.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / times.length;
+  return {laps_count: times.length, best_lap: best, avg_lap: avg, consistency: Math.sqrt(variance)};
+}
+function participantMetrics(p) {
+  const laps = lapsForParticipant(p);
+  const m = metricsFromLaps(laps);
+  return {...m, laps};
+}
+function sessionParticipantsForDisplay(s) {
+  return (s.participants || [])
+    .map(p => ({...p, _metrics: participantMetrics(p)}))
+    .filter(p => p._metrics.laps_count > 0)
+    .sort((a, b) => (a._metrics.best_lap || 9999) - (b._metrics.best_lap || 9999));
+}
+function allLapsFlat() {
+  const rows = [];
+  (DB?.activities || []).forEach(a => {
+    (a.participants || []).forEach(p => {
+      const pilotName = p.pilot_name || p.name || `Inconnu #${p.transponder}`;
+      const pilotSlug = p.pilot_slug || slugText(pilotName + '-' + normalizeTransponder(p.transponder));
+      (p.laps || []).forEach(l => {
+        const track = l.track || inferTrackFromSeconds(l.lap_time);
+        if (TRACK_FILTER !== 'all' && track !== TRACK_FILTER) return;
+        rows.push({
+          activity_id: a.id,
+          date: a.date,
+          date_fr: a.date_fr,
+          pilot_name: pilotName,
+          pilot_slug: pilotSlug,
+          transponder: p.transponder,
+          lap_no: l.lap_no,
+          start_time: l.start_time,
+          lap_time: Number(l.lap_time),
+          speed: l.speed,
+          track
+        });
+      });
+    });
+  });
+  return rows.filter(r => Number.isFinite(r.lap_time)).sort((a,b) => a.lap_time - b.lap_time);
+}
+function downloadText(filename, text, type='text/plain') {
+  const blob = new Blob([text], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function csvEscape(v) {
+  const s = String(v ?? '');
+  return /[;\n\r"]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function exportSessionCsv(activityId) {
+  const s = DB.activities.find(x => String(x.id) === String(activityId));
+  if (!s) return;
+  const rows = [['date','piste','pilote','transpondeur','rang','tour','heure','temps','vitesse']];
+  sessionParticipantsForDisplay(s).forEach((p, idx) => {
+    p._metrics.laps.forEach(l => rows.push([s.date_fr, l.track || inferTrackFromSeconds(l.lap_time), p.pilot_name, p.transponder, idx + 1, l.lap_no, l.start_time, Number(l.lap_time).toFixed(3), l.speed]));
+  });
+  downloadText(`mrcp_session_${s.date_fr || s.id}_${TRACK_FILTER}.csv`.replace(/[^a-z0-9_.-]+/gi, '_'), rows.map(r => r.map(csvEscape).join(';')).join('\n'), 'text/csv;charset=utf-8');
+}
 function pilotActivitiesFor(p) {
   const acts = p.activities || [];
   if (TRACK_FILTER === 'all') return acts;
@@ -233,7 +310,7 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.7` : 'MRCP Dashboard V2.7'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.8` : 'MRCP Dashboard V2.8'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -244,6 +321,7 @@ function route() {
   if (parts[0] === 'pilotes') return renderPilots();
   if (parts[0] === 'pilote') return renderPilot(parts[1]);
   if (parts[0] === 'records') return renderRecords();
+  if (parts[0] === 'chronos') return renderChronos();
   if (parts[0] === 'compare') return renderCompare();
   if (parts[0] === 'edition') return renderEdition();
   renderHome();
@@ -343,23 +421,23 @@ function renderSession(id) {
       <p><a href="#/sessions">← Retour sessions</a></p>
       <h2>Sortie du ${escapeHtml(s.date_fr || 'sans date')}</h2>
       ${trackControls()}
-      <p class="muted">${escapeHtml(s.date_fr)} • ${escapeHtml(s.track || tracksForActivity(s).join(', '))} • ${s.pilot_count} pilotes • ${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || (activityMatchesTrack(s) ? s.laps_count : 0))} tours</p>
-      <div class="toolbar"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /></div>
+      <p class="muted">${escapeHtml(s.date_fr)} • ${escapeHtml(s.track || tracksForActivity(s).join(', '))} • ${s.pilot_count} pilotes • ${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || 0)} tours</p>
+      <div class="toolbar wrap"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /><button class="button" onclick="exportSessionCsv('${escapeHtml(s.id)}')">Exporter CSV</button></div>
       <div id="sessionTable"></div>
     </div>
-    <div class="card"><h3>Détail tour par tour</h3><div id="lapDetails"></div></div>`;
+    <div class="card"><h3>Détail tour par tour</h3><p class="muted">Les tours affichés suivent le filtre piste actif.</p><div id="lapDetails"></div></div>`;
   const q = document.getElementById('qSession');
   const table = document.getElementById('sessionTable');
   const details = document.getElementById('lapDetails');
   function draw() {
     const term = norm(q.value);
-    const parts = s.participants.filter(participantMatchesTrack).filter(p => norm(p.pilot_name).includes(term) || String(p.transponder).includes(term));
+    const parts = sessionParticipantsForDisplay(s).filter(p => norm(p.pilot_name).includes(term) || String(p.transponder).includes(term));
     table.innerHTML = `<table><thead><tr><th>Rang</th><th>Piste</th><th>Pilote</th><th>Transpondeur</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
-      ${parts.map(p => `<tr><td>${p.rank}</td><td><span class="badge">${escapeHtml(p.track || tracksForParticipant(p).join(', '))}</span></td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.laps_count}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${fmtTime(p.avg_lap)}</td><td>${fmtTime(p.consistency)}</td></tr>`).join('')}
+      ${parts.map((p, idx) => `<tr><td>${idx + 1}</td><td><span class="badge">${escapeHtml(TRACK_FILTER === 'all' ? (p.track || tracksForParticipant(p).join(', ')) : TRACK_FILTER)}</span></td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p._metrics.laps_count}</td><td class="best">${fmtTime(p._metrics.best_lap)}</td><td>${fmtTime(p._metrics.avg_lap)}</td><td>${fmtTime(p._metrics.consistency)}</td></tr>`).join('')}
       </tbody></table>`;
-    details.innerHTML = parts.map(p => `<details><summary>${escapeHtml(p.pilot_name)} — ${p.laps_count} tours — best ${fmtTime(p.best_lap)}</summary>
-        <table><thead><tr><th>Tour</th><th>Heure</th><th>Temps</th><th>Vitesse</th></tr></thead><tbody>
-        ${p.laps.map(l => `<tr><td>${l.lap_no}</td><td>${escapeHtml(l.start_time)}</td><td class="best">${fmtTime(l.lap_time)}</td><td>${escapeHtml(l.speed)}</td></tr>`).join('')}
+    details.innerHTML = parts.map((p, idx) => `<details><summary>#${idx + 1} — ${escapeHtml(p.pilot_name)} — ${p._metrics.laps_count} tours — best ${fmtTime(p._metrics.best_lap)}</summary>
+        <table><thead><tr><th>Tour</th><th>Piste</th><th>Heure</th><th>Temps</th><th>Vitesse</th></tr></thead><tbody>
+        ${p._metrics.laps.map(l => `<tr><td>${l.lap_no}</td><td><span class="badge">${escapeHtml(l.track || inferTrackFromSeconds(l.lap_time))}</span></td><td>${escapeHtml(l.start_time)}</td><td class="best">${fmtTime(l.lap_time)}</td><td>${escapeHtml(l.speed)}</td></tr>`).join('')}
         </tbody></table></details>`).join('');
   }
   q.addEventListener('input', draw); draw();
@@ -474,6 +552,36 @@ function renderRecords() {
     </tbody></table></div>`;
 }
 
+
+function renderChronos() {
+  setTitle('Chronos');
+  const all = allLapsFlat();
+  app.innerHTML = `<div class="card">
+    <h2>Chronos tour par tour — ${trackBadge(TRACK_FILTER)}</h2>
+    ${trackControls()}
+    <p class="muted">Classement des meilleurs tours individuels, toutes sessions confondues. Pratique pour vérifier les records et retrouver rapidement une sortie.</p>
+    <div class="toolbar wrap"><input id="qChronos" placeholder="Rechercher pilote, transpondeur ou date..." /><button class="button" id="copyTopChronos">Copier le top 100 CSV</button></div>
+    <div id="chronoTable"></div>
+  </div>`;
+  const q = document.getElementById('qChronos');
+  const box = document.getElementById('chronoTable');
+  function filteredRows() {
+    const term = norm(q.value);
+    return all.filter(r => !term || norm(r.pilot_name).includes(term) || String(r.transponder).includes(term) || norm(r.date_fr).includes(term));
+  }
+  function draw() {
+    const rows = filteredRows().slice(0, 300);
+    box.innerHTML = `<p class="muted">${filteredRows().length} tour(s) trouvé(s), top ${rows.length} affiché(s).</p><table><thead><tr><th>#</th><th>Temps</th><th>Piste</th><th>Pilote</th><th>Date</th><th>Session</th><th>Tour</th><th>Heure</th></tr></thead><tbody>
+      ${rows.map((r,i) => `<tr><td>${i+1}</td><td class="best">${fmtTime(r.lap_time)}</td><td><span class="badge">${escapeHtml(r.track)}</span></td><td>${pilotNameCell(r.pilot_name, r.pilot_slug, r.transponder)}</td><td>${escapeHtml(r.date_fr)}</td><td><a href="#/session/${r.activity_id}">Voir</a></td><td>${escapeHtml(r.lap_no)}</td><td>${escapeHtml(r.start_time)}</td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  document.getElementById('copyTopChronos').addEventListener('click', () => {
+    const rows = filteredRows().slice(0,100);
+    const csv = [['rang','temps','piste','pilote','transpondeur','date','session','tour','heure']].concat(rows.map((r,i)=>[i+1, r.lap_time.toFixed(3), r.track, r.pilot_name, r.transponder, r.date_fr, r.activity_id, r.lap_no, r.start_time]));
+    navigator.clipboard.writeText(csv.map(row => row.map(csvEscape).join(';')).join('\n')).then(()=>alert('Top 100 copié en CSV.'));
+  });
+  q.addEventListener('input', draw); draw();
+}
 
 function renderCompare() {
   setTitle('Comparer');
