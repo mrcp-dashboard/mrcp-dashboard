@@ -146,7 +146,7 @@ a:hover{text-decoration:underline}
   <button class="tab-btn" data-tab="sessions">Sessions</button>
   <button class="tab-btn" data-tab="pilots">Pilotes</button>
   <button class="tab-btn" data-tab="rankings">Classements</button>
-  <button class="tab-btn" data-tab="evolution">Evolution</button>
+  <button class="tab-btn" data-tab="progress">Progressions</button>
 </nav>
 
 <div class="container">
@@ -154,10 +154,10 @@ a:hover{text-decoration:underline}
   <div class="tab-content" id="tab-sessions"></div>
   <div class="tab-content" id="tab-pilots"></div>
   <div class="tab-content" id="tab-rankings"></div>
-  <div class="tab-content" id="tab-evolution"></div>
+  <div class="tab-content" id="tab-progress"></div>
 </div>
 
-<div class="footer">MRCP Dashboard · Tours 31s-50s · Mis a jour le 06/05/2026 a 18:03</div>
+<div class="footer">MRCP Dashboard · Tours 31s-50s · Mis a jour le 06/05/2026 a 18:19</div>
 
 <script>
 const SESSIONS = [{"date": "02/05/2026", "key": "02052026", "file": "session_mrcp_02052026.html", "pilot_count": 3, "total_laps": 36, "best": 33.678, "best_pilot": "Grégoire Barroso"}, {"date": "01/05/2026", "key": "01052026", "file": "session_mrcp_01052026.html", "pilot_count": 3, "total_laps": 117, "best": 32.024, "best_pilot": "Dorian Giannetta"}, {"date": "29/04/2026", "key": "29042026", "file": "session_mrcp_29042026.html", "pilot_count": 3, "total_laps": 88, "best": 33.52, "best_pilot": "Dorian Giannetta"}, {"date": "26/04/2026", "key": "26042026", "file": "session_mrcp_26042026.html", "pilot_count": 15, "total_laps": 658, "best": 31.188, "best_pilot": "Inconnu #2866100"}, {"date": "19/04/2026", "key": "19042026", "file": "session_mrcp_19042026.html", "pilot_count": 52, "total_laps": 3898, "best": 31.548, "best_pilot": "Alexis Dufau Cazenave"}];
@@ -332,75 +332,141 @@ function renderRankTable(arr, field, colName, fmt, useFn){
   return h;
 }
 
-// ===== EVOLUTION =====
-var evoChart = null;
-function renderEvolution(){
-  var el = document.getElementById('tab-evolution');
-  // Recupere toutes les dates uniques
-  var allDates = {};
-  PILOTS.forEach(p=>(p.sessions||[]).forEach(s=>{allDates[s.date]=true}));
-  var dates = Object.keys(allDates).sort(function(a,b){
-    var pa = a.split('/'), pb = b.split('/');
-    return new Date(pa[2],pa[1]-1,pa[0]) - new Date(pb[2],pb[1]-1,pb[0]);
-  });
+// ===== PROGRESS =====
+function parseDateFR(d){var p=d.split('/');return new Date(p[2],p[1]-1,p[0]);}
 
-  if(!dates.length){
-    el.innerHTML = '<div class="card"><div class="empty">Pas encore de donnees d\'evolution</div></div>';
+function renderProgress(){
+  var el = document.getElementById('tab-progress');
+  if(!SESSIONS.length){
+    el.innerHTML = '<div class="card"><div class="empty">Pas encore de donnees</div></div>';
     return;
   }
 
-  var html = '<div class="card"><h2>📈 Evolution du meilleur tour — Tous les pilotes</h2>';
-  html += '<div class="chart-wrap"><canvas id="evoCanvas"></canvas></div>';
-  html += '</div>';
-  el.innerHTML = html;
+  var lastDate = SESSIONS[0].date;  // SESSIONS sont tries date desc
+  var html = '';
 
-  drawEvoChart(dates);
-}
-
-function drawEvoChart(dates){
-  var ctx = document.getElementById('evoCanvas');
-  if(!ctx) return;
-  var palette = ['#ff5722','#ffc107','#4caf50','#2196f3','#9c27b0','#00bcd4','#e91e63','#cddc39','#795548','#607d8b','#ff9800','#3f51b5'];
-  var datasets = PILOTS.filter(p=>p.sessions_count>=2).slice(0,12).map(function(p,i){
-    var byDate = {}; (p.sessions||[]).forEach(function(s){byDate[s.date]=s.best});
-    return {
-      label: p.name,
-      data: dates.map(d=>byDate[d]==null?null:byDate[d]),
-      borderColor: palette[i%palette.length],
-      backgroundColor: palette[i%palette.length]+'33',
-      tension: 0.25, spanGaps: true, pointRadius: 4,
-    };
+  // === Bloc 1 : ameliorations sur la derniere session ===
+  // Pour chaque pilote present dans la derniere session, comparer son best a celui de sa session precedente
+  var improvedLast = [];
+  PILOTS.forEach(function(p){
+    var sessions = (p.sessions||[]).slice().sort(function(a,b){return parseDateFR(b.date)-parseDateFR(a.date);});
+    if(sessions.length<2) return;
+    if(sessions[0].date !== lastDate) return;
+    var curr = sessions[0].best, prev = sessions[1].best;
+    if(curr==null || prev==null) return;
+    improvedLast.push({
+      pilot: p, curr: curr, prev: prev, delta: prev-curr,
+      pct: ((prev-curr)/prev)*100, prevDate: sessions[1].date
+    });
   });
+  improvedLast.sort(function(a,b){return b.delta-a.delta;});
 
-  var isDark = document.body.getAttribute('data-theme') !== 'light';
-  var grid = isDark ? '#2a3142' : '#dde0e7';
-  var text = isDark ? '#e8ecf3' : '#1a1d23';
+  html += '<div class="card"><h2>🔥 Derniere session ('+escapeHtml(lastDate)+') vs precedente</h2>';
+  if(!improvedLast.length){
+    html += '<div class="empty">Personne n\'a 2 sessions consecutives a comparer</div>';
+  } else {
+    html += '<table class="table"><thead><tr><th></th><th>Pilote</th><th class="num">Avant</th><th class="num">Apres</th><th class="num">Gain</th><th class="num">%</th></tr></thead><tbody>';
+    improvedLast.forEach(function(r,i){
+      var rkClass = i<3 && r.delta>0 ? 'rank r'+(i+1) : 'rank';
+      var deltaColor = r.delta>0 ? 'var(--good)' : (r.delta<0 ? 'var(--bad)' : 'var(--muted)');
+      var sign = r.delta>0 ? '−' : (r.delta<0 ? '+' : '');
+      var deltaTxt = sign + Math.abs(r.delta).toFixed(3) + 's';
+      var pctTxt = sign + Math.abs(r.pct).toFixed(2) + '%';
+      html += '<tr>';
+      html += '<td><span class="'+rkClass+'">'+(i+1)+'</span></td>';
+      html += '<td><a href="pilote_'+escapeHtml(r.pilot.slug)+'.html">'+escapeHtml(r.pilot.name)+'</a><div style="font-size:11px;color:var(--muted)">vs '+escapeHtml(r.prevDate)+'</div></td>';
+      html += '<td class="num">'+fmtLap(r.prev)+'</td>';
+      html += '<td class="num">'+fmtLap(r.curr)+'</td>';
+      html += '<td class="num" style="color:'+deltaColor+';font-weight:700">'+deltaTxt+'</td>';
+      html += '<td class="num" style="color:'+deltaColor+'">'+pctTxt+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+  }
+  html += '</div>';
 
-  if(evoChart) evoChart.destroy();
-  evoChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels: dates, datasets: datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: text, font: { family: 'Rajdhani', size: 12 } } } },
-      scales: {
-        x: { ticks: { color: text }, grid: { color: grid } },
-        y: { ticks: { color: text, callback: v=>v.toFixed(2)+'s' }, grid: { color: grid }, reverse: false }
-      }
+  // === Bloc 2 : nouveaux records personnels (ever) ===
+  // Un pilote bat son record si dans sa derniere session, son best == son best global ET il a >=2 sessions
+  var newRecords = [];
+  PILOTS.forEach(function(p){
+    var sessions = (p.sessions||[]).slice().sort(function(a,b){return parseDateFR(b.date)-parseDateFR(a.date);});
+    if(sessions.length<2) return;
+    var last = sessions[0];
+    if(last.best == null || p.best == null) return;
+    // Si son best global est dans la derniere session
+    if(Math.abs(last.best - p.best) < 0.001){
+      var prevBest = Math.min.apply(null, sessions.slice(1).map(s=>s.best).filter(x=>x!=null));
+      if(prevBest === Infinity) return;
+      newRecords.push({
+        pilot: p, newBest: last.best, prevBest: prevBest,
+        delta: prevBest-last.best, pct: ((prevBest-last.best)/prevBest)*100,
+        date: last.date
+      });
     }
   });
-}
+  newRecords.sort(function(a,b){return b.delta-a.delta;});
 
-window._refreshCharts = function(){
-  if(evoChart){
-    var allDates = {}; PILOTS.forEach(p=>(p.sessions||[]).forEach(s=>{allDates[s.date]=true}));
-    var dates = Object.keys(allDates).sort(function(a,b){
-      var pa=a.split('/'),pb=b.split('/');
-      return new Date(pa[2],pa[1]-1,pa[0]) - new Date(pb[2],pb[1]-1,pb[0]);
+  html += '<div class="card"><h2>🏆 Nouveaux records personnels (derniere session)</h2>';
+  if(!newRecords.length){
+    html += '<div class="empty">Aucun nouveau record personnel sur la derniere session</div>';
+  } else {
+    html += '<table class="table"><thead><tr><th></th><th>Pilote</th><th class="num">Ancien</th><th class="num">Nouveau</th><th class="num">Gain</th></tr></thead><tbody>';
+    newRecords.forEach(function(r,i){
+      var rkClass = i<3 ? 'rank r'+(i+1) : 'rank';
+      html += '<tr>';
+      html += '<td><span class="'+rkClass+'">'+(i+1)+'</span></td>';
+      html += '<td><a href="pilote_'+escapeHtml(r.pilot.slug)+'.html">'+escapeHtml(r.pilot.name)+'</a></td>';
+      html += '<td class="num">'+fmtLap(r.prevBest)+'</td>';
+      html += '<td class="num" style="color:var(--accent-2);font-weight:700">'+fmtLap(r.newBest)+'</td>';
+      html += '<td class="num" style="color:var(--good);font-weight:700">−'+r.delta.toFixed(3)+'s</td>';
+      html += '</tr>';
     });
-    drawEvoChart(dates);
+    html += '</tbody></table>';
   }
-};
+  html += '</div>';
+
+  // === Bloc 3 : progressions sur 30 derniers jours ===
+  var now = new Date();
+  var d30 = new Date(now.getTime() - 30*24*3600*1000);
+  var progress30 = [];
+  PILOTS.forEach(function(p){
+    var inWindow = (p.sessions||[]).filter(s=>parseDateFR(s.date) >= d30).slice().sort(function(a,b){return parseDateFR(a.date)-parseDateFR(b.date);});
+    if(inWindow.length < 2) return;
+    var first = inWindow[0], last = inWindow[inWindow.length-1];
+    if(first.best == null || last.best == null) return;
+    progress30.push({
+      pilot: p, first: first.best, last: last.best,
+      delta: first.best - last.best, pct: ((first.best-last.best)/first.best)*100,
+      sessions: inWindow.length, firstDate: first.date, lastDate: last.date
+    });
+  });
+  progress30.sort(function(a,b){return b.delta-a.delta;});
+
+  html += '<div class="card"><h2>📅 Progression sur 30 derniers jours</h2>';
+  if(!progress30.length){
+    html += '<div class="empty">Pas assez de donnees sur les 30 derniers jours</div>';
+  } else {
+    html += '<table class="table"><thead><tr><th></th><th>Pilote</th><th class="num">Sessions</th><th class="num">Debut</th><th class="num">Fin</th><th class="num">Evolution</th></tr></thead><tbody>';
+    progress30.forEach(function(r,i){
+      var rkClass = i<3 && r.delta>0 ? 'rank r'+(i+1) : 'rank';
+      var deltaColor = r.delta>0 ? 'var(--good)' : (r.delta<0 ? 'var(--bad)' : 'var(--muted)');
+      var sign = r.delta>0 ? '−' : (r.delta<0 ? '+' : '');
+      var deltaTxt = sign + Math.abs(r.delta).toFixed(3) + 's (' + sign + Math.abs(r.pct).toFixed(1) + '%)';
+      html += '<tr>';
+      html += '<td><span class="'+rkClass+'">'+(i+1)+'</span></td>';
+      html += '<td><a href="pilote_'+escapeHtml(r.pilot.slug)+'.html">'+escapeHtml(r.pilot.name)+'</a><div style="font-size:11px;color:var(--muted)">'+escapeHtml(r.firstDate)+' → '+escapeHtml(r.lastDate)+'</div></td>';
+      html += '<td class="num">'+r.sessions+'</td>';
+      html += '<td class="num">'+fmtLap(r.first)+'</td>';
+      html += '<td class="num">'+fmtLap(r.last)+'</td>';
+      html += '<td class="num" style="color:'+deltaColor+';font-weight:700">'+deltaTxt+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+}
 
 // ===== TABS =====
 document.querySelectorAll('.tab-btn').forEach(function(btn){
@@ -410,7 +476,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.classList.add('active');
     var tab = btn.getAttribute('data-tab');
     document.getElementById('tab-'+tab).classList.add('active');
-    if(tab==='evolution') renderEvolution();
+    if(tab==='progress') renderProgress();
     history.replaceState(null,'','#'+tab);
   };
 });
