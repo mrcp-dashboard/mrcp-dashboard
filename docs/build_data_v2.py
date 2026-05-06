@@ -22,13 +22,11 @@ CSV_DIR = ROOT / "speedhive_csv"
 OUT_DIR = ROOT / "speedhive_reports"
 CORRECTIONS_FILE = ROOT / "corrections.json"
 PILOTS_FILE = ROOT / "speedhive_pilots.json"
+LAP_OVERRIDES_FILE = ROOT / "lap_overrides.json"
 OUT_FILE = OUT_DIR / "data_v2.json"
 
 LAP_MIN = 15.0
 LAP_MAX = 120.0
-TRACK_SPLIT_SECONDS = 30.0
-TRACK_SHORT = "TT1/10"
-TRACK_LONG = "TT1/8"
 CLUB_NAME = "Mini Racing Club Palois"
 
 
@@ -55,8 +53,22 @@ def parse_laptime(value: str | None) -> float | None:
         return None
 
 
-def track_for_lap(lap_seconds: float) -> str:
-    return TRACK_SHORT if lap_seconds < TRACK_SPLIT_SECONDS else TRACK_LONG
+def infer_track_from_seconds(seconds: float | None) -> str | None:
+    """Règle MRCP : < 30 s = piste TT1/10, >= 30 s = piste TT1/8."""
+    if seconds is None:
+        return None
+    return "TT1/10" if float(seconds) < 30.0 else "TT1/8"
+
+
+def lap_key(activity_id: str, transponder: str, lap_no: int, start_time: str, lap_time: float) -> str:
+    """Même identifiant que l'interface admin JS."""
+    return "|".join([
+        str(activity_id),
+        str(transponder).strip(),
+        str(lap_no if lap_no is not None else ""),
+        str(start_time or ""),
+        f"{float(lap_time):.3f}",
+    ])
 
 
 def parse_date(value: str | None) -> str | None:
@@ -103,6 +115,16 @@ def load_corrections() -> dict[str, Any]:
     })
 
 
+def load_lap_overrides() -> dict[str, Any]:
+    data = load_json(LAP_OVERRIDES_FILE, {"excluded": {}, "forced_track": {}})
+    if not isinstance(data, dict):
+        return {"excluded": {}, "forced_track": {}}
+    return {
+        "excluded": data.get("excluded", {}) if isinstance(data.get("excluded", {}), dict) else {},
+        "forced_track": data.get("forced_track", {}) if isinstance(data.get("forced_track", {}), dict) else {},
+    }
+
+
 def build_transponder_maps(pilots: dict[str, str], corrections: dict[str, Any]) -> tuple[dict[str, str], dict[str, str]]:
     name_by_transponder = dict(pilots)
     canonical_by_transponder: dict[str, str] = {}
@@ -137,7 +159,7 @@ def is_deleted_lap(corrections: dict[str, Any], transponder: str, date_fr: str, 
     return False
 
 
-def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[str, str], name_map: dict[str, str]) -> dict[str, Any]:
+def read_activity_csv(path: Path, corrections: dict[str, Any], lap_overrides: dict[str, Any], merge_map: dict[str, str], name_map: dict[str, str]) -> dict[str, Any]:
     activity_id = path.stem.replace("sessions_", "")
     entries: list[dict[str, Any]] = []
     lap_index_by_transponder_date: dict[tuple[str, str], int] = defaultdict(int)
@@ -159,17 +181,28 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[s
                 continue
 
             t = canonical_transponder(raw_t, merge_map)
+            start_time = (row.get("Start time") or "").strip()
+            lap_no = int(float(row.get("Lap") or 0))
+            lap_time = round(lap_time, 3)
+            lap_id = lap_key(activity_id, t, lap_no, start_time, lap_time)
+
+            # Corrections admin définitives : exclusion ou piste forcée.
+            if lap_id in lap_overrides.get("excluded", {}):
+                continue
+            track = lap_overrides.get("forced_track", {}).get(lap_id) or infer_track_from_seconds(lap_time)
+
             entries.append({
                 "activity_id": activity_id,
+                "lap_id": lap_id,
                 "transponder": t,
                 "raw_transponder": raw_t,
                 "pilot_name": name_map.get(t) or name_map.get(raw_t) or f"Inconnu #{t}",
                 "date": iso_date,
                 "date_fr": date_fr,
-                "start_time": (row.get("Start time") or "").strip(),
-                "lap_no": int(float(row.get("Lap") or 0)),
-                "lap_time": round(lap_time, 3),
-                "track": track_for_lap(lap_time),
+                "start_time": start_time,
+                "lap_no": lap_no,
+                "lap_time": lap_time,
+                "track": track,
                 "speed": (row.get("Speed") or "").replace('"', '').strip(),
             })
 
@@ -182,16 +215,13 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[s
     for t, laps in by_pilot.items():
         times = [x["lap_time"] for x in laps]
         best = min(times)
-        track_counts = defaultdict(int)
-        for x in laps:
-            track_counts[x.get("track") or track_for_lap(x["lap_time"])] += 1
-        main_track = max(track_counts.items(), key=lambda kv: (kv[1], kv[0]))[0]
+        tracks = sorted({x.get("track") for x in laps if x.get("track")})
         participants.append({
             "transponder": t,
             "pilot_name": laps[0]["pilot_name"],
             "pilot_slug": slugify(laps[0]["pilot_name"]),
-            "track": main_track,
-            "tracks": sorted(track_counts.keys()),
+            "track": tracks[0] if len(tracks) == 1 else "mixte",
+            "tracks": tracks,
             "laps_count": len(times),
             "best_lap": round(best, 3),
             "avg_lap": round(sum(times) / len(times), 3),
@@ -204,19 +234,14 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[s
         p["rank"] = i
 
     best_participant = participants[0] if participants else None
-    activity_track_counts = defaultdict(int)
-    for e in entries:
-        activity_track_counts[e.get("track") or track_for_lap(e["lap_time"])] += 1
-    activity_tracks = sorted(activity_track_counts.keys())
-    activity_track = activity_tracks[0] if len(activity_tracks) == 1 else "Mixte"
+    activity_tracks = sorted({e.get("track") for e in entries if e.get("track")})
     return {
         "id": activity_id,
         "date": date,
+        "track": activity_tracks[0] if len(activity_tracks) == 1 else "mixte",
+        "tracks": activity_tracks,
         "date_fr": fmt_date_fr(date),
         "source_file": path.name,
-        "track": activity_track,
-        "tracks": activity_tracks,
-        "track_counts": dict(activity_track_counts),
         "pilot_count": len(participants),
         "laps_count": len(entries),
         "best_lap": best_participant["best_lap"] if best_participant else None,
@@ -227,12 +252,13 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], merge_map: dict[s
 
 def build() -> dict[str, Any]:
     corrections = load_corrections()
+    lap_overrides = load_lap_overrides()
     pilots = load_pilots()
     name_map, merge_map = build_transponder_maps(pilots, corrections)
 
     activities = []
     for path in sorted(CSV_DIR.glob("sessions_*.csv")):
-        activity = read_activity_csv(path, corrections, merge_map, name_map)
+        activity = read_activity_csv(path, corrections, lap_overrides, merge_map, name_map)
         if activity["laps_count"]:
             activities.append(activity)
 
@@ -248,26 +274,20 @@ def build() -> dict[str, Any]:
                 "activities": [],
                 "total_laps": 0,
                 "best_lap": None,
-                "tracks": {},
             })
             p["activities"].append({
                 "activity_id": activity["id"],
                 "date": activity["date"],
                 "date_fr": activity["date_fr"],
                 "rank": part["rank"],
+                "track": part.get("track"),
+                "tracks": part.get("tracks", []),
                 "laps_count": part["laps_count"],
                 "best_lap": part["best_lap"],
                 "avg_lap": part["avg_lap"],
                 "consistency": part["consistency"],
-                "track": part.get("track"),
             })
             p["total_laps"] += part["laps_count"]
-            tr = part.get("track") or (TRACK_SHORT if part["best_lap"] < TRACK_SPLIT_SECONDS else TRACK_LONG)
-            ts = p["tracks"].setdefault(tr, {"activities_count": 0, "total_laps": 0, "best_lap": None})
-            ts["activities_count"] += 1
-            ts["total_laps"] += part["laps_count"]
-            if ts["best_lap"] is None or part["best_lap"] < ts["best_lap"]:
-                ts["best_lap"] = part["best_lap"]
             if p["best_lap"] is None or part["best_lap"] < p["best_lap"]:
                 p["best_lap"] = part["best_lap"]
 
@@ -295,15 +315,15 @@ def build() -> dict[str, Any]:
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "club_name": CLUB_NAME,
         "source": "SpeedHive Practice 4308",
-        "filters": {"lap_min": LAP_MIN, "lap_max": LAP_MAX, "track_split_seconds": TRACK_SPLIT_SECONDS, "tracks": [TRACK_LONG, TRACK_SHORT]},
+        "filters": {"lap_min": LAP_MIN, "lap_max": LAP_MAX, "track_rule": "TT1/10 < 30s, TT1/8 >= 30s"},
+        "admin_overrides": {
+            "excluded_laps_count": len(lap_overrides.get("excluded", {})),
+            "forced_track_count": len(lap_overrides.get("forced_track", {})),
+        },
         "summary": {
             "activities_count": len(activities),
             "pilots_count": len(pilots_list),
             "laps_count": sum(a["laps_count"] for a in activities),
-            "tracks": {
-                TRACK_LONG: {"laps_count": sum(a.get("track_counts", {}).get(TRACK_LONG, 0) for a in activities)},
-                TRACK_SHORT: {"laps_count": sum(a.get("track_counts", {}).get(TRACK_SHORT, 0) for a in activities)},
-            },
         },
         "records": records,
         "activities": activities,
