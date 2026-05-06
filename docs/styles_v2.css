@@ -33,3 +33,11 @@ canvas { width:100%; max-width:100%; background:#0b1224; border:1px solid var(--
   table { display:block; overflow-x:auto; white-space:nowrap; }
   th { position:static; }
 }
+
+.select { width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#0b1224; color:var(--text); font-size:15px; }
+.kpi-row { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+.delta-good { color:var(--good); font-weight:700; }
+.delta-bad { color:#fca5a5; font-weight:700; }
+.small { font-size:12px; }
+.print-only { display:none; }
+@media print { .topbar, .toolbar, nav { display:none !important; } body { background:white; color:black; } .card { border:1px solid #ddd; box-shadow:none; background:white; } a { color:black; } .print-only { display:block; } }

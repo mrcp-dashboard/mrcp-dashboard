@@ -27,6 +27,7 @@ function route() {
   if (parts[0] === 'pilotes') return renderPilots();
   if (parts[0] === 'pilote') return renderPilot(parts[1]);
   if (parts[0] === 'records') return renderRecords();
+  if (parts[0] === 'compare') return renderCompare();
   renderHome();
 }
 
@@ -164,12 +165,33 @@ function renderPilot(slug) {
       </div>
       <h3>Progression des meilleurs tours</h3>
       <canvas id="pilotChart" height="120"></canvas>
+      <h3>Résumé</h3>
+      <div id="pilotInsights"></div>
       <h3>Historique</h3>
       <table><thead><tr><th>Date</th><th>Session</th><th>Rang</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
       ${acts.map(a => `<tr><td>${escapeHtml(a.date_fr)}</td><td><a href="#/session/${a.activity_id}">${escapeHtml(a.activity_id)}</a></td><td>${a.rank}</td><td>${a.laps_count}</td><td class="best">${fmtTime(a.best_lap)}</td><td>${fmtTime(a.avg_lap)}</td><td>${fmtTime(a.consistency)}</td></tr>`).join('')}</tbody></table>
     </div>`;
+  document.getElementById('pilotInsights').innerHTML = pilotInsights(p);
   drawSimpleLineChart('pilotChart', progression.map(a => ({label: a.date_fr || a.activity_id, value: a.best_lap})));
 }
+
+function pilotInsights(p) {
+  const acts = [...p.activities].filter(a => a.best_lap).sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')));
+  if (!acts.length) return '<p class="muted">Pas assez de données.</p>';
+  const first = acts[0], last = acts[acts.length - 1];
+  const best = acts.reduce((m,a) => a.best_lap < m.best_lap ? a : m, acts[0]);
+  const improvement = first.best_lap - best.best_lap;
+  const recent = acts.slice(-5);
+  const recentAvg = recent.reduce((s,a)=>s+a.best_lap,0) / recent.length;
+  return `<div class="kpi-row">
+    <span class="badge">Premier best connu : ${fmtTime(first.best_lap)}</span>
+    <span class="badge">Record : ${fmtTime(best.best_lap)} le ${escapeHtml(best.date_fr)}</span>
+    <span class="badge">Gain depuis début : <span class="${improvement >= 0 ? 'delta-good' : 'delta-bad'}">${improvement >= 0 ? '-' : '+'}${Math.abs(improvement).toFixed(3)} s</span></span>
+    <span class="badge">Moyenne 5 dernières : ${fmtTime(recentAvg)}</span>
+    <span class="badge">Dernière sortie : ${escapeHtml(last.date_fr)} / ${fmtTime(last.best_lap)}</span>
+  </div>`;
+}
+
 
 function drawSimpleLineChart(id, points) {
   const canvas = document.getElementById(id);
@@ -222,6 +244,74 @@ function renderRecords() {
     <div class="card"><h2>Top 20 meilleurs tours</h2><table><thead><tr><th>#</th><th>Pilote</th><th>Transpondeur</th><th>Meilleur</th><th>Sessions</th><th>Tours</th></tr></thead><tbody>
       ${top.map((p,i) => `<tr><td>${i+1}</td><td><a href="#/pilote/${p.slug}">${escapeHtml(p.name)}</a></td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td class="best">${fmtTime(p.best_lap)}</td><td>${p.activities_count}</td><td>${p.total_laps}</td></tr>`).join('')}
     </tbody></table></div>`;
+}
+
+
+function renderCompare() {
+  setTitle('Comparer');
+  const options = [...DB.pilots].sort((a,b)=>a.name.localeCompare(b.name, 'fr')).map(p => `<option value="${escapeHtml(p.slug)}">${escapeHtml(p.name)} — ${escapeHtml(p.transponder)}</option>`).join('');
+  app.innerHTML = `<div class="card">
+    <h2>Comparer deux pilotes</h2>
+    <p class="muted">Comparaison simple basée sur le meilleur tour, le volume de tours, les sessions et la régularité moyenne.</p>
+    <div class="two-col">
+      <div><label>Pilote A</label><select id="pA" class="select">${options}</select></div>
+      <div><label>Pilote B</label><select id="pB" class="select">${options}</select></div>
+    </div>
+    <div class="toolbar"><button class="button" id="swapBtn">Inverser</button></div>
+    <div id="compareResult"></div>
+  </div>`;
+  const a = document.getElementById('pA');
+  const b = document.getElementById('pB');
+  if (DB.pilots.length > 1) b.selectedIndex = 1;
+  function draw() {
+    const pa = DB.pilots.find(p => p.slug === a.value);
+    const pb = DB.pilots.find(p => p.slug === b.value);
+    if (!pa || !pb) return;
+    const common = commonActivities(pa, pb);
+    const bestDiff = (pa.best_lap || 0) - (pb.best_lap || 0);
+    document.getElementById('compareResult').innerHTML = `
+      <div class="two-col">
+        ${comparePilotCard(pa)}
+        ${comparePilotCard(pb)}
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Écart global</h3>
+        <p>Meilleur tour : <strong>${escapeHtml(pa.name)}</strong> ${fmtTime(pa.best_lap)} vs <strong>${escapeHtml(pb.name)}</strong> ${fmtTime(pb.best_lap)} — écart <span class="${bestDiff <= 0 ? 'delta-good' : 'delta-bad'}">${bestDiff > 0 ? '+' : ''}${bestDiff.toFixed(3)} s</span> pour ${escapeHtml(pa.name)}.</p>
+        <h3>Sessions communes</h3>
+        ${common.length ? renderCommonTable(common, pa, pb) : '<p class="muted">Aucune session commune trouvée.</p>'}
+      </div>`;
+  }
+  a.addEventListener('change', draw); b.addEventListener('change', draw);
+  document.getElementById('swapBtn').addEventListener('click', () => { const i=a.selectedIndex; a.selectedIndex=b.selectedIndex; b.selectedIndex=i; draw(); });
+  draw();
+}
+
+function comparePilotCard(p) {
+  const regs = p.activities.map(a => a.consistency).filter(x => Number.isFinite(Number(x)) && Number(x) > 0);
+  const avgReg = regs.length ? regs.reduce((s,x)=>s+Number(x),0)/regs.length : null;
+  return `<div class="card"><h3><a href="#/pilote/${p.slug}">${escapeHtml(p.name)}</a></h3>
+    <p><span class="badge">${escapeHtml(p.transponder)}</span></p>
+    <table><tbody>
+      <tr><th>Meilleur tour</th><td class="best">${fmtTime(p.best_lap)}</td></tr>
+      <tr><th>Sessions</th><td>${p.activities_count}</td></tr>
+      <tr><th>Tours</th><td>${p.total_laps}</td></tr>
+      <tr><th>Moy. meilleurs</th><td>${fmtTime(p.avg_best_lap)}</td></tr>
+      <tr><th>Régularité moyenne</th><td>${fmtTime(avgReg)}</td></tr>
+    </tbody></table></div>`;
+}
+
+function commonActivities(pa, pb) {
+  const ma = new Map(pa.activities.map(a => [String(a.activity_id), a]));
+  return pb.activities.filter(b => ma.has(String(b.activity_id))).map(b => ({a: ma.get(String(b.activity_id)), b})).sort((x,y)=>byDateDesc(x.a,y.a));
+}
+
+function renderCommonTable(common, pa, pb) {
+  return `<table><thead><tr><th>Date</th><th>Session</th><th>${escapeHtml(pa.name)}</th><th>${escapeHtml(pb.name)}</th><th>Écart A-B</th></tr></thead><tbody>
+    ${common.map(r => {
+      const d = Number(r.a.best_lap) - Number(r.b.best_lap);
+      return `<tr><td>${escapeHtml(r.a.date_fr)}</td><td><a href="#/session/${r.a.activity_id}">${escapeHtml(r.a.activity_id)}</a></td><td class="best">${fmtTime(r.a.best_lap)}</td><td class="best">${fmtTime(r.b.best_lap)}</td><td class="${d <= 0 ? 'delta-good' : 'delta-bad'}">${d > 0 ? '+' : ''}${d.toFixed(3)} s</td></tr>`;
+    }).join('')}
+  </tbody></table>`;
 }
 
 init();
