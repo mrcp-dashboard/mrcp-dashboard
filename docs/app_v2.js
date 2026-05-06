@@ -1,5 +1,85 @@
 let DB = null;
 
+let PILOT_NAMES = {};
+let LOCAL_NAMES = {};
+
+function normalizeTransponder(t) {
+  return String(t || '').trim().replace(/\/0$/, '');
+}
+function loadLocalNames() {
+  try { LOCAL_NAMES = JSON.parse(localStorage.getItem('mrcp_pilot_names') || '{}'); }
+  catch { LOCAL_NAMES = {}; }
+}
+function saveLocalNames() {
+  localStorage.setItem('mrcp_pilot_names', JSON.stringify(LOCAL_NAMES, null, 2));
+}
+async function loadPilotNamesFile() {
+  try {
+    const res = await fetch('speedhive_pilots.json?cache=' + Date.now());
+    if (res.ok) PILOT_NAMES = await res.json();
+  } catch (_) { PILOT_NAMES = {}; }
+}
+function pilotNameFor(transponder, fallback) {
+  const t = normalizeTransponder(transponder);
+  return LOCAL_NAMES[t] || PILOT_NAMES[t] || fallback || `Inconnu #${t}`;
+}
+function applyPilotNames() {
+  if (!DB) return;
+  const oldToNewSlug = new Map();
+  DB.pilots.forEach(p => {
+    const oldSlug = p.slug;
+    const name = pilotNameFor(p.transponder, p.name);
+    p.name = name;
+    p.slug = slugText(name + '-' + normalizeTransponder(p.transponder));
+    oldToNewSlug.set(oldSlug, p.slug);
+  });
+  DB.activities.forEach(a => {
+    a.participants.forEach(part => {
+      part.pilot_name = pilotNameFor(part.transponder, part.pilot_name);
+      part.pilot_slug = slugText(part.pilot_name + '-' + normalizeTransponder(part.transponder));
+    });
+    if (a.participants && a.participants.length) a.best_pilot = a.participants[0].pilot_name;
+  });
+  const best = DB.records?.best_lap;
+  if (best) { best.pilot = pilotNameFor(best.transponder, best.pilot); best.slug = slugText(best.pilot + '-' + normalizeTransponder(best.transponder)); }
+  const active = DB.records?.most_active;
+  if (active) { active.pilot = pilotNameFor(active.transponder, active.pilot); active.slug = slugText(active.pilot + '-' + normalizeTransponder(active.transponder)); }
+}
+function editButton(transponder, currentName) {
+  return `<button class="edit-btn" title="Modifier ce nom" onclick="editPilotName('${escapeHtml(normalizeTransponder(transponder))}', '${escapeHtml(currentName)}')">✏️</button>`;
+}
+function pilotNameCell(name, slug, transponder) {
+  return `<a href="#/pilote/${escapeHtml(slug)}">${escapeHtml(name)}</a> ${editButton(transponder, name)}`;
+}
+function activityLabel(s) {
+  return `${escapeHtml(s.date_fr || 'Sans date')}${s.best_pilot ? ' — ' + escapeHtml(s.best_pilot) : ''}`;
+}
+function editPilotName(transponder, currentName) {
+  const t = normalizeTransponder(transponder);
+  const name = prompt(`Nom du pilote pour le transpondeur ${t}`, (LOCAL_NAMES[t] || PILOT_NAMES[t] || currentName || '').replace(/^Inconnu #\d+$/, ''));
+  if (name === null) return;
+  const cleaned = name.trim();
+  if (!cleaned) return;
+  LOCAL_NAMES[t] = cleaned;
+  saveLocalNames();
+  applyPilotNames();
+  route();
+}
+function exportPilotNames() {
+  const merged = {...PILOT_NAMES, ...LOCAL_NAMES};
+  const blob = new Blob([JSON.stringify(merged, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'speedhive_pilots.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function unknownPilots() {
+  return DB.pilots.filter(p => /^Inconnu #/i.test(p.name));
+}
+
+
 const app = document.getElementById('app');
 const subtitle = document.getElementById('subtitle');
 
@@ -16,7 +96,7 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2` : 'MRCP Dashboard V2'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.3` : 'MRCP Dashboard V2.3'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -28,6 +108,7 @@ function route() {
   if (parts[0] === 'pilote') return renderPilot(parts[1]);
   if (parts[0] === 'records') return renderRecords();
   if (parts[0] === 'compare') return renderCompare();
+  if (parts[0] === 'edition') return renderEdition();
   renderHome();
 }
 
@@ -36,6 +117,9 @@ async function init() {
     const res = await fetch('data_v2.json?cache=' + Date.now());
     if (!res.ok) throw new Error('Impossible de charger data_v2.json');
     DB = await res.json();
+    loadLocalNames();
+    await loadPilotNamesFile();
+    applyPilotNames();
     subtitle.textContent = `${DB.summary.activities_count} sessions • ${DB.summary.pilots_count} pilotes • ${DB.summary.laps_count} tours • MAJ ${new Date(DB.generated_at).toLocaleString('fr-FR')}`;
     window.addEventListener('hashchange', route);
     route();
@@ -65,16 +149,16 @@ function renderHome() {
     <div class="two-col">
       <div class="card">
         <h2>Dernières sessions</h2>
-        <table><thead><tr><th>Date</th><th>Session</th><th>Pilotes</th><th>Best</th></tr></thead><tbody>
-          ${recent.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><a href="#/session/${s.id}">${escapeHtml(s.id)}</a></td><td>${s.pilot_count}</td><td class="best">${fmtTime(s.best_lap)}</td></tr>`).join('')}
+        <table><thead><tr><th>Date</th><th>Sortie</th><th>Pilotes</th><th>Best</th></tr></thead><tbody>
+          ${recent.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><a href="#/session/${s.id}">${activityLabel(s)}</a></td><td>${s.pilot_count}</td><td class="best">${fmtTime(s.best_lap)}</td></tr>`).join('')}
         </tbody></table>
       </div>
       <div class="card">
         <h2>Top pilotes</h2>
         <table><thead><tr><th>Pilote</th><th>Best</th><th>Tours</th></tr></thead><tbody>
-          ${topPilots.map(p => `<tr><td><a href="#/pilote/${p.slug}">${escapeHtml(p.name)}</a></td><td class="best">${fmtTime(p.best_lap)}</td><td>${p.total_laps}</td></tr>`).join('')}
+          ${topPilots.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${p.total_laps}</td></tr>`).join('')}
         </tbody></table>
-        <p class="muted">Pilote le plus actif : ${active ? `<a href="#/pilote/${active.slug}">${escapeHtml(active.pilot)}</a> (${active.laps} tours)` : '-'}</p>
+        <p class="muted">Pilote le plus actif : ${active ? `${pilotNameCell(active.pilot, active.slug, active.transponder)} (${active.laps} tours)` : '-'}</p>
       </div>
     </div>`;
   attachPilotSearch('homeSearch', 'homeResults', 10);
@@ -88,7 +172,7 @@ function attachPilotSearch(inputId, resultId, limit = 50) {
     if (!term) { box.innerHTML = '<p class="muted">Saisis au moins une lettre.</p>'; return; }
     const rows = DB.pilots.filter(p => norm(p.name).includes(term) || String(p.transponder).includes(term)).slice(0, limit);
     box.innerHTML = rows.length ? `<table><thead><tr><th>Pilote</th><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Meilleur</th></tr></thead><tbody>
-      ${rows.map(p => `<tr><td><a href="#/pilote/${p.slug}">${escapeHtml(p.name)}</a></td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.activities_count}</td><td>${p.total_laps}</td><td class="best">${fmtTime(p.best_lap)}</td></tr>`).join('')}
+      ${rows.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.activities_count}</td><td>${p.total_laps}</td><td class="best">${fmtTime(p.best_lap)}</td></tr>`).join('')}
       </tbody></table>` : '<p>Aucun pilote trouvé.</p>';
   }
   q.addEventListener('input', draw); draw();
@@ -103,8 +187,8 @@ function renderSessions() {
   function draw() {
     const term = norm(q.value);
     const filtered = rows.filter(s => String(s.id).includes(term) || norm(s.date_fr).includes(term) || norm(s.best_pilot).includes(term));
-    table.innerHTML = `<p class="muted">${filtered.length} session(s)</p><table><thead><tr><th>Date</th><th>Session</th><th>Pilotes</th><th>Tours</th><th>Meilleur tour</th><th>Meilleur pilote</th></tr></thead><tbody>
-      ${filtered.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><a href="#/session/${s.id}">${escapeHtml(s.id)}</a></td><td>${s.pilot_count}</td><td>${s.laps_count}</td><td class="best">${fmtTime(s.best_lap)}</td><td>${escapeHtml(s.best_pilot)}</td></tr>`).join('')}
+    table.innerHTML = `<p class="muted">${filtered.length} session(s)</p><table><thead><tr><th>Date</th><th>Sortie</th><th>Pilotes</th><th>Tours</th><th>Meilleur tour</th><th>Meilleur pilote</th></tr></thead><tbody>
+      ${filtered.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><a href="#/session/${s.id}">${activityLabel(s)}</a></td><td>${s.pilot_count}</td><td>${s.laps_count}</td><td class="best">${fmtTime(s.best_lap)}</td><td>${escapeHtml(s.best_pilot)}</td></tr>`).join('')}
       </tbody></table>`;
   }
   q.addEventListener('input', draw); draw();
@@ -113,11 +197,11 @@ function renderSessions() {
 function renderSession(id) {
   const s = DB.activities.find(x => String(x.id) === String(id));
   if (!s) return app.innerHTML = `<div class="card">Session introuvable.</div>`;
-  setTitle(`Session ${s.id}`);
+  setTitle(`Sortie ${s.date_fr || ''}`);
   app.innerHTML = `
     <div class="card">
       <p><a href="#/sessions">← Retour sessions</a></p>
-      <h2>Session ${escapeHtml(s.id)}</h2>
+      <h2>Sortie du ${escapeHtml(s.date_fr || 'sans date')}</h2>
       <p class="muted">${escapeHtml(s.date_fr)} • ${s.pilot_count} pilotes • ${s.laps_count} tours</p>
       <div class="toolbar"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /></div>
       <div id="sessionTable"></div>
@@ -130,7 +214,7 @@ function renderSession(id) {
     const term = norm(q.value);
     const parts = s.participants.filter(p => norm(p.pilot_name).includes(term) || String(p.transponder).includes(term));
     table.innerHTML = `<table><thead><tr><th>Rang</th><th>Pilote</th><th>Transpondeur</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
-      ${parts.map(p => `<tr><td>${p.rank}</td><td><a href="#/pilote/${p.pilot_slug}">${escapeHtml(p.pilot_name)}</a></td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.laps_count}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${fmtTime(p.avg_lap)}</td><td>${fmtTime(p.consistency)}</td></tr>`).join('')}
+      ${parts.map(p => `<tr><td>${p.rank}</td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.laps_count}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${fmtTime(p.avg_lap)}</td><td>${fmtTime(p.consistency)}</td></tr>`).join('')}
       </tbody></table>`;
     details.innerHTML = parts.map(p => `<details><summary>${escapeHtml(p.pilot_name)} — ${p.laps_count} tours — best ${fmtTime(p.best_lap)}</summary>
         <table><thead><tr><th>Tour</th><th>Heure</th><th>Temps</th><th>Vitesse</th></tr></thead><tbody>
@@ -168,8 +252,8 @@ function renderPilot(slug) {
       <h3>Résumé</h3>
       <div id="pilotInsights"></div>
       <h3>Historique</h3>
-      <table><thead><tr><th>Date</th><th>Session</th><th>Rang</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
-      ${acts.map(a => `<tr><td>${escapeHtml(a.date_fr)}</td><td><a href="#/session/${a.activity_id}">${escapeHtml(a.activity_id)}</a></td><td>${a.rank}</td><td>${a.laps_count}</td><td class="best">${fmtTime(a.best_lap)}</td><td>${fmtTime(a.avg_lap)}</td><td>${fmtTime(a.consistency)}</td></tr>`).join('')}</tbody></table>
+      <table><thead><tr><th>Date</th><th>Sortie</th><th>Rang</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
+      ${acts.map(a => `<tr><td>${escapeHtml(a.date_fr)}</td><td><a href="#/session/${a.activity_id}">Voir</a></td><td>${a.rank}</td><td>${a.laps_count}</td><td class="best">${fmtTime(a.best_lap)}</td><td>${fmtTime(a.avg_lap)}</td><td>${fmtTime(a.consistency)}</td></tr>`).join('')}</tbody></table>
     </div>`;
   document.getElementById('pilotInsights').innerHTML = pilotInsights(p);
   drawSimpleLineChart('pilotChart', progression.map(a => ({label: a.date_fr || a.activity_id, value: a.best_lap})));
@@ -237,12 +321,12 @@ function renderRecords() {
     <div class="card">
       <h2>Records</h2>
       <table><tbody>
-        <tr><th>Meilleur tour global</th><td class="best">${best ? fmtTime(best.time) : '-'}</td><td>${best ? `<a href="#/pilote/${best.slug}">${escapeHtml(best.pilot)}</a>` : ''}</td><td>${best ? `<span class="badge">${escapeHtml(best.transponder)}</span>` : ''}</td></tr>
-        <tr><th>Pilote le plus actif</th><td>${active ? `<a href="#/pilote/${active.slug}">${escapeHtml(active.pilot)}</a>` : '-'}</td><td>${active ? active.laps + ' tours' : ''}</td><td>${active ? `<span class="badge">${escapeHtml(active.transponder)}</span>` : ''}</td></tr>
+        <tr><th>Meilleur tour global</th><td class="best">${best ? fmtTime(best.time) : '-'}</td><td>${best ? `${pilotNameCell(best.pilot, best.slug, best.transponder)}` : ''}</td><td>${best ? `<span class="badge">${escapeHtml(best.transponder)}</span>` : ''}</td></tr>
+        <tr><th>Pilote le plus actif</th><td>${active ? `${pilotNameCell(active.pilot, active.slug, active.transponder)}` : '-'}</td><td>${active ? active.laps + ' tours' : ''}</td><td>${active ? `<span class="badge">${escapeHtml(active.transponder)}</span>` : ''}</td></tr>
       </tbody></table>
     </div>
     <div class="card"><h2>Top 20 meilleurs tours</h2><table><thead><tr><th>#</th><th>Pilote</th><th>Transpondeur</th><th>Meilleur</th><th>Sessions</th><th>Tours</th></tr></thead><tbody>
-      ${top.map((p,i) => `<tr><td>${i+1}</td><td><a href="#/pilote/${p.slug}">${escapeHtml(p.name)}</a></td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td class="best">${fmtTime(p.best_lap)}</td><td>${p.activities_count}</td><td>${p.total_laps}</td></tr>`).join('')}
+      ${top.map((p,i) => `<tr><td>${i+1}</td><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td class="best">${fmtTime(p.best_lap)}</td><td>${p.activities_count}</td><td>${p.total_laps}</td></tr>`).join('')}
     </tbody></table></div>`;
 }
 
@@ -289,7 +373,7 @@ function renderCompare() {
 function comparePilotCard(p) {
   const regs = p.activities.map(a => a.consistency).filter(x => Number.isFinite(Number(x)) && Number(x) > 0);
   const avgReg = regs.length ? regs.reduce((s,x)=>s+Number(x),0)/regs.length : null;
-  return `<div class="card"><h3><a href="#/pilote/${p.slug}">${escapeHtml(p.name)}</a></h3>
+  return `<div class="card"><h3>${pilotNameCell(p.name, p.slug, p.transponder)}</h3>
     <p><span class="badge">${escapeHtml(p.transponder)}</span></p>
     <table><tbody>
       <tr><th>Meilleur tour</th><td class="best">${fmtTime(p.best_lap)}</td></tr>
@@ -306,12 +390,30 @@ function commonActivities(pa, pb) {
 }
 
 function renderCommonTable(common, pa, pb) {
-  return `<table><thead><tr><th>Date</th><th>Session</th><th>${escapeHtml(pa.name)}</th><th>${escapeHtml(pb.name)}</th><th>Écart A-B</th></tr></thead><tbody>
+  return `<table><thead><tr><th>Date</th><th>Sortie</th><th>${escapeHtml(pa.name)}</th><th>${escapeHtml(pb.name)}</th><th>Écart A-B</th></tr></thead><tbody>
     ${common.map(r => {
       const d = Number(r.a.best_lap) - Number(r.b.best_lap);
-      return `<tr><td>${escapeHtml(r.a.date_fr)}</td><td><a href="#/session/${r.a.activity_id}">${escapeHtml(r.a.activity_id)}</a></td><td class="best">${fmtTime(r.a.best_lap)}</td><td class="best">${fmtTime(r.b.best_lap)}</td><td class="${d <= 0 ? 'delta-good' : 'delta-bad'}">${d > 0 ? '+' : ''}${d.toFixed(3)} s</td></tr>`;
+      return `<tr><td>${escapeHtml(r.a.date_fr)}</td><td><a href="#/session/${r.a.activity_id}">Voir</a></td><td class="best">${fmtTime(r.a.best_lap)}</td><td class="best">${fmtTime(r.b.best_lap)}</td><td class="${d <= 0 ? 'delta-good' : 'delta-bad'}">${d > 0 ? '+' : ''}${d.toFixed(3)} s</td></tr>`;
     }).join('')}
   </tbody></table>`;
+}
+
+
+function renderEdition() {
+  setTitle('Édition pilotes');
+  const unknown = unknownPilots().sort((a,b)=>String(a.transponder).localeCompare(String(b.transponder)));
+  const all = [...DB.pilots].sort((a,b)=>a.name.localeCompare(b.name, 'fr'));
+  app.innerHTML = `<div class="card">
+    <h2>Édition des noms pilotes</h2>
+    <p class="muted">Les modifications sont enregistrées dans ce navigateur. Clique ensuite sur “Exporter speedhive_pilots.json”, remplace le fichier dans ton projet, relance build_data_v2.py puis push GitHub.</p>
+    <div class="toolbar"><button class="button" onclick="exportPilotNames()">Exporter speedhive_pilots.json</button></div>
+    <h3>Pilotes inconnus à compléter (${unknown.length})</h3>
+    ${unknown.length ? `<table><thead><tr><th>Transpondeur</th><th>Nom actuel</th><th>Action</th></tr></thead><tbody>${unknown.map(p => `<tr><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${escapeHtml(p.name)}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}</tbody></table>` : '<p>Aucun pilote inconnu avec les données chargées.</p>'}
+    <h3>Tous les pilotes</h3>
+    <table><thead><tr><th>Pilote</th><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Action</th></tr></thead><tbody>
+      ${all.map(p => `<tr><td>${escapeHtml(p.name)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.activities_count}</td><td>${p.total_laps}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}
+    </tbody></table>
+  </div>`;
 }
 
 init();
