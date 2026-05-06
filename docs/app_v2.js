@@ -3,6 +3,7 @@ let DB = null;
 let PILOT_NAMES = {};
 let LOCAL_NAMES = {};
 let TRACK_FILTER = localStorage.getItem('mrcp_track_filter') || 'all'; // all | TT1/8 | TT1/10
+let FAVORITES = new Set();
 
 function setTrackFilter(track) {
   TRACK_FILTER = track || 'all';
@@ -12,6 +13,31 @@ function setTrackFilter(track) {
 function trackBadge(track) {
   if (!track || track === 'all') return 'Toutes pistes';
   return track;
+}
+function loadFavorites() {
+  try { FAVORITES = new Set(JSON.parse(localStorage.getItem('mrcp_favorite_transponders') || '[]').map(normalizeTransponder)); }
+  catch { FAVORITES = new Set(); }
+}
+function saveFavorites() {
+  localStorage.setItem('mrcp_favorite_transponders', JSON.stringify([...FAVORITES]));
+}
+function toggleFavorite(transponder) {
+  const t = normalizeTransponder(transponder);
+  if (!t) return;
+  if (FAVORITES.has(t)) FAVORITES.delete(t); else FAVORITES.add(t);
+  saveFavorites();
+  route();
+}
+function favoriteButton(transponder) {
+  const t = normalizeTransponder(transponder);
+  const active = FAVORITES.has(t);
+  return `<button class="fav-btn ${active ? 'active' : ''}" title="${active ? 'Retirer des favoris' : 'Ajouter aux favoris'}" onclick="toggleFavorite('${escapeHtml(t)}')">${active ? '★' : '☆'}</button>`;
+}
+function favoritePilots() {
+  return filteredPilots().filter(p => FAVORITES.has(normalizeTransponder(p.transponder)));
+}
+function copyCurrentLink() {
+  navigator.clipboard.writeText(location.href).then(() => alert('Lien copié.'));
 }
 function inferTrackFromSeconds(seconds) {
   const v = Number(seconds);
@@ -204,7 +230,7 @@ function editButton(transponder, currentName) {
   return `<button class="edit-btn" title="Modifier ce nom" onclick="editPilotName('${escapeHtml(normalizeTransponder(transponder))}', '${escapeHtml(currentName)}')">✏️</button>`;
 }
 function pilotNameCell(name, slug, transponder) {
-  return `<a href="#/pilote/${escapeHtml(slug)}">${escapeHtml(name)}</a> ${editButton(transponder, name)}`;
+  return `${favoriteButton(transponder)} <a href="#/pilote/${escapeHtml(slug)}">${escapeHtml(name)}</a> ${editButton(transponder, name)}`;
 }
 function activityLabel(s) {
   return `${escapeHtml(s.date_fr || 'Sans date')}${s.best_pilot ? ' — ' + escapeHtml(s.best_pilot) : ''}`;
@@ -310,7 +336,7 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.8` : 'MRCP Dashboard V2.8'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.9` : 'MRCP Dashboard V2.9'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -323,6 +349,7 @@ function route() {
   if (parts[0] === 'records') return renderRecords();
   if (parts[0] === 'chronos') return renderChronos();
   if (parts[0] === 'compare') return renderCompare();
+  if (parts[0] === 'favoris') return renderFavorites();
   if (parts[0] === 'edition') return renderEdition();
   renderHome();
 }
@@ -333,6 +360,7 @@ async function init() {
     if (!res.ok) throw new Error('Impossible de charger data_v2.json');
     DB = await res.json();
     loadLocalNames();
+    loadFavorites();
     await loadPilotNamesFile();
     applyPilotNames();
     subtitle.textContent = `${DB.summary.activities_count} sessions • ${DB.summary.pilots_count} pilotes • ${DB.summary.laps_count} tours • Filtre: ${trackBadge(TRACK_FILTER)} • MAJ ${new Date(DB.generated_at).toLocaleString('fr-FR')}`;
@@ -341,6 +369,18 @@ async function init() {
   } catch (err) {
     app.innerHTML = `<div class="card"><h2>Erreur</h2><p>${escapeHtml(err.message)}</p><p>Vérifie que <strong>data_v2.json</strong> est dans le même dossier que index_v2.html.</p></div>`;
   }
+}
+
+
+function homeFavoritesBlock() {
+  const favs = favoritePilots().sort(byBestLap).slice(0, 12);
+  if (!favs.length) {
+    return `<div class="card"><h2>Favoris</h2><p class="muted">Clique sur ☆ à côté d’un pilote pour le retrouver ici rapidement.</p></div>`;
+  }
+  return `<div class="card"><h2>Favoris</h2><div class="toolbar wrap"><a class="button" href="#/favoris">Voir tous les favoris</a></div>
+    <table><thead><tr><th>Pilote</th><th>Best</th><th>Sessions</th><th>Tours</th></tr></thead><tbody>
+      ${favs.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td class="best">${fmtTime(pilotBestFor(p))}</td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td></tr>`).join('')}
+    </tbody></table></div>`;
 }
 
 function renderHome() {
@@ -364,6 +404,7 @@ function renderHome() {
       <div class="toolbar"><input id="homeSearch" placeholder="Tape un nom ou transpondeur..." autofocus /></div>
       <div id="homeResults"></div>
     </div>
+    ${homeFavoritesBlock()}
     <div class="two-col">
       <div class="card">
         <h2>Dernières sessions</h2>
@@ -422,7 +463,7 @@ function renderSession(id) {
       <h2>Sortie du ${escapeHtml(s.date_fr || 'sans date')}</h2>
       ${trackControls()}
       <p class="muted">${escapeHtml(s.date_fr)} • ${escapeHtml(s.track || tracksForActivity(s).join(', '))} • ${s.pilot_count} pilotes • ${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || 0)} tours</p>
-      <div class="toolbar wrap"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /><button class="button" onclick="exportSessionCsv('${escapeHtml(s.id)}')">Exporter CSV</button></div>
+      <div class="toolbar wrap"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /><button class="button" onclick="exportSessionCsv('${escapeHtml(s.id)}')">Exporter CSV</button><button class="button" onclick="copyCurrentLink()">Copier lien session</button></div>
       <div id="sessionTable"></div>
     </div>
     <div class="card"><h3>Détail tour par tour</h3><p class="muted">Les tours affichés suivent le filtre piste actif.</p><div id="lapDetails"></div></div>`;
@@ -458,7 +499,8 @@ function renderPilot(slug) {
   app.innerHTML = `
     <div class="card">
       <p><a href="#/pilotes">← Retour pilotes</a></p>
-      <h2>${escapeHtml(p.name)}</h2>
+      <h2>${favoriteButton(p.transponder)} ${escapeHtml(p.name)}</h2>
+      <div class="toolbar wrap"><button class="button" onclick="copyCurrentLink()">Copier lien pilote</button><button class="button" onclick="window.print()">Imprimer fiche</button></div>
       ${trackControls()}
       <p><span class="badge">Transpondeur ${escapeHtml(p.transponder)}</span> <span class="badge">${trackBadge(TRACK_FILTER)}</span></p>
       <div class="grid">
@@ -532,6 +574,18 @@ function drawSimpleLineChart(id, points) {
   ctx.fillText(points[points.length - 1].label, Math.max(pad, w - pad - 90), h - 8);
 }
 
+
+function bestProgressions(limit = 10) {
+  return filteredPilots().map(p => {
+    const acts = pilotActivitiesFor(p).filter(a => Number.isFinite(Number(a.best_lap))).sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')));
+    if (acts.length < 2) return null;
+    const first = acts[0];
+    const best = acts.reduce((m,a) => Number(a.best_lap) < Number(m.best_lap) ? a : m, acts[0]);
+    const gain = Number(first.best_lap) - Number(best.best_lap);
+    return {p, first, best, gain};
+  }).filter(x => x && x.gain > 0).sort((a,b) => b.gain - a.gain).slice(0, limit);
+}
+
 function renderRecords() {
   setTitle('Records');
   const pilots = filteredPilots().filter(p => pilotBestFor(p));
@@ -549,7 +603,14 @@ function renderRecords() {
     </div>
     <div class="card"><h2>Top 20 meilleurs tours</h2><table><thead><tr><th>#</th><th>Pilote</th><th>Transpondeur</th><th>Meilleur</th><th>Sessions</th><th>Tours</th></tr></thead><tbody>
       ${top.map((p,i) => `<tr><td>${i+1}</td><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td class="best">${fmtTime(pilotBestFor(p))}</td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td></tr>`).join('')}
-    </tbody></table></div>`;
+    </tbody></table></div>
+    ${renderProgressionsBlock()}
+  `;
+}
+
+function renderProgressionsBlock() {
+  const rows = bestProgressions(10);
+  return `<div class="card"><h2>Meilleures progressions</h2><p class="muted">Gain entre le premier meilleur tour connu et le record personnel actuel, selon le filtre piste actif.</p>${rows.length ? `<table><thead><tr><th>#</th><th>Pilote</th><th>Premier best</th><th>Record</th><th>Gain</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${pilotNameCell(r.p.name, r.p.slug, r.p.transponder)}</td><td>${fmtTime(r.first.best_lap)}<br><span class="muted small">${escapeHtml(r.first.date_fr)}</span></td><td class="best">${fmtTime(r.best.best_lap)}<br><span class="muted small">${escapeHtml(r.best.date_fr)}</span></td><td class="delta-good">-${r.gain.toFixed(3)} s</td></tr>`).join('')}</tbody></table>` : '<p>Pas assez de données.</p>'}</div>`;
 }
 
 
@@ -651,6 +712,20 @@ function renderCommonTable(common, pa, pb) {
   </tbody></table>`;
 }
 
+
+
+function renderFavorites() {
+  setTitle('Favoris');
+  const favs = favoritePilots().sort(byBestLap);
+  app.innerHTML = `<div class="card">
+    <h2>Mes pilotes favoris — ${trackBadge(TRACK_FILTER)}</h2>
+    ${trackControls()}
+    <p class="muted">Les favoris sont enregistrés dans ce navigateur. Utilise ☆ / ★ à côté d’un nom de pilote.</p>
+    ${favs.length ? `<table><thead><tr><th>Pilote</th><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Meilleur</th><th>Moy. meilleurs</th></tr></thead><tbody>
+      ${favs.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td><td class="best">${fmtTime(pilotBestFor(p))}</td><td>${fmtTime(avgBestLapFor(p))}</td></tr>`).join('')}
+    </tbody></table>` : '<p>Aucun favori pour l’instant.</p>'}
+  </div>`;
+}
 
 function renderEdition() {
   setTitle('Édition pilotes');

@@ -53,3 +53,7 @@ code { background:#0b1224; border:1px solid var(--line); padding:2px 6px; border
 .track-filter button { cursor: pointer; }
 
 .nowrap { white-space: nowrap; }
+
+.fav-btn { margin-right:6px; padding:2px 7px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); cursor:pointer; }
+.fav-btn.active { color:#facc15; border-color:#facc15; background:rgba(250,204,21,.10); }
+.fav-btn:hover { border-color:var(--accent); color:var(--text); }
