@@ -2,6 +2,56 @@ let DB = null;
 
 let PILOT_NAMES = {};
 let LOCAL_NAMES = {};
+let TRACK_FILTER = localStorage.getItem('mrcp_track_filter') || 'all'; // all | TT1/8 | TT1/10
+
+function setTrackFilter(track) {
+  TRACK_FILTER = track || 'all';
+  localStorage.setItem('mrcp_track_filter', TRACK_FILTER);
+  route();
+}
+function trackBadge(track) {
+  if (!track || track === 'all') return 'Toutes pistes';
+  return track;
+}
+function activityMatchesTrack(a) {
+  if (TRACK_FILTER === 'all') return true;
+  return Array.isArray(a.tracks) ? a.tracks.includes(TRACK_FILTER) : a.track === TRACK_FILTER;
+}
+function participantMatchesTrack(p) {
+  if (TRACK_FILTER === 'all') return true;
+  return Array.isArray(p.tracks) ? p.tracks.includes(TRACK_FILTER) : p.track === TRACK_FILTER;
+}
+function pilotActivitiesFor(p) {
+  const acts = p.activities || [];
+  if (TRACK_FILTER === 'all') return acts;
+  return acts.filter(a => a.track === TRACK_FILTER);
+}
+function pilotBestFor(p) {
+  if (TRACK_FILTER === 'all') return p.best_lap;
+  return p.tracks?.[TRACK_FILTER]?.best_lap ?? null;
+}
+function pilotTotalFor(p) {
+  if (TRACK_FILTER === 'all') return p.total_laps || 0;
+  return p.tracks?.[TRACK_FILTER]?.total_laps || 0;
+}
+function pilotSessionsFor(p) {
+  if (TRACK_FILTER === 'all') return p.activities_count || 0;
+  return p.tracks?.[TRACK_FILTER]?.activities_count || 0;
+}
+function filteredPilots() {
+  return (DB?.pilots || []).filter(p => TRACK_FILTER === 'all' || pilotActivitiesFor(p).length > 0);
+}
+function filteredActivities() {
+  return (DB?.activities || []).filter(activityMatchesTrack);
+}
+function trackControls() {
+  const cls = t => TRACK_FILTER === t ? 'button active' : 'button';
+  return `<div class="track-filter toolbar wrap">
+    <button class="${cls('all')}" onclick="setTrackFilter('all')">Toutes pistes</button>
+    <button class="${cls('TT1/8')}" onclick="setTrackFilter('TT1/8')">TT1/8 ≥ 30 s</button>
+    <button class="${cls('TT1/10')}" onclick="setTrackFilter('TT1/10')">TT1/10 &lt; 30 s</button>
+  </div>`;
+}
 
 function normalizeTransponder(t) {
   return String(t || '').trim().replace(/\/0$/, '');
@@ -150,12 +200,12 @@ function slugText(s) {
   return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 function byDateDesc(a, b) { return String(b.date || '').localeCompare(String(a.date || '')) || String(b.activity_id || b.id || '').localeCompare(String(a.activity_id || a.id || '')); }
-function byBestLap(a, b) { return (Number(a.best_lap) || 9999) - (Number(b.best_lap) || 9999); }
+function byBestLap(a, b) { return (Number(pilotBestFor(a)) || 9999) - (Number(pilotBestFor(b)) || 9999); }
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.4` : 'MRCP Dashboard V2.4'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V2.5` : 'MRCP Dashboard V2.5'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -179,7 +229,7 @@ async function init() {
     loadLocalNames();
     await loadPilotNamesFile();
     applyPilotNames();
-    subtitle.textContent = `${DB.summary.activities_count} sessions • ${DB.summary.pilots_count} pilotes • ${DB.summary.laps_count} tours • MAJ ${new Date(DB.generated_at).toLocaleString('fr-FR')}`;
+    subtitle.textContent = `${DB.summary.activities_count} sessions • ${DB.summary.pilots_count} pilotes • ${DB.summary.laps_count} tours • Filtre: ${trackBadge(TRACK_FILTER)} • MAJ ${new Date(DB.generated_at).toLocaleString('fr-FR')}`;
     window.addEventListener('hashchange', route);
     route();
   } catch (err) {
@@ -189,16 +239,19 @@ async function init() {
 
 function renderHome() {
   setTitle('Accueil');
-  const best = DB.records?.best_lap;
-  const active = DB.records?.most_active;
-  const recent = [...DB.activities].sort(byDateDesc).slice(0, 8);
-  const topPilots = [...DB.pilots].sort(byBestLap).slice(0, 8);
+  const recent = filteredActivities().sort(byDateDesc).slice(0, 8);
+  const pilots = filteredPilots();
+  const topPilots = pilots.sort(byBestLap).slice(0, 8);
+  const bestPilot = topPilots[0] || null;
+  const activePilot = [...pilots].sort((a,b)=>pilotTotalFor(b)-pilotTotalFor(a))[0] || null;
+  const lapsInFilter = TRACK_FILTER === 'all' ? DB.summary.laps_count : (DB.summary.tracks?.[TRACK_FILTER]?.laps_count || filteredActivities().reduce((sum,a)=>sum+(a.track_counts?.[TRACK_FILTER]||0),0));
   app.innerHTML = `
+    ${trackControls()}
     <div class="grid">
-      <div class="card"><div class="muted">Sessions</div><div class="stat">${DB.summary.activities_count}</div></div>
-      <div class="card"><div class="muted">Pilotes</div><div class="stat">${DB.summary.pilots_count}</div></div>
-      <div class="card"><div class="muted">Tours</div><div class="stat">${DB.summary.laps_count}</div></div>
-      <div class="card"><div class="muted">Meilleur tour</div><div class="stat">${best ? fmtTime(best.time) : '-'}</div><div class="muted">${best ? escapeHtml(best.pilot) : ''}</div></div>
+      <div class="card"><div class="muted">Sessions</div><div class="stat">${filteredActivities().length}</div></div>
+      <div class="card"><div class="muted">Pilotes</div><div class="stat">${pilots.length}</div></div>
+      <div class="card"><div class="muted">Tours</div><div class="stat">${lapsInFilter}</div></div>
+      <div class="card"><div class="muted">Meilleur tour</div><div class="stat">${bestPilot ? fmtTime(pilotBestFor(bestPilot)) : '-'}</div><div class="muted">${bestPilot ? escapeHtml(bestPilot.name) : ''}</div></div>
     </div>
     <div class="card">
       <h2>Recherche rapide pilote</h2>
@@ -215,9 +268,9 @@ function renderHome() {
       <div class="card">
         <h2>Top pilotes</h2>
         <table><thead><tr><th>Pilote</th><th>Best</th><th>Tours</th></tr></thead><tbody>
-          ${topPilots.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${p.total_laps}</td></tr>`).join('')}
+          ${topPilots.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td class="best">${fmtTime(pilotBestFor(p))}</td><td>${pilotTotalFor(p)}</td></tr>`).join('')}
         </tbody></table>
-        <p class="muted">Pilote le plus actif : ${active ? `${pilotNameCell(active.pilot, active.slug, active.transponder)} (${active.laps} tours)` : '-'}</p>
+        <p class="muted">Pilote le plus actif : ${activePilot ? `${pilotNameCell(activePilot.name, activePilot.slug, activePilot.transponder)} (${pilotTotalFor(activePilot)} tours)` : '-'}</p>
       </div>
     </div>`;
   attachPilotSearch('homeSearch', 'homeResults', 10);
@@ -229,9 +282,9 @@ function attachPilotSearch(inputId, resultId, limit = 50) {
   function draw() {
     const term = norm(q.value.trim());
     if (!term) { box.innerHTML = '<p class="muted">Saisis au moins une lettre.</p>'; return; }
-    const rows = DB.pilots.filter(p => norm(p.name).includes(term) || String(p.transponder).includes(term)).slice(0, limit);
+    const rows = filteredPilots().filter(p => norm(p.name).includes(term) || String(p.transponder).includes(term)).slice(0, limit);
     box.innerHTML = rows.length ? `<table><thead><tr><th>Pilote</th><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Meilleur</th></tr></thead><tbody>
-      ${rows.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.activities_count}</td><td>${p.total_laps}</td><td class="best">${fmtTime(p.best_lap)}</td></tr>`).join('')}
+      ${rows.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td><td class="best">${fmtTime(pilotBestFor(p))}</td></tr>`).join('')}
       </tbody></table>` : '<p>Aucun pilote trouvé.</p>';
   }
   q.addEventListener('input', draw); draw();
@@ -239,15 +292,15 @@ function attachPilotSearch(inputId, resultId, limit = 50) {
 
 function renderSessions() {
   setTitle('Sessions');
-  const rows = [...DB.activities].sort(byDateDesc);
-  app.innerHTML = `<div class="card"><h2>Sessions</h2><div class="toolbar"><input id="q" placeholder="Rechercher date, pilote, session..." /></div><div id="table"></div></div>`;
+  const rows = filteredActivities().sort(byDateDesc);
+  app.innerHTML = `<div class="card"><h2>Sessions — ${trackBadge(TRACK_FILTER)}</h2>${trackControls()}<div class="toolbar"><input id="q" placeholder="Rechercher date ou pilote..." /></div><div id="table"></div></div>`;
   const q = document.getElementById('q');
   const table = document.getElementById('table');
   function draw() {
     const term = norm(q.value);
-    const filtered = rows.filter(s => String(s.id).includes(term) || norm(s.date_fr).includes(term) || norm(s.best_pilot).includes(term));
-    table.innerHTML = `<p class="muted">${filtered.length} session(s)</p><table><thead><tr><th>Date</th><th>Sortie</th><th>Pilotes</th><th>Tours</th><th>Meilleur tour</th><th>Meilleur pilote</th></tr></thead><tbody>
-      ${filtered.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><a href="#/session/${s.id}">${activityLabel(s)}</a></td><td>${s.pilot_count}</td><td>${s.laps_count}</td><td class="best">${fmtTime(s.best_lap)}</td><td>${escapeHtml(s.best_pilot)}</td></tr>`).join('')}
+    const filtered = rows.filter(s => norm(s.date_fr).includes(term) || norm(s.best_pilot).includes(term));
+    table.innerHTML = `<p class="muted">${filtered.length} session(s)</p><table><thead><tr><th>Date</th><th>Piste</th><th>Sortie</th><th>Pilotes</th><th>Tours</th><th>Meilleur tour</th><th>Meilleur pilote</th></tr></thead><tbody>
+      ${filtered.map(s => `<tr><td>${escapeHtml(s.date_fr)}</td><td><span class="badge">${escapeHtml(s.track || (s.tracks||[]).join(', '))}</span></td><td><a href="#/session/${s.id}">${activityLabel(s)}</a></td><td>${s.pilot_count}</td><td>${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || 0)}</td><td class="best">${fmtTime(s.best_lap)}</td><td>${escapeHtml(s.best_pilot)}</td></tr>`).join('')}
       </tbody></table>`;
   }
   q.addEventListener('input', draw); draw();
@@ -261,7 +314,8 @@ function renderSession(id) {
     <div class="card">
       <p><a href="#/sessions">← Retour sessions</a></p>
       <h2>Sortie du ${escapeHtml(s.date_fr || 'sans date')}</h2>
-      <p class="muted">${escapeHtml(s.date_fr)} • ${s.pilot_count} pilotes • ${s.laps_count} tours</p>
+      ${trackControls()}
+      <p class="muted">${escapeHtml(s.date_fr)} • ${escapeHtml(s.track || '')} • ${s.pilot_count} pilotes • ${TRACK_FILTER === 'all' ? s.laps_count : (s.track_counts?.[TRACK_FILTER] || 0)} tours</p>
       <div class="toolbar"><input id="qSession" placeholder="Filtrer les pilotes de cette session..." /></div>
       <div id="sessionTable"></div>
     </div>
@@ -271,9 +325,9 @@ function renderSession(id) {
   const details = document.getElementById('lapDetails');
   function draw() {
     const term = norm(q.value);
-    const parts = s.participants.filter(p => norm(p.pilot_name).includes(term) || String(p.transponder).includes(term));
-    table.innerHTML = `<table><thead><tr><th>Rang</th><th>Pilote</th><th>Transpondeur</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
-      ${parts.map(p => `<tr><td>${p.rank}</td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.laps_count}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${fmtTime(p.avg_lap)}</td><td>${fmtTime(p.consistency)}</td></tr>`).join('')}
+    const parts = s.participants.filter(participantMatchesTrack).filter(p => norm(p.pilot_name).includes(term) || String(p.transponder).includes(term));
+    table.innerHTML = `<table><thead><tr><th>Rang</th><th>Piste</th><th>Pilote</th><th>Transpondeur</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
+      ${parts.map(p => `<tr><td>${p.rank}</td><td><span class="badge">${escapeHtml(p.track || '')}</span></td><td>${pilotNameCell(p.pilot_name, p.pilot_slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.laps_count}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${fmtTime(p.avg_lap)}</td><td>${fmtTime(p.consistency)}</td></tr>`).join('')}
       </tbody></table>`;
     details.innerHTML = parts.map(p => `<details><summary>${escapeHtml(p.pilot_name)} — ${p.laps_count} tours — best ${fmtTime(p.best_lap)}</summary>
         <table><thead><tr><th>Tour</th><th>Heure</th><th>Temps</th><th>Vitesse</th></tr></thead><tbody>
@@ -285,7 +339,7 @@ function renderSession(id) {
 
 function renderPilots() {
   setTitle('Pilotes');
-  app.innerHTML = `<div class="card"><h2>Pilotes</h2><div class="toolbar"><input id="qPilots" placeholder="Rechercher nom ou transpondeur..." /></div><div id="pilotResults"></div></div>`;
+  app.innerHTML = `<div class="card"><h2>Pilotes — ${trackBadge(TRACK_FILTER)}</h2>${trackControls()}<div class="toolbar"><input id="qPilots" placeholder="Rechercher nom ou transpondeur..." /></div><div id="pilotResults"></div></div>`;
   attachPilotSearch('qPilots', 'pilotResults', 500);
 }
 
@@ -293,17 +347,18 @@ function renderPilot(slug) {
   const p = DB.pilots.find(x => x.slug === slug || slugText(x.name) === slug || String(x.transponder) === String(slug));
   if (!p) return app.innerHTML = `<div class="card">Pilote introuvable.</div>`;
   setTitle(p.name);
-  const acts = [...p.activities].sort(byDateDesc);
-  const progression = [...p.activities].filter(a => a.best_lap).sort((a,b) => String(a.date || '').localeCompare(String(b.date || ''))).slice(-25);
+  const acts = pilotActivitiesFor(p).sort(byDateDesc);
+  const progression = pilotActivitiesFor(p).filter(a => a.best_lap).sort((a,b) => String(a.date || '').localeCompare(String(b.date || ''))).slice(-25);
   app.innerHTML = `
     <div class="card">
       <p><a href="#/pilotes">← Retour pilotes</a></p>
       <h2>${escapeHtml(p.name)}</h2>
-      <p><span class="badge">Transpondeur ${escapeHtml(p.transponder)}</span></p>
+      ${trackControls()}
+      <p><span class="badge">Transpondeur ${escapeHtml(p.transponder)}</span> <span class="badge">${trackBadge(TRACK_FILTER)}</span></p>
       <div class="grid">
-        <div class="card"><div class="muted">Sessions</div><div class="stat">${p.activities_count}</div></div>
-        <div class="card"><div class="muted">Tours</div><div class="stat">${p.total_laps}</div></div>
-        <div class="card"><div class="muted">Meilleur</div><div class="stat">${fmtTime(p.best_lap)}</div></div>
+        <div class="card"><div class="muted">Sessions</div><div class="stat">${pilotSessionsFor(p)}</div></div>
+        <div class="card"><div class="muted">Tours</div><div class="stat">${pilotTotalFor(p)}</div></div>
+        <div class="card"><div class="muted">Meilleur</div><div class="stat">${fmtTime(pilotBestFor(p))}</div></div>
         <div class="card"><div class="muted">Moy. meilleurs</div><div class="stat">${fmtTime(p.avg_best_lap)}</div></div>
       </div>
       <h3>Progression des meilleurs tours</h3>
@@ -311,15 +366,15 @@ function renderPilot(slug) {
       <h3>Résumé</h3>
       <div id="pilotInsights"></div>
       <h3>Historique</h3>
-      <table><thead><tr><th>Date</th><th>Sortie</th><th>Rang</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
-      ${acts.map(a => `<tr><td>${escapeHtml(a.date_fr)}</td><td><a href="#/session/${a.activity_id}">Voir</a></td><td>${a.rank}</td><td>${a.laps_count}</td><td class="best">${fmtTime(a.best_lap)}</td><td>${fmtTime(a.avg_lap)}</td><td>${fmtTime(a.consistency)}</td></tr>`).join('')}</tbody></table>
+      <table><thead><tr><th>Date</th><th>Piste</th><th>Sortie</th><th>Rang</th><th>Tours</th><th>Meilleur</th><th>Moyenne</th><th>Régularité</th></tr></thead><tbody>
+      ${acts.map(a => `<tr><td>${escapeHtml(a.date_fr)}</td><td><span class="badge">${escapeHtml(a.track || '')}</span></td><td><a href="#/session/${a.activity_id}">Voir</a></td><td>${a.rank}</td><td>${a.laps_count}</td><td class="best">${fmtTime(a.best_lap)}</td><td>${fmtTime(a.avg_lap)}</td><td>${fmtTime(a.consistency)}</td></tr>`).join('')}</tbody></table>
     </div>`;
   document.getElementById('pilotInsights').innerHTML = pilotInsights(p);
   drawSimpleLineChart('pilotChart', progression.map(a => ({label: a.date_fr || a.activity_id, value: a.best_lap})));
 }
 
 function pilotInsights(p) {
-  const acts = [...p.activities].filter(a => a.best_lap).sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')));
+  const acts = pilotActivitiesFor(p).filter(a => a.best_lap).sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')));
   if (!acts.length) return '<p class="muted">Pas assez de données.</p>';
   const first = acts[0], last = acts[acts.length - 1];
   const best = acts.reduce((m,a) => a.best_lap < m.best_lap ? a : m, acts[0]);
@@ -373,28 +428,31 @@ function drawSimpleLineChart(id, points) {
 
 function renderRecords() {
   setTitle('Records');
-  const best = DB.records?.best_lap;
-  const active = DB.records?.most_active;
-  const top = [...DB.pilots].sort(byBestLap).slice(0, 20);
+  const pilots = filteredPilots().filter(p => pilotBestFor(p));
+  const top = pilots.sort(byBestLap).slice(0, 20);
+  const best = top[0] || null;
+  const active = [...filteredPilots()].sort((a,b)=>pilotTotalFor(b)-pilotTotalFor(a))[0] || null;
   app.innerHTML = `
     <div class="card">
-      <h2>Records</h2>
+      <h2>Records — ${trackBadge(TRACK_FILTER)}</h2>
+      ${trackControls()}
       <table><tbody>
-        <tr><th>Meilleur tour global</th><td class="best">${best ? fmtTime(best.time) : '-'}</td><td>${best ? `${pilotNameCell(best.pilot, best.slug, best.transponder)}` : ''}</td><td>${best ? `<span class="badge">${escapeHtml(best.transponder)}</span>` : ''}</td></tr>
-        <tr><th>Pilote le plus actif</th><td>${active ? `${pilotNameCell(active.pilot, active.slug, active.transponder)}` : '-'}</td><td>${active ? active.laps + ' tours' : ''}</td><td>${active ? `<span class="badge">${escapeHtml(active.transponder)}</span>` : ''}</td></tr>
+        <tr><th>Meilleur tour</th><td class="best">${best ? fmtTime(pilotBestFor(best)) : '-'}</td><td>${best ? `${pilotNameCell(best.name, best.slug, best.transponder)}` : ''}</td><td>${best ? `<span class="badge">${escapeHtml(best.transponder)}</span>` : ''}</td></tr>
+        <tr><th>Pilote le plus actif</th><td>${active ? `${pilotNameCell(active.name, active.slug, active.transponder)}` : '-'}</td><td>${active ? pilotTotalFor(active) + ' tours' : ''}</td><td>${active ? `<span class="badge">${escapeHtml(active.transponder)}</span>` : ''}</td></tr>
       </tbody></table>
     </div>
     <div class="card"><h2>Top 20 meilleurs tours</h2><table><thead><tr><th>#</th><th>Pilote</th><th>Transpondeur</th><th>Meilleur</th><th>Sessions</th><th>Tours</th></tr></thead><tbody>
-      ${top.map((p,i) => `<tr><td>${i+1}</td><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td class="best">${fmtTime(p.best_lap)}</td><td>${p.activities_count}</td><td>${p.total_laps}</td></tr>`).join('')}
+      ${top.map((p,i) => `<tr><td>${i+1}</td><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td class="best">${fmtTime(pilotBestFor(p))}</td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td></tr>`).join('')}
     </tbody></table></div>`;
 }
 
 
 function renderCompare() {
   setTitle('Comparer');
-  const options = [...DB.pilots].sort((a,b)=>a.name.localeCompare(b.name, 'fr')).map(p => `<option value="${escapeHtml(p.slug)}">${escapeHtml(p.name)} — ${escapeHtml(p.transponder)}</option>`).join('');
+  const options = filteredPilots().sort((a,b)=>a.name.localeCompare(b.name, 'fr')).map(p => `<option value="${escapeHtml(p.slug)}">${escapeHtml(p.name)} — ${escapeHtml(p.transponder)}</option>`).join('');
   app.innerHTML = `<div class="card">
-    <h2>Comparer deux pilotes</h2>
+    <h2>Comparer deux pilotes — ${trackBadge(TRACK_FILTER)}</h2>
+    ${trackControls()}
     <p class="muted">Comparaison simple basée sur le meilleur tour, le volume de tours, les sessions et la régularité moyenne.</p>
     <div class="two-col">
       <div><label>Pilote A</label><select id="pA" class="select">${options}</select></div>
@@ -405,13 +463,13 @@ function renderCompare() {
   </div>`;
   const a = document.getElementById('pA');
   const b = document.getElementById('pB');
-  if (DB.pilots.length > 1) b.selectedIndex = 1;
+  if (filteredPilots().length > 1) b.selectedIndex = 1;
   function draw() {
     const pa = DB.pilots.find(p => p.slug === a.value);
     const pb = DB.pilots.find(p => p.slug === b.value);
     if (!pa || !pb) return;
     const common = commonActivities(pa, pb);
-    const bestDiff = (pa.best_lap || 0) - (pb.best_lap || 0);
+    const bestDiff = (pilotBestFor(pa) || 0) - (pilotBestFor(pb) || 0);
     document.getElementById('compareResult').innerHTML = `
       <div class="two-col">
         ${comparePilotCard(pa)}
@@ -419,7 +477,7 @@ function renderCompare() {
       </div>
       <div class="card" style="margin-top:16px">
         <h3>Écart global</h3>
-        <p>Meilleur tour : <strong>${escapeHtml(pa.name)}</strong> ${fmtTime(pa.best_lap)} vs <strong>${escapeHtml(pb.name)}</strong> ${fmtTime(pb.best_lap)} — écart <span class="${bestDiff <= 0 ? 'delta-good' : 'delta-bad'}">${bestDiff > 0 ? '+' : ''}${bestDiff.toFixed(3)} s</span> pour ${escapeHtml(pa.name)}.</p>
+        <p>Meilleur tour : <strong>${escapeHtml(pa.name)}</strong> ${fmtTime(pilotBestFor(pa))} vs <strong>${escapeHtml(pb.name)}</strong> ${fmtTime(pilotBestFor(pb))} — écart <span class="${bestDiff <= 0 ? 'delta-good' : 'delta-bad'}">${bestDiff > 0 ? '+' : ''}${bestDiff.toFixed(3)} s</span> pour ${escapeHtml(pa.name)}.</p>
         <h3>Sessions communes</h3>
         ${common.length ? renderCommonTable(common, pa, pb) : '<p class="muted">Aucune session commune trouvée.</p>'}
       </div>`;
@@ -436,16 +494,16 @@ function comparePilotCard(p) {
     <p><span class="badge">${escapeHtml(p.transponder)}</span></p>
     <table><tbody>
       <tr><th>Meilleur tour</th><td class="best">${fmtTime(p.best_lap)}</td></tr>
-      <tr><th>Sessions</th><td>${p.activities_count}</td></tr>
-      <tr><th>Tours</th><td>${p.total_laps}</td></tr>
+      <tr><th>Sessions</th><td>${pilotSessionsFor(p)}</td></tr>
+      <tr><th>Tours</th><td>${pilotTotalFor(p)}</td></tr>
       <tr><th>Moy. meilleurs</th><td>${fmtTime(p.avg_best_lap)}</td></tr>
       <tr><th>Régularité moyenne</th><td>${fmtTime(avgReg)}</td></tr>
     </tbody></table></div>`;
 }
 
 function commonActivities(pa, pb) {
-  const ma = new Map(pa.activities.map(a => [String(a.activity_id), a]));
-  return pb.activities.filter(b => ma.has(String(b.activity_id))).map(b => ({a: ma.get(String(b.activity_id)), b})).sort((x,y)=>byDateDesc(x.a,y.a));
+  const ma = new Map(pilotActivitiesFor(pa).map(a => [String(a.activity_id), a]));
+  return pilotActivitiesFor(pb).filter(b => ma.has(String(b.activity_id))).map(b => ({a: ma.get(String(b.activity_id)), b})).sort((x,y)=>byDateDesc(x.a,y.a));
 }
 
 function renderCommonTable(common, pa, pb) {
@@ -495,7 +553,7 @@ function renderEdition() {
     const term = norm(q.value);
     const rows = all.filter(p => !term || norm(p.name).includes(term) || String(p.transponder).includes(term)).slice(0, 300);
     box.innerHTML = `<p class="muted">${rows.length} pilote(s) affiché(s)</p><table><thead><tr><th>Pilote</th><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Meilleur</th><th>Action</th></tr></thead><tbody>
-      ${rows.map(p => `<tr><td>${escapeHtml(p.name)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${p.activities_count}</td><td>${p.total_laps}</td><td class="best">${fmtTime(p.best_lap)}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}
+      ${rows.map(p => `<tr><td>${escapeHtml(p.name)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td><td class="best">${fmtTime(pilotBestFor(p))}</td><td>${editButton(p.transponder, p.name)}</td></tr>`).join('')}
     </tbody></table>`;
   }
   q.addEventListener('input', drawEditTable); drawEditTable();
