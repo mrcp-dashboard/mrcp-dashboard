@@ -2,6 +2,7 @@ let DB = null;
 
 let PILOT_NAMES = {};
 let LOCAL_NAMES = {};
+let LOCAL_CORRECTIONS = { renamed_transponders: [], merged_transponders: [] };
 let TRACK_FILTER = localStorage.getItem('mrcp_track_filter') || 'all'; // all | TT1/8 | TT1/10
 let FAVORITES = new Set();
 let LAP_OVERRIDES = { excluded: {}, forced_track: {} };
@@ -343,6 +344,61 @@ function loadLocalNames() {
 function saveLocalNames() {
   localStorage.setItem('mrcp_pilot_names', JSON.stringify(LOCAL_NAMES, null, 2));
 }
+
+function loadLocalCorrections() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('mrcp_pilot_corrections') || '{}');
+    LOCAL_CORRECTIONS = {
+      renamed_transponders: Array.isArray(raw.renamed_transponders) ? raw.renamed_transponders : [],
+      merged_transponders: Array.isArray(raw.merged_transponders) ? raw.merged_transponders : []
+    };
+  } catch (_) { LOCAL_CORRECTIONS = { renamed_transponders: [], merged_transponders: [] }; }
+}
+function saveLocalCorrections() {
+  localStorage.setItem('mrcp_pilot_corrections', JSON.stringify(LOCAL_CORRECTIONS, null, 2));
+}
+function exportCorrectionsJson() {
+  const corrections = {
+    deleted_laps: [],
+    edited_laps: [],
+    renamed_transponders: LOCAL_CORRECTIONS.renamed_transponders || [],
+    merged_transponders: LOCAL_CORRECTIONS.merged_transponders || []
+  };
+  downloadText('corrections.json', JSON.stringify(corrections, null, 2), 'application/json;charset=utf-8');
+}
+function addRenameCorrection(transponder, currentName) {
+  if (!requireAdmin()) return;
+  const t = normalizeTransponder(transponder);
+  const name = prompt(`Nom définitif pour le transpondeur ${t}`, (currentName || '').replace(/^Inconnu #\d+$/, ''));
+  if (name === null) return;
+  const cleaned = name.trim();
+  if (!cleaned) return;
+  LOCAL_NAMES[t] = cleaned;
+  LOCAL_CORRECTIONS.renamed_transponders = (LOCAL_CORRECTIONS.renamed_transponders || []).filter(x => normalizeTransponder(x.transponder) !== t);
+  LOCAL_CORRECTIONS.renamed_transponders.push({ transponder: t, name: cleaned, at: new Date().toISOString() });
+  saveLocalNames();
+  saveLocalCorrections();
+  applyPilotNames();
+  route();
+}
+function addMergeCorrection(sourceTransponder) {
+  if (!requireAdmin()) return;
+  const source = normalizeTransponder(sourceTransponder);
+  const target = normalizeTransponder(prompt(`Fusionner le transpondeur ${source} vers quel transpondeur principal ?`, ''));
+  if (!target || target === source) return;
+  LOCAL_CORRECTIONS.merged_transponders = (LOCAL_CORRECTIONS.merged_transponders || []).filter(x => normalizeTransponder(x.source || x.from) !== source);
+  LOCAL_CORRECTIONS.merged_transponders.push({ source, target, at: new Date().toISOString() });
+  saveLocalCorrections();
+  alert('Fusion ajoutée. Exporte corrections.json puis relance build_data_v2.py pour que la fusion soit appliquée définitivement.');
+  route();
+}
+function clearPilotCorrections() {
+  if (!requireAdmin()) return;
+  if (!confirm('Effacer les corrections pilotes locales ?')) return;
+  LOCAL_CORRECTIONS = { renamed_transponders: [], merged_transponders: [] };
+  saveLocalCorrections();
+  route();
+}
 async function loadPilotNamesFile() {
   try {
     const res = await fetch('speedhive_pilots.json?cache=' + Date.now());
@@ -503,6 +559,7 @@ function route() {
   if (parts[0] === 'compare') return renderCompare();
   if (parts[0] === 'favoris') return renderFavorites();
   if (parts[0] === 'edition') return renderEdition();
+  if (parts[0] === 'pilotes-admin') return renderPilotsAdmin();
   if (parts[0] === 'qualite') return renderDataQuality();
   if (parts[0] === 'admin') return renderAdminRecords();
   renderHome();
@@ -514,6 +571,7 @@ async function init() {
     if (!res.ok) throw new Error('Impossible de charger data_v2.json');
     DB = await res.json();
     loadLocalNames();
+    loadLocalCorrections();
     loadFavorites();
     loadLapOverrides();
     await loadPilotNamesFile();
@@ -1105,6 +1163,63 @@ function renderFavorites() {
       ${favs.map(p => `<tr><td>${pilotNameCell(p.name, p.slug, p.transponder)}</td><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td><td class="best">${fmtTime(pilotBestFor(p))}</td><td>${fmtTime(avgBestLapFor(p))}</td></tr>`).join('')}
     </tbody></table>` : '<p>Aucun favori pour l’instant.</p>'}
   </div>`;
+}
+
+
+function renderPilotsAdmin() {
+  setTitle('Pilotes admin');
+  if (!ADMIN_MODE) {
+    app.innerHTML = `<div class="card"><h2>Pilotes admin</h2><p class="muted">Cette page sert à fiabiliser les noms, transpondeurs et fusions avant publication.</p><button class="button" onclick="requireAdmin() && route()">Entrer en mode admin</button></div>`;
+    return;
+  }
+  const unknown = unknownPilots().sort((a,b)=>(b.total_laps||0)-(a.total_laps||0));
+  const duplicates = findPossibleDuplicatePilots();
+  const renames = LOCAL_CORRECTIONS.renamed_transponders || [];
+  const merges = LOCAL_CORRECTIONS.merged_transponders || [];
+  app.innerHTML = `<div class="card">
+    <h2>Fiabilisation pilotes / transpondeurs ${adminBadge()}</h2>
+    <p class="muted">Ici tu prépares les corrections définitives. Après modification : exporte <strong>corrections.json</strong>, mets-le dans le dossier du projet, relance <code>python build_data_v2.py</code>, puis push.</p>
+    <div class="grid">
+      <div class="card"><div class="muted">Pilotes inconnus</div><div class="stat">${unknown.length}</div></div>
+      <div class="card"><div class="muted">Doublons probables</div><div class="stat">${duplicates.length}</div></div>
+      <div class="card"><div class="muted">Renommages prêts</div><div class="stat">${renames.length}</div></div>
+      <div class="card"><div class="muted">Fusions prêtes</div><div class="stat">${merges.length}</div></div>
+    </div>
+    <div class="toolbar wrap">
+      <button class="button" onclick="exportCorrectionsJson()">Exporter corrections.json</button>
+      <button class="button" onclick="exportPilotNames()">Exporter speedhive_pilots.json</button>
+      <button class="button danger" onclick="clearPilotCorrections()">Effacer corrections pilotes locales</button>
+      <a class="button" href="#/edition">Édition noms simple</a>
+      <a class="button" href="#/qualite">Retour qualité</a>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Pilotes inconnus à identifier</h2>
+    ${unknown.length ? `<table><thead><tr><th>Transpondeur</th><th>Sessions</th><th>Tours</th><th>Best</th><th>Actions</th></tr></thead><tbody>${unknown.slice(0,200).map(p=>`<tr><td><span class="badge">${escapeHtml(p.transponder)}</span></td><td>${pilotSessionsFor(p)}</td><td>${pilotTotalFor(p)}</td><td class="best">${fmtTime(pilotBestFor(p))}</td><td><button class="button" onclick="addRenameCorrection('${escapeHtml(p.transponder)}','${escapeHtml(p.name)}')">Nommer</button><button class="button" onclick="addMergeCorrection('${escapeHtml(p.transponder)}')">Fusionner</button></td></tr>`).join('')}</tbody></table>` : '<p>Aucun inconnu.</p>'}
+  </div>
+  <div class="card">
+    <h2>Doublons probables</h2>
+    <p class="muted">Détection simple par noms proches. Utilise “Fusionner” si deux transpondeurs appartiennent au même pilote.</p>
+    ${duplicates.length ? `<table><thead><tr><th>Nom proche</th><th>Pilotes détectés</th><th>Action</th></tr></thead><tbody>${duplicates.slice(0,100).map(d=>`<tr><td>${escapeHtml(d.key)}</td><td>${d.items.map(p=>`${escapeHtml(p.name)} <span class="badge">${escapeHtml(p.transponder)}</span>`).join('<br>')}</td><td>${d.items.map(p=>`<button class="button" onclick="addMergeCorrection('${escapeHtml(p.transponder)}')">Fusionner ${escapeHtml(p.transponder)}</button>`).join(' ')}</td></tr>`).join('')}</tbody></table>` : '<p>Aucun doublon probable détecté.</p>'}
+  </div>
+  <div class="card">
+    <h2>Corrections prêtes à exporter</h2>
+    <h3>Renommages</h3>
+    ${renames.length ? `<pre>${escapeHtml(JSON.stringify(renames, null, 2))}</pre>` : '<p class="muted">Aucun renommage local.</p>'}
+    <h3>Fusions</h3>
+    ${merges.length ? `<pre>${escapeHtml(JSON.stringify(merges, null, 2))}</pre>` : '<p class="muted">Aucune fusion locale.</p>'}
+  </div>`;
+}
+
+function findPossibleDuplicatePilots() {
+  const groups = new Map();
+  (DB.pilots || []).forEach(p => {
+    const key = norm(String(p.name || '').replace(/^inconnu #\d+$/i, '')).split(' ').filter(Boolean).slice(0,2).join(' ');
+    if (!key || key.length < 4) return;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(p);
+  });
+  return [...groups.entries()].filter(([_, items]) => items.length > 1).map(([key, items]) => ({key, items}));
 }
 
 function renderEdition() {
