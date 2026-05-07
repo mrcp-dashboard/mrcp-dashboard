@@ -1,12 +1,18 @@
-V3.7.3 - Correctif données vides
+V3.7.4 - Admin fonctionnel
 
 Ne renomme rien.
-Copie directement :
+Copie :
 - index_v2.html
 - app_v2.js
 - styles_v2.css
 
-Cette version lit les données au format réel :
-activities -> participants -> laps
+Ajouts :
+- Records admin fonctionnel
+- Exclure un tour
+- Forcer TT1/10
+- Forcer TT1/8
+- Reset correction
+- Export / import lap_overrides.json
+- Page qualité avec lien vers corrections
 
-Puis Ctrl + F5.
+Code admin : mrcp

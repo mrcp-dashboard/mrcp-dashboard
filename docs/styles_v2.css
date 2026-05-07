@@ -106,3 +106,9 @@ a{color:var(--accent)}
   main{padding:12px}
   th,td{font-size:13px}
 }
+
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-danger{border-color:#f85149!important}
+.btn-good{border-color:#3fb950!important}
+.btn-warn{border-color:#d29922!important}
+textarea.admin-json{width:100%;min-height:220px;background:#0d1117;color:#f0f6fc;border:1px solid #30363d;border-radius:12px;padding:12px}
