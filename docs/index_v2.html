@@ -1,39 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MRCP Dashboard V3.5 pilotes fiables</title>
-  <link rel="stylesheet" href="styles_v2.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MRCP Dashboard V3.7</title>
+  <link rel="stylesheet" href="styles_v3_7.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>MRCP Dashboard V3.5 pilotes fiables</h1>
-      <p id="subtitle">Chargement des données...</p>
-    </div>
-    <nav>
-      <a href="#/">Accueil</a>
-      <a href="#/mes-chronos">Mes chronos</a>
-      <a href="#/sessions">Sessions</a>
-      <a href="#/pilotes">Pilotes</a>
-      <a href="#/records">Records</a>
-      <a href="#/podiums">Podiums</a>
-      <a href="#/graphiques">Graphiques</a>
-      <a href="#/chronos">Chronos</a>
-      <a href="#/compare">Comparer</a>
-      <a href="#/favoris">Favoris</a>
-      <a href="#/edition">Édition</a>
-      <a href="#/pilotes-admin">Pilotes admin</a>
-      <a href="#/qualite">Qualité</a>
-      <a href="#/admin">Admin</a>
-    </nav>
-  </header>
-
-  <main id="app" class="container">
-    <div class="card">Chargement...</div>
-  </main>
-
-  <script src="app_v2.js"></script>
+<header class="topbar">
+  <div>
+    <h1>MRCP Dashboard</h1>
+    <p>Chronos club, podiums et progression pilotes</p>
+  </div>
+  <nav>
+    <a href="#/">Accueil</a>
+    <a href="#/mes-chronos">Mes chronos</a>
+    <a href="#/pilotes">Pilotes</a>
+    <a href="#/podiums">Podiums</a>
+    <button id="adminBtn">⚙️</button>
+  </nav>
+  <nav id="adminNav" class="hidden">
+    <a href="#/quality">Qualité</a>
+    <a href="#/admin-pilotes">Pilotes admin</a>
+    <a href="#/admin-records">Records admin</a>
+    <a href="#/admin">Admin</a>
+    <button id="adminExit">Quitter admin</button>
+  </nav>
+</header>
+<main id="app"><section class="card"><h2>Chargement...</h2></section></main>
+<script src="app_v3_7.js"></script>
 </body>
 </html>
