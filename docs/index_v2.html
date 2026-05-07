@@ -1,36 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MRCP Dashboard V3.1</title>
-  <link rel="stylesheet" href="styles_v2.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRCP Dashboard V3.3</title>
+<link rel="stylesheet" href="styles_v3_3.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>MRCP Dashboard V3.1</h1>
-      <p id="subtitle">Chargement des données...</p>
-    </div>
-    <nav>
-      <a href="#/">Accueil</a>
-      <a href="#/sessions">Sessions</a>
-      <a href="#/pilotes">Pilotes</a>
-      <a href="#/records">Records</a>
-      <a href="#/podiums">Podiums</a>
-      <a href="#/graphiques">Graphiques</a>
-      <a href="#/chronos">Chronos</a>
-      <a href="#/compare">Comparer</a>
-      <a href="#/favoris">Favoris</a>
-      <a href="#/edition">Édition</a>
-      <a href="#/admin">Admin</a>
-    </nav>
-  </header>
+<header>
+<h1>MRCP Dashboard V3.3</h1>
+<button id="myProfileBtn">C'est mon profil</button>
+</header>
 
-  <main id="app" class="container">
-    <div class="card">Chargement...</div>
-  </main>
+<section id="mobilePanel">
+<h2>Mes chronos</h2>
+<div id="myStats">Sélectionne ton profil pilote.</div>
+</section>
 
-  <script src="app_v2.js"></script>
+<script src="app_v3_3.js"></script>
 </body>
 </html>
