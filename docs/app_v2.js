@@ -24,10 +24,6 @@ function escapeHtml(value){
     .replace(/'/g,'&#039;');
 }
 
-function safeNameForOnclick(name){
-  return escapeHtml(String(name).replace(/\\/g,'\\\\').replace(/'/g,"\\'"));
-}
-
 function fmtTime(v){
   var n = Number(v);
   return Number.isFinite(n) ? n.toFixed(3) + ' s' : '-';
@@ -38,7 +34,8 @@ function lapSeconds(l){
     l.lap_time != null ? l.lap_time :
     l.time != null ? l.time :
     l.seconds != null ? l.seconds :
-    l.best_lap
+    l.best_lap != null ? l.best_lap :
+    l.duration
   );
 }
 
@@ -49,42 +46,164 @@ function normalizeTrack(l){
   return t < 30 ? 'TT1/10' : 'TT1/8';
 }
 
+function normalizeTransponder(v){
+  return String(v || '').replace('/0','').trim();
+}
+
 function lapPilot(l){
-  return l.pilot_name || l.pilot || l.driver || l.name || l.transponder || 'Pilote inconnu';
+  return l.pilot_name || l.pilot || l.driver || l.name || l.participant_name || l.transponder || 'Pilote inconnu';
+}
+
+function lapKey(activityId, transponder, lapNo, startTime, lapTime){
+  var n = Number(lapTime);
+  return [activityId || '', normalizeTransponder(transponder), lapNo || '', startTime || '', Number.isFinite(n) ? n.toFixed(3) : ''].join('|');
+}
+
+function loadLocalLapOverrides(){
+  try{
+    var raw = JSON.parse(localStorage.getItem('mrcp_lap_overrides') || '{}');
+    return {
+      excluded: raw.excluded && typeof raw.excluded === 'object' ? raw.excluded : {},
+      forced_track: raw.forced_track && typeof raw.forced_track === 'object' ? raw.forced_track : {}
+    };
+  }catch(e){
+    return {excluded:{}, forced_track:{}};
+  }
+}
+
+function isExcludedByAny(lapId, l){
+  var overrides = loadLocalLapOverrides();
+  return !!overrides.excluded[lapId] || !!l.exclude_from_records || !!l.excluded;
+}
+
+function forcedTrack(lapId){
+  var overrides = loadLocalLapOverrides();
+  return overrides.forced_track[lapId] || null;
+}
+
+function pushLap(rows, rawLap, context){
+  var lap = Object.assign({}, rawLap || {});
+  var t = lapSeconds(lap);
+  if(!Number.isFinite(t) || t <= 0) return;
+
+  var activityId = context.activity_id || context.session_id || '';
+  var transponder = context.transponder || lap.transponder || '';
+  var lapNo = lap.lap_no || lap.lap || lap.number || '';
+  var startTime = lap.start_time || lap.started_at || '';
+  var lapId = lap.lap_id || lap.id || lapKey(activityId, transponder, lapNo, startTime, t);
+
+  if(isExcludedByAny(lapId, lap)) return;
+
+  var pilotName = context.pilot_name || lapPilot(lap);
+  var track = forcedTrack(lapId) || lap.track || context.track || normalizeTrack(lap);
+
+  rows.push(Object.assign({}, lap, {
+    lap_id: lapId,
+    activity_id: activityId,
+    session_id: context.session_id || activityId,
+    session_name: context.session_name || lap.session_name || '',
+    session_date: context.session_date || lap.session_date || lap.date || '',
+    transponder: transponder,
+    pilot_name: pilotName,
+    _time: t,
+    _track: track,
+    _pilot: pilotName,
+    _date: context.session_date || lap.date || lap.session_date || ''
+  }));
 }
 
 function getAllLaps(){
-  var laps = [];
+  var rows = [];
 
-  if(DATA && Array.isArray(DATA.laps)){
-    laps = laps.concat(DATA.laps);
+  // Format actuel principal : activities -> participants -> laps
+  if(DATA && Array.isArray(DATA.activities)){
+    DATA.activities.forEach(function(a){
+      var activityId = a.id || a.activity_id || a.session_id || '';
+      var sessionName = a.name || a.title || a.session_name || a.date_fr || a.date || '';
+      var sessionDate = a.date || a.session_date || a.created_at || '';
+
+      (a.participants || []).forEach(function(p){
+        var pilotName = p.pilot_name || p.name || p.driver || ('Inconnu #' + (p.transponder || ''));
+        var transponder = p.transponder || p.transponder_id || '';
+        var laps = Array.isArray(p.laps) ? p.laps : [];
+        laps.forEach(function(l){
+          pushLap(rows, l, {
+            activity_id: activityId,
+            session_id: activityId,
+            session_name: sessionName,
+            session_date: sessionDate,
+            pilot_name: pilotName,
+            transponder: transponder,
+            track: l.track || p.track || null
+          });
+        });
+      });
+    });
   }
 
+  // Format secondaire : sessions -> participants/laps/results
   if(DATA && Array.isArray(DATA.sessions)){
     DATA.sessions.forEach(function(s){
+      var sessionId = s.id || s.session_id || '';
+      var sessionName = s.name || s.title || s.session_name || s.date_fr || s.date || '';
+      var sessionDate = s.date || s.session_date || '';
+
+      if(Array.isArray(s.participants)){
+        s.participants.forEach(function(p){
+          var pilotName = p.pilot_name || p.name || p.driver || ('Inconnu #' + (p.transponder || ''));
+          var transponder = p.transponder || p.transponder_id || '';
+          (p.laps || []).forEach(function(l){
+            pushLap(rows, l, {
+              activity_id: sessionId,
+              session_id: sessionId,
+              session_name: sessionName,
+              session_date: sessionDate,
+              pilot_name: pilotName,
+              transponder: transponder,
+              track: l.track || p.track || null
+            });
+          });
+        });
+      }
+
       var sessionLaps = s.laps || s.results || [];
       if(Array.isArray(sessionLaps)){
         sessionLaps.forEach(function(l){
-          var copy = Object.assign({}, l);
-          copy.session_name = s.name || s.title || s.session_name || '';
-          copy.session_date = s.date || s.session_date || '';
-          laps.push(copy);
+          pushLap(rows, l, {
+            activity_id: sessionId,
+            session_id: sessionId,
+            session_name: sessionName,
+            session_date: sessionDate,
+            pilot_name: lapPilot(l),
+            transponder: l.transponder || '',
+            track: l.track || null
+          });
         });
       }
     });
   }
 
-  return laps.map(function(l, i){
-    var t = lapSeconds(l);
-    return Object.assign({}, l, {
-      _idx: i,
-      _time: t,
-      _track: normalizeTrack(l),
-      _pilot: lapPilot(l),
-      _date: l.date || l.session_date || ''
+  // Format plat : laps
+  if(DATA && Array.isArray(DATA.laps)){
+    DATA.laps.forEach(function(l){
+      pushLap(rows, l, {
+        activity_id: l.activity_id || l.session_id || '',
+        session_id: l.session_id || l.activity_id || '',
+        session_name: l.session_name || '',
+        session_date: l.date || l.session_date || '',
+        pilot_name: lapPilot(l),
+        transponder: l.transponder || '',
+        track: l.track || null
+      });
     });
-  }).filter(function(l){
-    return Number.isFinite(l._time) && l._time > 0 && !l.exclude_from_records && !l.excluded;
+  }
+
+  // Dédoublonnage par lap_id
+  var seen = {};
+  return rows.filter(function(r){
+    if(seen[r.lap_id]) return false;
+    seen[r.lap_id] = true;
+    return true;
   });
 }
 
@@ -117,13 +236,7 @@ function pilotStats(name){
     var key = l.session_name || l._date || 'session';
     sessions[key] = true;
   });
-  return {
-    name: name,
-    laps: laps,
-    best: sorted[0],
-    avg: avg,
-    sessions: Object.keys(sessions).length
-  };
+  return {name:name, laps:laps, best:sorted[0], avg:avg, sessions:Object.keys(sessions).length};
 }
 
 function renderFilters(){
@@ -140,17 +253,13 @@ function bindFilters(callback){
   var t = document.getElementById('trackFilter');
   if(t){
     t.value = state.track;
-    t.onchange = function(e){
-      state.track = e.target.value;
-      callback();
-    };
+    t.onchange = function(e){ state.track = e.target.value; callback(); };
   }
 }
 
 function podiumHtml(rows){
   var top = rows.slice(0,3);
-  if(!top.length) return '<p class="small">Aucun chrono.</p>';
-
+  if(!top.length) return '<p class="small">Aucun chrono trouvé dans data_v2.json.</p>';
   var order = [1,0,2];
   return '<div class="podium">' + order.map(function(i){
     var r = top[i];
@@ -169,25 +278,28 @@ function podiumHtml(rows){
 function recordsTable(rows, limit){
   limit = limit || 20;
   return '<div class="table-wrap"><table>' +
-    '<thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th></tr></thead>' +
+    '<thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Session</th></tr></thead>' +
     '<tbody>' + rows.slice(0, limit).map(function(r,i){
       return '<tr>' +
         '<td>' + (i+1) + '</td>' +
         '<td><a href="#/pilote/' + encodeURIComponent(r._pilot) + '">' + escapeHtml(r._pilot) + '</a></td>' +
         '<td><strong>' + fmtTime(r._time) + '</strong></td>' +
         '<td><span class="badge">' + escapeHtml(r._track) + '</span></td>' +
+        '<td>' + escapeHtml(r.session_name || r._date || '-') + '</td>' +
       '</tr>';
     }).join('') + '</tbody></table></div>';
 }
 
 function home(){
-  var best = bestByPilot(applyFilters(getAllLaps()));
+  var laps = getAllLaps();
+  var best = bestByPilot(applyFilters(laps));
   var my = localStorage.getItem('mrcp_my_pilot');
 
   app.innerHTML =
     '<section class="card">' +
       '<h2>Bienvenue</h2>' +
       '<p>Interface simplifiée pour les pilotes et visiteurs.</p>' +
+      '<p class="small">Tours lus : ' + laps.length + ' — Pilotes : ' + bestByPilot(laps).length + '</p>' +
       (my
         ? '<p><strong>Ton profil :</strong> ' + escapeHtml(my) + '</p><a href="#/mes-chronos"><button>Voir mes chronos</button></a>'
         : '<a href="#/mes-chronos"><button>Choisir mon profil pilote</button></a>'
@@ -223,10 +335,7 @@ function myChronos(){
 
     document.getElementById('savePilot').onclick = function(){
       var v = document.getElementById('pilotSelect').value;
-      if(v){
-        localStorage.setItem('mrcp_my_pilot', v);
-        myChronos();
-      }
+      if(v){ localStorage.setItem('mrcp_my_pilot', v); myChronos(); }
     };
     return;
   }
@@ -234,6 +343,7 @@ function myChronos(){
   var s = pilotStats(saved);
   var best18 = bestByPilot(s.laps.filter(function(l){ return l._track === 'TT1/8'; }))[0];
   var best10 = bestByPilot(s.laps.filter(function(l){ return l._track === 'TT1/10'; }))[0];
+  var last = s.laps.slice(-30).reverse();
 
   app.innerHTML =
     '<section class="card">' +
@@ -246,7 +356,8 @@ function myChronos(){
       '<div class="card"><h3>Moyenne</h3><div class="big">' + fmtTime(s.avg) + '</div></div>' +
       '<div class="card"><h3>Tours</h3><div class="big">' + s.laps.length + '</div></div>' +
       '<div class="card"><h3>Sessions</h3><div class="big">' + s.sessions + '</div></div>' +
-    '</section>';
+    '</section>' +
+    '<section class="card"><h3>Derniers tours</h3>' + recordsTable(last, 30) + '</section>';
 
   document.getElementById('changePilot').onclick = function(){
     localStorage.removeItem('mrcp_my_pilot');
@@ -284,7 +395,8 @@ function pilotPage(encodedName){
       '<div class="card"><h3>Moyenne</h3><div class="big">' + fmtTime(s.avg) + '</div></div>' +
       '<div class="card"><h3>Tours</h3><div class="big">' + s.laps.length + '</div></div>' +
       '<div class="card"><h3>Sessions</h3><div class="big">' + s.sessions + '</div></div>' +
-    '</section>';
+    '</section>' +
+    '<section class="card"><h3>Tours récents</h3>' + recordsTable(s.laps.slice(-50).reverse(), 50) + '</section>';
 
   document.getElementById('setMyProfile').onclick = function(){
     localStorage.setItem('mrcp_my_pilot', name);
@@ -322,21 +434,14 @@ function quality(){
     '<div class="grid">' +
       '<div class="card"><h3>Score</h3><div class="big">' + escapeHtml(q.score != null ? q.score : (q.global_score != null ? q.global_score : '-')) + '</div></div>' +
       '<div class="card"><h3>Tours suspects</h3><div class="big">' + suspects.length + '</div></div>' +
+      '<div class="card"><h3>Tours lus</h3><div class="big">' + getAllLaps().length + '</div></div>' +
     '</div>'
   );
 }
 
-function adminPage(){
-  adminOnly('Admin', '<p>Zone réservée admin : corrections, imports/exports et publication.</p>');
-}
-
-function adminPilots(){
-  adminOnly('Pilotes admin', '<p>Corrections pilotes / transpondeurs.</p>');
-}
-
-function adminRecords(){
-  adminOnly('Records admin', '<p>Exclusions et forçage TT1/8 / TT1/10.</p>');
-}
+function adminPage(){ adminOnly('Admin', '<p>Zone réservée admin : corrections, imports/exports et publication.</p>'); }
+function adminPilots(){ adminOnly('Pilotes admin', '<p>Corrections pilotes / transpondeurs.</p>'); }
+function adminRecords(){ adminOnly('Records admin', '<p>Exclusions et forçage TT1/8 / TT1/10.</p>'); }
 
 function updateAdminNav(){
   var nav = document.getElementById('adminNav');
@@ -397,6 +502,13 @@ async function init(){
     var res = await fetch('data_v2.json?ts=' + Date.now());
     if(!res.ok) throw new Error('Impossible de charger data_v2.json : HTTP ' + res.status);
     DATA = await res.json();
+
+    console.log('MRCP data loaded', {
+      activities: Array.isArray(DATA.activities) ? DATA.activities.length : 0,
+      sessions: Array.isArray(DATA.sessions) ? DATA.sessions.length : 0,
+      flat_laps: Array.isArray(DATA.laps) ? DATA.laps.length : 0,
+      parsed_laps: getAllLaps().length
+    });
 
     router();
   }catch(err){
