@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MRCP Dashboard V3.7</title>
-  <link rel="stylesheet" href="styles_v3_7.css">
+  <title>MRCP Dashboard V3.7.1</title>
+  <link rel="stylesheet" href="styles_v3_7_1.css">
 </head>
 <body>
 <header class="topbar">
@@ -12,22 +12,30 @@
     <h1>MRCP Dashboard</h1>
     <p>Chronos club, podiums et progression pilotes</p>
   </div>
-  <nav>
+
+  <nav class="nav-public">
     <a href="#/">Accueil</a>
     <a href="#/mes-chronos">Mes chronos</a>
     <a href="#/pilotes">Pilotes</a>
     <a href="#/podiums">Podiums</a>
-    <button id="adminBtn">⚙️</button>
+    <button id="adminBtn" type="button">⚙️</button>
   </nav>
-  <nav id="adminNav" class="hidden">
+
+  <nav id="adminNav" class="nav-admin hidden">
     <a href="#/quality">Qualité</a>
     <a href="#/admin-pilotes">Pilotes admin</a>
     <a href="#/admin-records">Records admin</a>
     <a href="#/admin">Admin</a>
-    <button id="adminExit">Quitter admin</button>
+    <button id="adminExit" type="button">Quitter admin</button>
   </nav>
 </header>
-<main id="app"><section class="card"><h2>Chargement...</h2></section></main>
-<script src="app_v3_7.js"></script>
+
+<main id="app">
+  <section class="card">
+    <h2>Chargement...</h2>
+  </section>
+</main>
+
+<script src="app_v3_7_1.js"></script>
 </body>
 </html>
