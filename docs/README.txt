@@ -1,17 +1,18 @@
-V3.8 - Nouveau thème premium
+V3.9 - Vraie présentation façon mockup
 
-Copie directement dans ton projet :
+Cette fois il faut copier les 3 fichiers :
 - index_v2.html
+- app_v2.js
 - styles_v2.css
 
-Ne touche PAS à app_v2.js.
+Puis Ctrl + F5.
 
-Puis :
-Ctrl + F5
-
-Le dashboard garde toutes les fonctions actuelles mais avec :
-- fond immersif
-- effet verre / glassmorphism
-- podium premium
-- thème motorsport moderne
-- meilleure expérience smartphone
+Cette version ne se contente pas de changer le fond :
+- sidebar façon app
+- hero d'accueil
+- bloc chiffres clés
+- dernières activités
+- meilleurs tours
+- podium façon mockup
+- admin conservé
+- corrections records conservées

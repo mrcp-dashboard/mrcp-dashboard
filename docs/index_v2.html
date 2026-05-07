@@ -3,40 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MRCP Dashboard</title>
+  <title>MRCP Speedhive</title>
   <link rel="stylesheet" href="styles_v2.css">
 </head>
 <body>
-<div class="bg-overlay"></div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-main">MRCP</div>
+      <div class="brand-sub">SPEEDHIVE</div>
+    </div>
 
-<header class="topbar">
-  <div class="logo-zone">
-    <h1>MRCP <span>Speedhive</span></h1>
-    <p>Chronométrage et statistiques du club</p>
+    <nav class="side-nav">
+      <a href="#/" class="nav-link">🏠 <span>Accueil</span></a>
+      <a href="#/mes-chronos" class="nav-link">⏱️ <span>Mes chronos</span></a>
+      <a href="#/pilotes" class="nav-link">👥 <span>Pilotes</span></a>
+      <a href="#/podiums" class="nav-link">🏆 <span>Podiums</span></a>
+      <button id="adminBtn" class="nav-link nav-button">⚙️ <span>Admin</span></button>
+    </nav>
+
+    <nav id="adminNav" class="side-nav admin-nav hidden">
+      <a href="#/quality" class="nav-link">📊 <span>Qualité</span></a>
+      <a href="#/admin-pilotes" class="nav-link">🧑‍🔧 <span>Pilotes admin</span></a>
+      <a href="#/admin-records" class="nav-link">🛠️ <span>Records admin</span></a>
+      <a href="#/admin" class="nav-link">🔐 <span>Admin</span></a>
+      <button id="adminExit" class="nav-link nav-button">🚪 <span>Quitter</span></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="flag">🏁</div>
+      <strong>MRCP Speedhive</strong>
+      <small>Le chronométrage au service de la performance</small>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="top-pills">
+      <div class="pill">☀️ <span>Live club</span></div>
+      <div class="pill">📅 <span id="todayLabel">Aujourd’hui</span></div>
+      <button id="adminBtnTop" class="pill pill-button">⚙️ Connexion admin</button>
+    </div>
+
+    <main id="app">
+      <section class="card">
+        <h2>Chargement...</h2>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>🏁 MRCP Speedhive Dashboard</span>
+      <span id="lastUpdateFooter">Données en cours de chargement</span>
+      <span>🚀 Propulsé par Speedhive</span>
+    </footer>
   </div>
-
-  <nav class="main-nav">
-    <a href="#/">Accueil</a>
-    <a href="#/mes-chronos">Mes chronos</a>
-    <a href="#/pilotes">Pilotes</a>
-    <a href="#/podiums">Podiums</a>
-    <button id="adminBtn">⚙️ Admin</button>
-  </nav>
-
-  <nav id="adminNav" class="hidden admin-nav">
-    <a href="#/quality">Qualité</a>
-    <a href="#/admin-pilotes">Pilotes admin</a>
-    <a href="#/admin-records">Records admin</a>
-    <a href="#/admin">Admin</a>
-    <button id="adminExit">Quitter</button>
-  </nav>
-</header>
-
-<main id="app">
-  <section class="card">
-    <h2>Chargement...</h2>
-  </section>
-</main>
+</div>
 
 <script src="app_v2.js"></script>
 </body>
