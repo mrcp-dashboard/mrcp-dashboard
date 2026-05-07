@@ -100,3 +100,10 @@ code { background:#0b1224; border:1px solid var(--line); padding:2px 6px; border
   table { font-size:13px; }
   th, td { padding:8px 7px; }
 }
+
+
+.quality-banner { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
+.quality-good { border-color:rgba(34,197,94,.35); }
+.quality-warn { border-color:rgba(250,204,21,.45); }
+.quality-bad { border-color:rgba(239,68,68,.55); }
+@media (max-width: 700px) { .quality-banner { flex-direction:column; align-items:flex-start; } .quality-banner .button { width:100%; text-align:center; } }

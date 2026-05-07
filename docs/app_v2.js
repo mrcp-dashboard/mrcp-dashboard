@@ -485,7 +485,7 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V3.3` : 'MRCP Dashboard V3.3'; }
+function setTitle(title) { document.title = title ? `${title} | MRCP Dashboard V3.4` : 'MRCP Dashboard V3.4'; }
 
 function route() {
   const hash = location.hash || '#/';
@@ -503,6 +503,7 @@ function route() {
   if (parts[0] === 'compare') return renderCompare();
   if (parts[0] === 'favoris') return renderFavorites();
   if (parts[0] === 'edition') return renderEdition();
+  if (parts[0] === 'qualite') return renderDataQuality();
   if (parts[0] === 'admin') return renderAdminRecords();
   renderHome();
 }
@@ -547,6 +548,7 @@ function renderHome() {
   const lapsInFilter = TRACK_FILTER === 'all' ? DB.summary.laps_count : (DB.summary.tracks?.[TRACK_FILTER]?.laps_count || filteredActivities().reduce((sum,a)=>sum+(a.track_counts?.[TRACK_FILTER]||0),0));
   app.innerHTML = `
     ${trackControls()}
+    ${qualityHomeBlock()}
     ${myChronosHomeBlock()}
     <div class="grid">
       <div class="card"><div class="muted">Sessions</div><div class="stat">${filteredActivities().length}</div></div>
@@ -938,6 +940,49 @@ function renderChronos() {
 }
 
 
+
+function qualityHomeBlock() {
+  const q = DB?.data_quality || null;
+  if (!q) return '';
+  const score = Number(q.global_score ?? 100);
+  const cls = score >= 90 ? 'quality-good' : score >= 70 ? 'quality-warn' : 'quality-bad';
+  const suspects = Number(q.suspicious_laps_count || 0);
+  const unknown = Number(q.unknown_pilots_count || 0);
+  const excluded = Number(q.overrides?.excluded_count || 0);
+  const forced = Number(q.overrides?.forced_track_count || 0);
+  return `<div class="card quality-banner ${cls}">
+    <div><h2>Qualité des données</h2><p class="muted">Score ${score}/100 • ${suspects} tour(s) suspect(s) • ${unknown} pilote(s) inconnu(s) • ${excluded} exclu(s) • ${forced} piste(s) forcée(s)</p></div>
+    <a class="button" href="#/qualite">Contrôler</a>
+  </div>`;
+}
+
+function renderDataQuality() {
+  setTitle('Qualité données');
+  const q = DB?.data_quality || {};
+  const suspects = Array.isArray(q.suspicious_laps) ? q.suspicious_laps : [];
+  const unknowns = Array.isArray(q.unknown_pilots) ? q.unknown_pilots : [];
+  const sessions = Array.isArray(q.sessions_quality) ? q.sessions_quality : [];
+  const override = q.overrides || {};
+  app.innerHTML = `<div class="card">
+    <h2>Fiabilisation des données</h2>
+    <p class="muted">Cette page sert à contrôler les erreurs qui faussent records, podiums et graphiques. Les corrections définitives passent par <code>lap_overrides.json</code> puis <code>python build_data_v2.py</code>.</p>
+    <div class="grid">
+      <div class="card"><div class="muted">Score global</div><div class="stat">${escapeHtml(q.global_score ?? '-')}</div></div>
+      <div class="card"><div class="muted">Tours suspects</div><div class="stat">${escapeHtml(q.suspicious_laps_count ?? suspects.length)}</div></div>
+      <div class="card"><div class="muted">Pilotes inconnus</div><div class="stat">${escapeHtml(q.unknown_pilots_count ?? unknowns.length)}</div></div>
+      <div class="card"><div class="muted">Corrections</div><div class="stat">${escapeHtml((override.excluded_count || 0) + (override.forced_track_count || 0))}</div></div>
+    </div>
+    <div class="toolbar wrap"><a class="button" href="#/admin">Ouvrir admin corrections</a><button class="button" onclick="exportLapOverrides()">Exporter lap_overrides.json</button></div>
+  </div>
+  <div class="card"><h2>Tours suspects prioritaires</h2><p class="muted">Principalement les tours TT1/8 entre 30 et 45 s : souvent des TT1/10 lents comptés sur la mauvaise piste.</p>${renderQualitySuspects(suspects)}</div>
+  <div class="card"><h2>Pilotes inconnus</h2>${unknowns.length ? `<table><thead><tr><th>Transpondeur</th><th>Tours</th><th>Best</th><th>Action</th></tr></thead><tbody>${unknowns.slice(0,150).map(u=>`<tr><td><span class="badge">${escapeHtml(u.transponder)}</span></td><td>${escapeHtml(u.laps_count)}</td><td class="best">${fmtTime(u.best_lap)}</td><td>${editButton(u.transponder, '')}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">Aucun pilote inconnu détecté.</p>'}</div>
+  <div class="card"><h2>Qualité par session</h2>${sessions.length ? `<table><thead><tr><th>Score</th><th>Date</th><th>Piste</th><th>Tours</th><th>Suspects</th><th>Inconnus</th><th>Session</th></tr></thead><tbody>${sessions.slice(0,120).map(s=>`<tr><td><span class="badge">${escapeHtml(s.quality_score)}</span></td><td>${escapeHtml(s.date_fr)}</td><td>${escapeHtml((s.tracks || []).join(', '))}</td><td>${escapeHtml(s.laps_count)}</td><td>${escapeHtml(s.suspicious_laps_count)}</td><td>${escapeHtml(s.unknown_pilots_count)}</td><td><a href="#/session/${escapeHtml(s.id)}">Voir</a></td></tr>`).join('')}</tbody></table>` : '<p class="muted">Pas de rapport session.</p>'}</div>`;
+}
+function renderQualitySuspects(rows) {
+  if (!rows.length) return '<p class="muted">Aucun tour suspect détecté.</p>';
+  return `<table><thead><tr><th>Temps</th><th>Piste</th><th>Raison</th><th>Pilote</th><th>Date</th><th>Session</th><th>Admin</th></tr></thead><tbody>${rows.slice(0,250).map(r=>`<tr><td class="best">${fmtTime(r.lap_time)}</td><td><span class="badge">${escapeHtml(r.track)}</span></td><td>${escapeHtml(r.reason || '')}</td><td>${pilotNameCell(r.pilot_name, r.pilot_slug || slugText((r.pilot_name||'')+'-'+normalizeTransponder(r.transponder)), r.transponder)}</td><td>${escapeHtml(r.date_fr)}</td><td><a href="#/session/${escapeHtml(r.activity_id)}">Voir</a></td><td>${ADMIN_MODE ? adminLapButtons(r) : '<a href="#/admin">Admin</a>'}</td></tr>`).join('')}</tbody></table>`;
+}
+
 function renderAdminRecords() {
   setTitle('Admin records');
   if (!ADMIN_MODE && !requireAdmin()) return renderHome();
@@ -964,7 +1009,7 @@ function renderAdminRecords() {
   const forced = allRaw.filter(r => LAP_OVERRIDES.forced_track[r.lap_id]).sort((a,b)=>a.lap_time-b.lap_time).slice(0,200);
   app.innerHTML = `<div class="card">
     <h2>Mode admin — corrections records/podiums ${adminBadge()}</h2>
-    <p class="muted">Ici tu peux exclure un tour des records/podiums ou forcer sa piste. Les données SpeedHive restent intactes : les corrections sont stockées localement dans ce navigateur.</p>
+    <p class="muted">Ici tu peux exclure un tour des records/podiums ou forcer sa piste. Les données SpeedHive restent intactes : les corrections sont stockées localement dans ce navigateur, puis peuvent devenir définitives avec export lap_overrides.json + rebuild.</p>
     <div class="toolbar wrap"><button class="button" onclick="exportLapOverrides()">Exporter lap_overrides.json</button><button class="button" onclick="importLapOverridesFromText()">Importer/coller JSON</button><button class="button danger" onclick="exitAdmin()">Quitter admin</button></div>
     <p class="muted"><strong>Important :</strong> pour rendre ces corrections permanentes sur ton poste, exporte le JSON et garde-le avec ton projet. Sur GitHub Pages statique, les visiteurs ne verront pas tes corrections locales tant qu’on ne les intègre pas dans le fichier généré.</p>
   </div>
