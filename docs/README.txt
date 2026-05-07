@@ -1,18 +1,17 @@
-V3.7.4 - Admin fonctionnel
+V3.8 - Nouveau thème premium
 
-Ne renomme rien.
-Copie :
+Copie directement dans ton projet :
 - index_v2.html
-- app_v2.js
 - styles_v2.css
 
-Ajouts :
-- Records admin fonctionnel
-- Exclure un tour
-- Forcer TT1/10
-- Forcer TT1/8
-- Reset correction
-- Export / import lap_overrides.json
-- Page qualité avec lien vers corrections
+Ne touche PAS à app_v2.js.
 
-Code admin : mrcp
+Puis :
+Ctrl + F5
+
+Le dashboard garde toutes les fonctions actuelles mais avec :
+- fond immersif
+- effet verre / glassmorphism
+- podium premium
+- thème motorsport moderne
+- meilleure expérience smartphone

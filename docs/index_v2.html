@@ -3,30 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MRCP Dashboard V3.7.1</title>
+  <title>MRCP Dashboard</title>
   <link rel="stylesheet" href="styles_v2.css">
 </head>
 <body>
+<div class="bg-overlay"></div>
+
 <header class="topbar">
-  <div>
-    <h1>MRCP Dashboard</h1>
-    <p>Chronos club, podiums et progression pilotes</p>
+  <div class="logo-zone">
+    <h1>MRCP <span>Speedhive</span></h1>
+    <p>Chronométrage et statistiques du club</p>
   </div>
 
-  <nav class="nav-public">
+  <nav class="main-nav">
     <a href="#/">Accueil</a>
     <a href="#/mes-chronos">Mes chronos</a>
     <a href="#/pilotes">Pilotes</a>
     <a href="#/podiums">Podiums</a>
-    <button id="adminBtn" type="button">⚙️</button>
+    <button id="adminBtn">⚙️ Admin</button>
   </nav>
 
-  <nav id="adminNav" class="nav-admin hidden">
+  <nav id="adminNav" class="hidden admin-nav">
     <a href="#/quality">Qualité</a>
     <a href="#/admin-pilotes">Pilotes admin</a>
     <a href="#/admin-records">Records admin</a>
     <a href="#/admin">Admin</a>
-    <button id="adminExit" type="button">Quitter admin</button>
+    <button id="adminExit">Quitter</button>
   </nav>
 </header>
 
