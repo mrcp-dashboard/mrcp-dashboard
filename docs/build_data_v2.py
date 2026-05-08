@@ -206,7 +206,11 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], overrides: dict[s
             base_track = infer_track(lap_time)
             lid = lap_id(activity_id, t, lap_no, start_time, lap_time)
             if lid in overrides["excluded"]:
-                quality_collector["excluded_laps"].append({"lap_id": lid, "activity_id": activity_id, "date_fr": date_fr, "transponder": t, "lap_time": round(lap_time, 3), "reason": overrides["excluded"].get(lid, {}).get("reason", "Exclu")})
+                quality_collector["excluded_laps"].append({"lap_id": lid, "activity_id": activity_id, "date_fr": date_fr, "transponder": t, "lap_time": round(lap_time, 3), "reason": (
+            overrides["excluded"].get(lid, {}).get("reason", "Exclu")
+            if isinstance(overrides["excluded"].get(lid, {}), dict)
+            else "Exclu admin"
+        )})
                 continue
             track = overrides["forced_track"].get(lid) or base_track
             pilot_name = name_map.get(t) or name_map.get(raw_t) or f"Inconnu #{t}"
