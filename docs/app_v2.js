@@ -396,7 +396,7 @@ function adminPilots(){
     });
   };
 }
-function adminPage(){adminOnly('Admin','<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/quality" class="btn-secondary">Qualité</a></p><ol><li>Corrige dans Records admin.</li><li>Exporte lap_overrides.json.</li><li>Copie dans le projet.</li><li>Lance python build_data_v2.py.</li><li>Commit/push.</li></ol>');}
+function adminPage(){adminOnly('Admin','<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/quality" class="btn-secondary">Qualité</a></p><ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Exporte lap_overrides.json et corrections.json.</li><li>Copie dans le projet.</li><li>Lance python build_data_v2.py puis commit/push.</li></ol>');}
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live')===0)return livePage();
     if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}

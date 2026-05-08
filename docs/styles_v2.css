@@ -338,3 +338,42 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
 #adminPilotRows tr[style*="display: none"]{
   display:none!important;
 }
+
+
+/* V4.1.2 Admin complet */
+.pilot-name-input{
+  min-width:220px;
+  width:100%;
+  margin-bottom:8px;
+}
+.pilot-select-input{
+  min-width:220px;
+  width:100%;
+}
+.admin-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.admin-actions button{
+  padding:9px 11px;
+  font-size:13px;
+  white-space:nowrap;
+}
+.badge-warn{
+  background:rgba(255,138,40,.22);
+  color:#ffd8b2;
+}
+#adminPilotRows tr[style*="display: none"],
+#adminRecordRows tr[style*="display: none"]{
+  display:none!important;
+}
+@media(max-width:720px){
+  .pilot-name-input,
+  .pilot-select-input{
+    min-width:180px;
+  }
+  .admin-actions{
+    flex-direction:column;
+  }
+}
