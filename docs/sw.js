@@ -1,4 +1,5 @@
-const CACHE_NAME = 'mrcp-dashboard-v4-1';
+const CACHE_NAME = 'mrcp-dashboard-v4-4-2';
+
 const ASSETS = [
   './index_v2.html',
   './app_v2.js',
@@ -7,7 +8,9 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
   self.skipWaiting();
 });
 
@@ -24,7 +27,12 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
   if (url.pathname.endsWith('data_v2.json')) {
-    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+    event.respondWith(fetch(event.request, {cache: 'no-store'}));
+    return;
+  }
+
+  if (url.pathname.endsWith('app_v2.js') || url.pathname.endsWith('styles_v2.css')) {
+    event.respondWith(fetch(event.request, {cache: 'no-store'}).catch(() => caches.match(event.request)));
     return;
   }
 
