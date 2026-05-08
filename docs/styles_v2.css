@@ -377,3 +377,18 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
     flex-direction:column;
   }
 }
+
+
+/* V4.2 Admin API */
+#adminApiUrl,
+#adminApiToken{
+  display:block;
+  max-width:520px;
+  margin:8px 0;
+}
+#adminApiStatus{
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(0,0,0,.22);
+}

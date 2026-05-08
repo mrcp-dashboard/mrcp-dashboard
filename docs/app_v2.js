@@ -396,7 +396,92 @@ function adminPilots(){
     });
   };
 }
-function adminPage(){adminOnly('Admin','<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/quality" class="btn-secondary">Qualité</a></p><ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Exporte lap_overrides.json et corrections.json.</li><li>Copie dans le projet.</li><li>Lance python build_data_v2.py puis commit/push.</li></ol>');}
+
+function getAdminApiConfig(){
+  return {
+    url: localStorage.getItem('mrcp_admin_api_url') || 'http://IP_DU_LXC:5055',
+    token: localStorage.getItem('mrcp_admin_api_token') || ''
+  };
+}
+
+function setAdminApiConfig(url, token){
+  localStorage.setItem('mrcp_admin_api_url', url || '');
+  localStorage.setItem('mrcp_admin_api_token', token || '');
+}
+
+async function applyCorrectionsToServer(){
+  var urlInput = document.getElementById('adminApiUrl');
+  var tokenInput = document.getElementById('adminApiToken');
+  var status = document.getElementById('adminApiStatus');
+
+  var url = (urlInput && urlInput.value.trim()) || '';
+  var token = (tokenInput && tokenInput.value.trim()) || '';
+
+  if(!url || !token){
+    alert('Renseigne URL API et token admin.');
+    return;
+  }
+
+  setAdminApiConfig(url, token);
+
+  var lapOverrides = getOverrides();
+  var pilotCorrections = typeof getPilotCorrections === 'function'
+    ? getPilotCorrections()
+    : {names:{}, transponders:{}};
+
+  if(status) status.textContent = 'Envoi des corrections au serveur...';
+
+  try{
+    var res = await fetch(url.replace(/\/$/, '') + '/apply-corrections', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-MRCP-Admin-Token': token
+      },
+      body: JSON.stringify({
+        lap_overrides: lapOverrides,
+        corrections: pilotCorrections,
+        message: 'Maj corrections depuis interface admin'
+      })
+    });
+
+    var data = await res.json();
+
+    if(!res.ok || !data.ok){
+      console.error(data);
+      if(status) status.textContent = 'Erreur : ' + (data.error || res.status);
+      alert('Erreur API : ' + (data.error || res.status));
+      return;
+    }
+
+    console.log(data);
+    if(status) status.textContent = data.message || 'Corrections appliquées.';
+    alert('Corrections appliquées et GitHub mis à jour.');
+  }catch(e){
+    console.error(e);
+    if(status) status.textContent = 'Erreur réseau : ' + e.message;
+    alert('Erreur réseau : ' + e.message);
+  }
+}
+
+function adminPage(){
+  var cfg = getAdminApiConfig();
+  adminOnly('Admin',
+    '<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/quality" class="btn-secondary">Qualité</a></p>' +
+    '<div class="card">' +
+      '<h3>🚀 Appliquer les corrections sur le serveur</h3>' +
+      '<p class="small">Envoie <strong>lap_overrides.json</strong> et <strong>corrections.json</strong> au LXC, lance <code>build_data_v2.py</code>, puis commit/push GitHub.</p>' +
+      '<input id="adminApiUrl" class="searchBox" value="'+escapeHtml(cfg.url)+'" placeholder="http://IP_DU_LXC:5055">' +
+      '<input id="adminApiToken" class="searchBox" type="password" value="'+escapeHtml(cfg.token)+'" placeholder="Token admin API">' +
+      '<p><button id="applyCorrectionsServer" class="btn-primary">Appliquer corrections + Push GitHub</button></p>' +
+      '<p id="adminApiStatus" class="small">API non appelée.</p>' +
+    '</div>' +
+    '<ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Reviens ici et clique sur Appliquer corrections + Push GitHub.</li></ol>'
+  );
+
+  var btn = document.getElementById('applyCorrectionsServer');
+  if(btn) btn.onclick = applyCorrectionsToServer;
+}
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live')===0)return livePage();
     if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
