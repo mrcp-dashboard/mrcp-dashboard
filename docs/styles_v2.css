@@ -432,3 +432,11 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
     color:#333!important;
   }
 }
+
+
+/* V4.4.1 - correction rapide admin records */
+#adminRecordRows tr.row-fixed{
+  opacity:.25;
+  transform:translateX(14px);
+  transition:opacity .12s ease, transform .12s ease;
+}

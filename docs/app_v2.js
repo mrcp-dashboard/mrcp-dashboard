@@ -465,7 +465,163 @@ function livePage(){
 function adminOnly(title, body){if(!state.isAdmin){app.innerHTML='<section class="card"><h2>Accès admin</h2><p>Page réservée à l’administrateur.</p></section>';return false;}app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2>'+body+'</section>';return true;}
 function suspiciousLaps(){return getAllLapsRaw(true).filter(function(l){if(l._excluded)return true;if(l._time<8)return true;if(l._time>=30&&l._time<=45&&l._track==='TT1/8')return true;if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu')return true;return false;}).sort(function(a,b){return a._time-b._time;});}
 function downloadJson(filename,obj){var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function adminRecords(){var laps=suspiciousLaps(),o=getOverrides();var rows=laps.slice(0,300).map(function(l){return'<tr><td><code>'+escapeHtml(l.lap_id)+'</code></td><td>'+escapeHtml(l._pilot)+'</td><td><strong>'+fmtTimeS(l._time)+'</strong></td><td>'+escapeHtml(l._track)+'</td><td>'+escapeHtml(l.session_name||l._date||'-')+'</td><td><div class="admin-actions"><button class="btn-danger" data-action="exclude" data-id="'+escapeHtml(l.lap_id)+'">Exclure</button><button class="btn-good" data-action="tt10" data-id="'+escapeHtml(l.lap_id)+'">TT1/10</button><button class="btn-warn" data-action="tt8" data-id="'+escapeHtml(l.lap_id)+'">TT1/8</button><button data-action="reset" data-id="'+escapeHtml(l.lap_id)+'">Reset</button></div></td></tr>';}).join('');if(!adminOnly('Records admin','<p class="small">Corrections locales. Exporte ensuite lap_overrides.json.</p><div class="grid"><div class="card"><h3>Exclusions</h3><div class="big">'+Object.keys(o.excluded).length+'</div></div><div class="card"><h3>Forçages piste</h3><div class="big">'+Object.keys(o.forced_track).length+'</div></div><div class="card"><h3>Tours suspects</h3><div class="big">'+laps.length+'</div></div></div><p><button id="exportLapOverrides">Exporter lap_overrides.json</button> <button id="copyLapOverrides">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections locales</button></p><textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea><p><button id="importLapOverrides">Importer le JSON ci-dessus</button></p><div class="table-wrap"><table><thead><tr><th>ID tour</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Session</th><th>Actions</th></tr></thead><tbody>'+rows+'</tbody></table></div>'))return;document.querySelectorAll('[data-action]').forEach(function(btn){btn.onclick=function(){var id=btn.getAttribute('data-id'),a=btn.getAttribute('data-action'),x=getOverrides();if(a==='exclude')x.excluded[id]=true;if(a==='tt10')x.forced_track[id]='TT1/10';if(a==='tt8')x.forced_track[id]='TT1/8';if(a==='reset'){delete x.excluded[id];delete x.forced_track[id];}setOverrides(x);adminRecords();};});document.getElementById('exportLapOverrides').onclick=function(){downloadJson('lap_overrides.json',getOverrides());};document.getElementById('copyLapOverrides').onclick=function(){navigator.clipboard.writeText(JSON.stringify(getOverrides(),null,2));alert('JSON copié');};document.getElementById('clearLapOverrides').onclick=function(){if(confirm('Vider toutes les corrections locales ?')){setOverrides({excluded:{},forced_track:{}});adminRecords();}};document.getElementById('importLapOverrides').onclick=function(){try{setOverrides(JSON.parse(document.getElementById('lapOverridesText').value));alert('Corrections importées');adminRecords();}catch(e){alert('JSON invalide : '+e.message);}};}
+function adminRecords(){
+  var laps=suspiciousLaps();
+  var o=getOverrides();
+
+  var rows=laps.slice(0,500).map(function(l){
+    var reason=[];
+    if(l._excluded) reason.push('exclu');
+    if(l._time<8) reason.push('< 8s');
+    if(l._time>=30&&l._time<=45&&l._track==='TT1/8') reason.push('30-45s TT1/8');
+    if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu'||/^[0-9]+/.test(String(l._pilot))) reason.push('pilote inconnu');
+
+    return '<tr data-lap-id="'+escapeHtml(l.lap_id)+'" data-search="'+escapeHtml((l._pilot+' '+l.transponder+' '+l.session_name+' '+l._track+' '+reason.join(' ')).toLowerCase())+'">' +
+      '<td><code>'+escapeHtml(l.lap_id)+'</code></td>' +
+      '<td>'+escapeHtml(l._pilot)+'<div class="small">'+escapeHtml(l.transponder||'')+'</div></td>' +
+      '<td><strong>'+fmtTimeS(l._time)+'</strong></td>' +
+      '<td><span class="badge">'+escapeHtml(l._track)+'</span></td>' +
+      '<td>'+escapeHtml(l.session_name||l._date||'-')+'</td>' +
+      '<td>'+escapeHtml(reason.join(', ')||'-')+'</td>' +
+      '<td>' +
+        '<div class="admin-actions">' +
+          '<button class="record-action btn-danger" data-action="exclude" data-id="'+escapeHtml(l.lap_id)+'">Supprimer tour</button>' +
+          '<button class="record-action btn-good" data-action="tt10" data-id="'+escapeHtml(l.lap_id)+'">Mettre TT1/10</button>' +
+          '<button class="record-action btn-warn" data-action="tt8" data-id="'+escapeHtml(l.lap_id)+'">Mettre TT1/8</button>' +
+          '<button class="record-action" data-action="reset" data-id="'+escapeHtml(l.lap_id)+'">Annuler</button>' +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  if(!adminOnly('Records admin',
+    '<p class="small">Mode correction rapide : après un clic sur Supprimer / TT1/10 / TT1/8, la ligne disparaît automatiquement pour passer à la suivante. Ensuite exporte <strong>lap_overrides.json</strong>.</p>' +
+    '<div class="grid">' +
+      '<div class="card"><h3>Exclusions</h3><div class="big" id="excludedCount">'+Object.keys(o.excluded).length+'</div></div>' +
+      '<div class="card"><h3>Forçages piste</h3><div class="big" id="forcedTrackCount">'+Object.keys(o.forced_track).length+'</div></div>' +
+      '<div class="card"><h3>Tours suspects restants</h3><div class="big" id="suspectCount">'+laps.length+'</div></div>' +
+    '</div>' +
+    '<p><button id="exportLapOverrides" class="btn-primary">Exporter lap_overrides.json</button> <button id="copyLapOverrides" class="btn-secondary">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections records</button></p>' +
+    '<textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea>' +
+    '<p><button id="importLapOverrides" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
+    '<input class="searchBox" id="adminRecordSearch" placeholder="Rechercher pilote, puce, session, raison...">' +
+    '<div class="table-wrap"><table><thead><tr><th>ID tour</th><th>Pilote/Puce</th><th>Temps</th><th>Piste</th><th>Session</th><th>Raison</th><th>Actions</th></tr></thead><tbody id="adminRecordRows">'+rows+'</tbody></table></div>'
+  )) return;
+
+  function refreshOverrideText(){
+    var current=getOverrides();
+    var txt=document.getElementById('lapOverridesText');
+    if(txt) txt.value=JSON.stringify(current,null,2);
+
+    var excluded=document.getElementById('excludedCount');
+    if(excluded) excluded.textContent=Object.keys(current.excluded).length;
+
+    var forced=document.getElementById('forcedTrackCount');
+    if(forced) forced.textContent=Object.keys(current.forced_track).length;
+
+    var suspect=document.getElementById('suspectCount');
+    if(suspect) suspect.textContent=document.querySelectorAll('#adminRecordRows tr').length;
+  }
+
+  function removeCorrectedRow(btn){
+    var row=btn.closest('tr');
+    if(row){
+      row.classList.add('row-fixed');
+      setTimeout(function(){
+        if(row && row.parentNode){
+          row.parentNode.removeChild(row);
+          refreshOverrideText();
+        }
+      },120);
+    }else{
+      refreshOverrideText();
+    }
+  }
+
+  document.querySelectorAll('.record-action').forEach(function(btn){
+    btn.onclick=function(){
+      var id=btn.getAttribute('data-id');
+      var action=btn.getAttribute('data-action');
+      var x=getOverrides();
+
+      if(action==='exclude'){
+        x.excluded[id]={reason:'Exclu admin'};
+        delete x.forced_track[id];
+        setOverrides(x);
+        removeCorrectedRow(btn);
+        return;
+      }
+
+      if(action==='tt10'){
+        x.forced_track[id]='TT1/10';
+        delete x.excluded[id];
+        setOverrides(x);
+        removeCorrectedRow(btn);
+        return;
+      }
+
+      if(action==='tt8'){
+        x.forced_track[id]='TT1/8';
+        delete x.excluded[id];
+        setOverrides(x);
+        removeCorrectedRow(btn);
+        return;
+      }
+
+      if(action==='reset'){
+        delete x.excluded[id];
+        delete x.forced_track[id];
+        setOverrides(x);
+        removeCorrectedRow(btn);
+        return;
+      }
+    };
+  });
+
+  document.getElementById('exportLapOverrides').onclick=function(){
+    downloadJson('lap_overrides.json',getOverrides());
+  };
+
+  document.getElementById('copyLapOverrides').onclick=function(){
+    navigator.clipboard.writeText(JSON.stringify(getOverrides(),null,2));
+    alert('JSON copié');
+  };
+
+  document.getElementById('clearLapOverrides').onclick=function(){
+    if(confirm('Vider toutes les corrections records locales ?')){
+      setOverrides({excluded:{},forced_track:{}});
+      adminRecords();
+    }
+  };
+
+  document.getElementById('importLapOverrides').onclick=function(){
+    try{
+      var imported=JSON.parse(document.getElementById('lapOverridesText').value);
+
+      // Compatibilité anciens exports : excluded: {id: true}
+      if(imported.excluded){
+        Object.keys(imported.excluded).forEach(function(k){
+          if(imported.excluded[k]===true){
+            imported.excluded[k]={reason:'Exclu admin'};
+          }
+        });
+      }
+
+      setOverrides(imported);
+      alert('Corrections records importées');
+      adminRecords();
+    }catch(e){
+      alert('JSON invalide : '+e.message);
+    }
+  };
+
+  document.getElementById('adminRecordSearch').oninput=function(e){
+    var q=e.target.value.toLowerCase();
+    document.querySelectorAll('#adminRecordRows tr').forEach(function(tr){
+      tr.style.display = tr.getAttribute('data-search').indexOf(q) !== -1 ? '' : 'none';
+    });
+  };
+}
 function quality(){adminOnly('Qualité données','<div class="grid"><div class="card"><h3>Tours suspects</h3><div class="big">'+suspiciousLaps().length+'</div></div><div class="card"><h3>Tours lus</h3><div class="big">'+getAllLaps().length+'</div></div></div><p><a href="#/admin-records" class="btn-primary">Corriger les tours suspects</a></p>');}
 function getPilotCorrections(){
   try{
