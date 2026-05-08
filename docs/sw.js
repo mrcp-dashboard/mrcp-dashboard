@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mrcp-dashboard-v4-0';
+const CACHE_NAME = 'mrcp-dashboard-v4-1';
 const ASSETS = [
   './index_v2.html',
   './app_v2.js',

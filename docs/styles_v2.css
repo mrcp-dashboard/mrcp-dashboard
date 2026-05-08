@@ -182,3 +182,147 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
     width:100%;display:block;text-align:center;border-radius:18px
   }
 }
+
+
+/* V4.1 Live Timing */
+.live-hero{
+  display:grid;
+  grid-template-columns:1.25fr .75fr;
+  gap:18px;
+  align-items:stretch;
+}
+
+.live-card{
+  background:linear-gradient(135deg, rgba(0,229,255,.18), rgba(15,133,255,.12));
+  border:1px solid rgba(0,229,255,.28);
+}
+
+.live-title{
+  font-size:36px;
+  font-weight:1000;
+  margin:0 0 8px;
+}
+
+.live-status{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(0,224,130,.16);
+  border:1px solid rgba(0,224,130,.28);
+  color:#bfffe5;
+  font-weight:800;
+}
+
+.live-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 18px var(--green);
+  animation:pulseLive 1.4s infinite;
+}
+
+@keyframes pulseLive{
+  0%{opacity:.45;transform:scale(.85)}
+  50%{opacity:1;transform:scale(1.15)}
+  100%{opacity:.45;transform:scale(.85)}
+}
+
+.live-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:18px;
+}
+
+.live-ranking-row{
+  display:grid;
+  grid-template-columns:54px 1fr auto auto;
+  gap:12px;
+  align-items:center;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.live-rank{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  background:rgba(15,133,255,.22);
+  font-weight:1000;
+}
+
+.live-rank.first{
+  background:linear-gradient(135deg,#ffe680,#ffbf1f);
+  color:#07101f;
+}
+
+.live-pilot{
+  font-weight:900;
+}
+
+.live-last{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.live-time{
+  font-size:22px;
+  font-weight:1000;
+  text-align:right;
+}
+
+.live-refresh{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:14px;
+}
+
+.live-tv{
+  min-height:100vh;
+  padding:24px;
+}
+
+.live-tv .sidebar,
+.live-tv .top-pills,
+.live-tv .footer{
+  display:none!important;
+}
+
+.live-tv .app-shell{
+  display:block;
+}
+
+.live-tv .main-area{
+  padding:16px;
+}
+
+.live-tv .live-title{
+  font-size:52px;
+}
+
+.live-tv .live-ranking-row{
+  font-size:22px;
+  grid-template-columns:70px 1fr auto auto;
+}
+
+.live-tv .live-time{
+  font-size:34px;
+}
+
+@media(max-width:900px){
+  .live-hero,.live-grid{
+    grid-template-columns:1fr;
+  }
+  .live-ranking-row{
+    grid-template-columns:44px 1fr auto;
+  }
+  .live-ranking-row .badge{
+    display:none;
+  }
+}

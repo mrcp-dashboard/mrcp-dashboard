@@ -127,6 +127,142 @@ function pilots(){var best=bestByPilot(getAllLaps());app.innerHTML='<section cla
 function pilotPage(encoded){var name=decodeURIComponent(encoded),s=pilotStats(name),best18=pilotBestByTrack(s,'TT1/8'),best10=pilotBestByTrack(s,'TT1/10');app.innerHTML='<section class="card pilot-main-card"><h2>'+escapeHtml(name)+'</h2><button id="setMyProfile">C’est mon profil</button></section><section class="grid"><div class="card"><h3>Meilleur TT1/8</h3><div class="big">'+fmtTimeS(best18&&best18._time)+'</div></div><div class="card"><h3>Meilleur TT1/10</h3><div class="big">'+fmtTimeS(best10&&best10._time)+'</div></div><div class="card"><h3>Moyenne</h3><div class="big">'+fmtTimeS(s.avg)+'</div></div><div class="card"><h3>Tours</h3><div class="big">'+s.laps.length+'</div></div></section><section class="card"><h3>Progression</h3>'+renderProgressSvg(pilotProgressData(s,best18?'TT1/8':'all'))+'</section><section class="card"><h3>Tours récents</h3>'+recordsTable(s.laps.slice(-50).reverse(),50)+'</section>';document.getElementById('setMyProfile').onclick=function(){localStorage.setItem('mrcp_my_pilot',name);location.hash='#/mes-chronos';};}
 function podiums(){var best=bestByPilot(applyFilters(getAllLaps()));app.innerHTML='<section class="card"><h2>Podiums</h2>'+renderFilters()+podiumHtml(best)+'</section><section class="card"><h2>Classement</h2>'+recordsTable(best,100)+'</section>';bindFilters(podiums);}
 
+
+var liveTimer = null;
+
+function latestSessionLaps(){
+  var laps = getAllLaps();
+  if(!laps.length) return {sessionName:'Aucune activité', date:'', laps:[]};
+
+  var groups = {};
+  laps.forEach(function(l){
+    var key = l.session_id || l.session_name || l._date || 'session';
+    if(!groups[key]){
+      groups[key] = {
+        key:key,
+        sessionName:l.session_name || l._date || key,
+        date:l._date || '',
+        laps:[]
+      };
+    }
+    groups[key].laps.push(l);
+  });
+
+  var sessions = Object.values(groups).sort(function(a,b){
+    return String(b.date || b.sessionName).localeCompare(String(a.date || a.sessionName));
+  });
+
+  return sessions[0] || {sessionName:'Aucune activité', date:'', laps:[]};
+}
+
+function liveRanking(sessionLaps){
+  var map = new Map();
+
+  sessionLaps.forEach(function(l){
+    var item = map.get(l._pilot) || {
+      pilot:l._pilot,
+      best:Infinity,
+      last:null,
+      laps:0,
+      track:l._track,
+      session:l.session_name,
+      date:l._date
+    };
+
+    item.laps += 1;
+    item.last = l;
+    item.track = l._track;
+    if(l._time < item.best) item.best = l._time;
+
+    map.set(l._pilot, item);
+  });
+
+  return Array.from(map.values()).sort(function(a,b){return a.best-b.best;});
+}
+
+function renderLiveRows(rows){
+  if(!rows.length){
+    return '<p class="small">Aucun tour live disponible pour le moment.</p>';
+  }
+
+  return rows.map(function(r,i){
+    return '<div class="live-ranking-row">' +
+      '<div class="live-rank '+(i===0?'first':'')+'">'+(i+1)+'</div>' +
+      '<div>' +
+        '<div class="live-pilot">'+escapeHtml(r.pilot)+'</div>' +
+        '<div class="live-last">'+r.laps+' tours · Dernier : '+fmtTimeS(r.last && r.last._time)+'</div>' +
+      '</div>' +
+      '<div><span class="badge">'+escapeHtml(r.track)+'</span></div>' +
+      '<div class="live-time">'+fmtTimeS(r.best)+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+function livePage(){
+  if(liveTimer) clearTimeout(liveTimer);
+
+  var session = latestSessionLaps();
+  var filtered = applyFilters(session.laps);
+  var rows = liveRanking(filtered);
+  var best = rows[0] || null;
+  var lastUpdate = new Date().toLocaleTimeString('fr-FR');
+
+  app.innerHTML =
+    '<section class="live-hero">' +
+      '<div class="card live-card">' +
+        '<div class="live-status"><span class="live-dot"></span> LIVE / quasi-live</div>' +
+        '<h1 class="live-title">Live Timing MRCP</h1>' +
+        '<p class="pilot-sub">Classement automatique basé sur la dernière activité SpeedHive récupérée par le LXC.</p>' +
+        '<div class="goal-box">' +
+          '<div class="goal-pill"><span class="small">Activité</span><strong>'+escapeHtml(session.sessionName)+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">Pilotes</span><strong>'+rows.length+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">Tours</span><strong>'+filtered.length+'</strong></div>' +
+        '</div>' +
+        '<div class="live-refresh">' +
+          '<button id="manualRefreshLive" class="btn-primary">Rafraîchir</button>' +
+          '<button id="toggleTvMode" class="btn-secondary">Mode TV</button>' +
+          '<span class="small">Dernier rafraîchissement : '+lastUpdate+'</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<h3>🏆 Meilleur tour live</h3>' +
+        '<div class="big">'+fmtTimeS(best && best.best)+'</div>' +
+        '<p>'+(best ? escapeHtml(best.pilot) : '-')+'</p>' +
+        '<p class="small">Le classement se met à jour automatiquement toutes les 60 secondes.</p>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="live-grid">' +
+      '<div class="card">' +
+        '<div class="panel-title"><h2>📡 Classement live</h2></div>' +
+        renderFilters() +
+        '<div id="liveRows">'+renderLiveRows(rows)+'</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<h2>🚨 Alertes</h2>' +
+        '<p class="small">Cette première version détecte la dernière session. La prochaine pourra signaler automatiquement un nouveau record.</p>' +
+        '<div class="goal-box">' +
+          '<div class="goal-pill"><span class="small">Piste</span><strong>'+escapeHtml(state.track === 'all' ? 'Toutes' : state.track)+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">Source</span><strong>data_v2.json</strong></div>' +
+        '</div>' +
+      '</div>' +
+    '</section>';
+
+  bindFilters(livePage);
+
+  var manual = document.getElementById('manualRefreshLive');
+  if(manual) manual.onclick = function(){ location.reload(); };
+
+  var tv = document.getElementById('toggleTvMode');
+  if(tv) tv.onclick = function(){ document.body.classList.toggle('live-tv'); };
+
+  liveTimer = setTimeout(function(){
+    // Recharge complet pour récupérer un data_v2.json neuf poussé par le LXC
+    location.reload();
+  }, 60000);
+}
+
+
 function adminOnly(title, body){if(!state.isAdmin){app.innerHTML='<section class="card"><h2>Accès admin</h2><p>Page réservée à l’administrateur.</p></section>';return false;}app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2>'+body+'</section>';return true;}
 function suspiciousLaps(){return getAllLapsRaw(true).filter(function(l){if(l._excluded)return true;if(l._time<8)return true;if(l._time>=30&&l._time<=45&&l._track==='TT1/8')return true;if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu')return true;return false;}).sort(function(a,b){return a._time-b._time;});}
 function downloadJson(filename,obj){var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
@@ -135,7 +271,8 @@ function quality(){adminOnly('Qualité données','<div class="grid"><div class="
 function adminPilots(){adminOnly('Pilotes admin','<p>Corrections pilotes / transpondeurs.</p>');}
 function adminPage(){adminOnly('Admin','<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/quality" class="btn-secondary">Qualité</a></p><ol><li>Corrige dans Records admin.</li><li>Exporte lap_overrides.json.</li><li>Copie dans le projet.</li><li>Lance python build_data_v2.py.</li><li>Commit/push.</li></ol>');}
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
-function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
+function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live')===0)return livePage();
+    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){function unlock(){var c=prompt('Code admin');if(c==='mrcp'){localStorage.setItem('mrcp_admin','1');state.isAdmin=true;updateAdminNav();alert('Mode admin activé');}else if(c)alert('Code incorrect');}var a=document.getElementById('adminBtn');if(a)a.onclick=unlock;var b=document.getElementById('adminBtnTop');if(b)b.onclick=unlock;var e=document.getElementById('adminExit');if(e)e.onclick=function(){localStorage.removeItem('mrcp_admin');state.isAdmin=false;location.hash='#/';router();};}
 
 function setupPwa(){
