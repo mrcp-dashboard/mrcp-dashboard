@@ -379,16 +379,56 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
 }
 
 
-/* V4.2 Admin API */
-#adminApiUrl,
-#adminApiToken{
-  display:block;
-  max-width:520px;
-  margin:8px 0;
+/* V4.3 / V4.4 - Profil pilote complet + analyse IA */
+.qr-card{
+  text-align:center;
 }
-#adminApiStatus{
-  padding:10px 12px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:rgba(0,0,0,.22);
+.qr-img{
+  width:220px;
+  height:220px;
+  max-width:100%;
+  background:#fff;
+  border-radius:18px;
+  padding:10px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+.ai-card{
+  border-color:rgba(0,229,255,.22);
+  background:linear-gradient(180deg, rgba(0,229,255,.10), rgba(2,12,28,.84));
+}
+.ai-list{
+  display:grid;
+  gap:10px;
+}
+.ai-item{
+  padding:14px 16px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  line-height:1.45;
+}
+@media print{
+  body{
+    background:#fff!important;
+    color:#000!important;
+  }
+  .sidebar,.top-pills,.footer,.share-row,.mobile-sticky-action{
+    display:none!important;
+  }
+  .app-shell{
+    display:block!important;
+  }
+  .main-area{
+    padding:0!important;
+  }
+  .card{
+    box-shadow:none!important;
+    background:#fff!important;
+    color:#000!important;
+    border:1px solid #ddd!important;
+    break-inside:avoid;
+  }
+  .small,.pilot-sub{
+    color:#333!important;
+  }
 }
