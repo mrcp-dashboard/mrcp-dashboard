@@ -268,7 +268,134 @@ function suspiciousLaps(){return getAllLapsRaw(true).filter(function(l){if(l._ex
 function downloadJson(filename,obj){var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
 function adminRecords(){var laps=suspiciousLaps(),o=getOverrides();var rows=laps.slice(0,300).map(function(l){return'<tr><td><code>'+escapeHtml(l.lap_id)+'</code></td><td>'+escapeHtml(l._pilot)+'</td><td><strong>'+fmtTimeS(l._time)+'</strong></td><td>'+escapeHtml(l._track)+'</td><td>'+escapeHtml(l.session_name||l._date||'-')+'</td><td><div class="admin-actions"><button class="btn-danger" data-action="exclude" data-id="'+escapeHtml(l.lap_id)+'">Exclure</button><button class="btn-good" data-action="tt10" data-id="'+escapeHtml(l.lap_id)+'">TT1/10</button><button class="btn-warn" data-action="tt8" data-id="'+escapeHtml(l.lap_id)+'">TT1/8</button><button data-action="reset" data-id="'+escapeHtml(l.lap_id)+'">Reset</button></div></td></tr>';}).join('');if(!adminOnly('Records admin','<p class="small">Corrections locales. Exporte ensuite lap_overrides.json.</p><div class="grid"><div class="card"><h3>Exclusions</h3><div class="big">'+Object.keys(o.excluded).length+'</div></div><div class="card"><h3>Forçages piste</h3><div class="big">'+Object.keys(o.forced_track).length+'</div></div><div class="card"><h3>Tours suspects</h3><div class="big">'+laps.length+'</div></div></div><p><button id="exportLapOverrides">Exporter lap_overrides.json</button> <button id="copyLapOverrides">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections locales</button></p><textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea><p><button id="importLapOverrides">Importer le JSON ci-dessus</button></p><div class="table-wrap"><table><thead><tr><th>ID tour</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Session</th><th>Actions</th></tr></thead><tbody>'+rows+'</tbody></table></div>'))return;document.querySelectorAll('[data-action]').forEach(function(btn){btn.onclick=function(){var id=btn.getAttribute('data-id'),a=btn.getAttribute('data-action'),x=getOverrides();if(a==='exclude')x.excluded[id]=true;if(a==='tt10')x.forced_track[id]='TT1/10';if(a==='tt8')x.forced_track[id]='TT1/8';if(a==='reset'){delete x.excluded[id];delete x.forced_track[id];}setOverrides(x);adminRecords();};});document.getElementById('exportLapOverrides').onclick=function(){downloadJson('lap_overrides.json',getOverrides());};document.getElementById('copyLapOverrides').onclick=function(){navigator.clipboard.writeText(JSON.stringify(getOverrides(),null,2));alert('JSON copié');};document.getElementById('clearLapOverrides').onclick=function(){if(confirm('Vider toutes les corrections locales ?')){setOverrides({excluded:{},forced_track:{}});adminRecords();}};document.getElementById('importLapOverrides').onclick=function(){try{setOverrides(JSON.parse(document.getElementById('lapOverridesText').value));alert('Corrections importées');adminRecords();}catch(e){alert('JSON invalide : '+e.message);}};}
 function quality(){adminOnly('Qualité données','<div class="grid"><div class="card"><h3>Tours suspects</h3><div class="big">'+suspiciousLaps().length+'</div></div><div class="card"><h3>Tours lus</h3><div class="big">'+getAllLaps().length+'</div></div></div><p><a href="#/admin-records" class="btn-primary">Corriger les tours suspects</a></p>');}
-function adminPilots(){adminOnly('Pilotes admin','<p>Corrections pilotes / transpondeurs.</p>');}
+function getPilotCorrections(){
+  try{
+    var raw=JSON.parse(localStorage.getItem('mrcp_pilot_corrections')||'{}');
+    return {
+      names: raw.names && typeof raw.names==='object' ? raw.names : {},
+      transponders: raw.transponders && typeof raw.transponders==='object' ? raw.transponders : {}
+    };
+  }catch(e){
+    return {names:{}, transponders:{}};
+  }
+}
+
+function setPilotCorrections(c){
+  localStorage.setItem('mrcp_pilot_corrections', JSON.stringify({
+    names:c.names||{},
+    transponders:c.transponders||{}
+  }, null, 2));
+}
+
+function exportPilotCorrections(){
+  downloadJson('corrections.json', getPilotCorrections());
+}
+
+function transponderSummary(){
+  var map = {};
+  getAllLapsRaw(true).forEach(function(l){
+    var tp = normalizeTransponder(l.transponder || '');
+    if(!tp) tp = 'sans-transpondeur';
+    if(!map[tp]){
+      map[tp] = {
+        transponder: tp,
+        names: {},
+        laps: 0,
+        best: Infinity,
+        tracks: {}
+      };
+    }
+    map[tp].names[l._pilot] = true;
+    map[tp].laps += 1;
+    if(l._time < map[tp].best) map[tp].best = l._time;
+    map[tp].tracks[l._track] = true;
+  });
+  return Object.values(map).sort(function(a,b){return b.laps-a.laps;});
+}
+
+function adminPilots(){
+  var corrections = getPilotCorrections();
+  var rows = transponderSummary();
+  var q = '';
+  var htmlRows = rows.map(function(r){
+    var currentName = corrections.transponders[r.transponder] || Object.keys(r.names)[0] || '';
+    var names = Object.keys(r.names).join(' / ');
+    var tracks = Object.keys(r.tracks).join(' / ');
+    return '<tr data-search="'+escapeHtml((r.transponder+' '+names+' '+currentName).toLowerCase())+'">' +
+      '<td><strong>'+escapeHtml(r.transponder)+'</strong></td>' +
+      '<td>'+escapeHtml(names)+'</td>' +
+      '<td>'+r.laps+'</td>' +
+      '<td>'+fmtTimeS(r.best)+'</td>' +
+      '<td><span class="badge">'+escapeHtml(tracks)+'</span></td>' +
+      '<td><input class="pilot-name-input" data-tp="'+escapeHtml(r.transponder)+'" value="'+escapeHtml(currentName)+'" placeholder="Nom pilote officiel"></td>' +
+      '<td><button class="save-pilot-name btn-primary" data-tp="'+escapeHtml(r.transponder)+'">Sauver</button></td>' +
+    '</tr>';
+  }).join('');
+
+  if(!adminOnly('Pilotes admin',
+    '<p class="small">Associe une puce/transpondeur à un nom pilote officiel. Ensuite exporte <strong>corrections.json</strong>, copie-le dans le projet, puis relance <code>python build_data_v2.py</code>.</p>' +
+    '<div class="grid">' +
+      '<div class="card"><h3>Transpondeurs détectés</h3><div class="big">'+rows.length+'</div></div>' +
+      '<div class="card"><h3>Associations locales</h3><div class="big">'+Object.keys(corrections.transponders).length+'</div></div>' +
+    '</div>' +
+    '<p><button id="exportPilotCorrections" class="btn-primary">Exporter corrections.json</button> <button id="copyPilotCorrections" class="btn-secondary">Copier JSON</button> <button id="clearPilotCorrections" class="btn-danger">Vider corrections pilotes</button></p>' +
+    '<textarea class="admin-json" id="pilotCorrectionsText">'+escapeHtml(JSON.stringify(corrections,null,2))+'</textarea>' +
+    '<p><button id="importPilotCorrections" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
+    '<input class="searchBox" id="adminPilotSearch" placeholder="Rechercher transpondeur ou pilote...">' +
+    '<div class="table-wrap"><table><thead><tr><th>Puce</th><th>Noms vus</th><th>Tours</th><th>Best</th><th>Piste</th><th>Nom officiel</th><th>Action</th></tr></thead><tbody id="adminPilotRows">'+htmlRows+'</tbody></table></div>'
+  )) return;
+
+  document.querySelectorAll('.save-pilot-name').forEach(function(btn){
+    btn.onclick=function(){
+      var tp=btn.getAttribute('data-tp');
+      var input=null; document.querySelectorAll('.pilot-name-input').forEach(function(el){ if(el.getAttribute('data-tp')===tp) input=el; });
+      var name=input ? input.value.trim() : '';
+      var c=getPilotCorrections();
+      if(name){
+        c.transponders[tp]=name;
+      }else{
+        delete c.transponders[tp];
+      }
+      setPilotCorrections(c);
+      document.getElementById('pilotCorrectionsText').value=JSON.stringify(c,null,2);
+      alert('Association enregistrée localement pour '+tp);
+    };
+  });
+
+  document.getElementById('exportPilotCorrections').onclick=function(){
+    exportPilotCorrections();
+  };
+
+  document.getElementById('copyPilotCorrections').onclick=function(){
+    navigator.clipboard.writeText(JSON.stringify(getPilotCorrections(),null,2));
+    alert('JSON copié');
+  };
+
+  document.getElementById('clearPilotCorrections').onclick=function(){
+    if(confirm('Vider toutes les corrections pilotes locales ?')){
+      setPilotCorrections({names:{},transponders:{}});
+      adminPilots();
+    }
+  };
+
+  document.getElementById('importPilotCorrections').onclick=function(){
+    try{
+      var obj=JSON.parse(document.getElementById('pilotCorrectionsText').value);
+      setPilotCorrections(obj);
+      alert('Corrections pilotes importées');
+      adminPilots();
+    }catch(e){
+      alert('JSON invalide : '+e.message);
+    }
+  };
+
+  document.getElementById('adminPilotSearch').oninput=function(e){
+    var query=e.target.value.toLowerCase();
+    document.querySelectorAll('#adminPilotRows tr').forEach(function(tr){
+      tr.style.display = tr.getAttribute('data-search').indexOf(query) !== -1 ? '' : 'none';
+    });
+  };
+}
 function adminPage(){adminOnly('Admin','<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/quality" class="btn-secondary">Qualité</a></p><ol><li>Corrige dans Records admin.</li><li>Exporte lap_overrides.json.</li><li>Copie dans le projet.</li><li>Lance python build_data_v2.py.</li><li>Commit/push.</li></ol>');}
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live')===0)return livePage();

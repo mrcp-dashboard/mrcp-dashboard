@@ -326,3 +326,15 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
     display:none;
   }
 }
+
+
+/* V4.1.1 Admin pilotes */
+.pilot-name-input{
+  min-width:220px;
+}
+.save-pilot-name{
+  padding:9px 13px;
+}
+#adminPilotRows tr[style*="display: none"]{
+  display:none!important;
+}
