@@ -37063,3 +37063,229 @@ Résumé: {'activities_count': 193, 'pilots_count': 71, 'laps_count': 8705, 'tra
 Qualité: score 0/100 | suspects 6871 | inconnus 16 | overrides exclus 1023 | pistes forcées 0
 ATTENTION: tours suspects détectés. Voir l’onglet Qualité/Admin du dashboard.
 [3/4] Git add
+[4/4] Git commit / push
+[main 7bc74f0] Auto update dashboard 2026-05-09 23:30
+ 5 files changed, 634 insertions(+), 200 deletions(-)
+To github.com:mrcp-dashboard/mrcp-dashboard.git
+   beea602..7bc74f0  main -> main
+Terminé
+============================================================
+MRCP DASHBOARD AUTO UPDATE - Sat May  9 23:40:01 UTC 2026
+============================================================
+[1/4] Synchronisation SpeedHive
+[2026-05-09 23:40:01] ======================================================================
+[2026-05-09 23:40:01] SYNC SPEEDHIVE LINUX
+[2026-05-09 23:40:01] ======================================================================
+[2026-05-09 23:40:02] Activités récupérées : 200
+[2026-05-09 23:40:02] Déjà présent : sessions_7772039604.csv | MRCP-CLUB-01
+[2026-05-09 23:40:02] Déjà présent : sessions_7763362422.csv | Xavier Castets
+[2026-05-09 23:40:02] Déjà présent : sessions_7763646378.csv | 6944083 [0]
+[2026-05-09 23:40:02] Déjà présent : sessions_7763663736.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:02] Déjà présent : sessions_7763652408.csv | saux olivier
+[2026-05-09 23:40:02] Déjà présent : sessions_7762983894.csv | MRCP-CLUB-01
+[2026-05-09 23:40:02] Déjà présent : sessions_7761101052.csv | T2M Blitz MATHUNT
+[2026-05-09 23:40:02] Déjà présent : sessions_7761081012.csv | saux olivier
+[2026-05-09 23:40:02] Déjà présent : sessions_7760717238.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:02] Pas de CSV exploitable : 7747966020 | MRCP-CLUB-01
+[2026-05-09 23:40:02] Déjà présent : sessions_7741688013.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:02] Déjà présent : sessions_7741581936.csv | saux olivier
+[2026-05-09 23:40:02] Déjà présent : sessions_7742333862.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:02] Déjà présent : sessions_7736306778.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:02] Déjà présent : sessions_7736403183.csv | Dorian Giannetta
+[2026-05-09 23:40:02] Déjà présent : sessions_7736202777.csv | MRCP-CLUB-01
+[2026-05-09 23:40:02] Déjà présent : sessions_7727464614.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:02] Déjà présent : sessions_7727521812.csv | Damien
+[2026-05-09 23:40:02] Déjà présent : sessions_7727467452.csv | Dorian Giannetta
+[2026-05-09 23:40:02] Déjà présent : sessions_7722512832.csv | FOUAD ELWARD
+[2026-05-09 23:40:02] Déjà présent : sessions_7717111575.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:02] Déjà présent : sessions_7718924805.csv | Damien
+[2026-05-09 23:40:02] Déjà présent : sessions_7718228805.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:02] Déjà présent : sessions_7718972415.csv | T2M Blitz MATHUNT
+[2026-05-09 23:40:02] Déjà présent : sessions_7717739778.csv | JMR
+[2026-05-09 23:40:02] Déjà présent : sessions_7717748352.csv | saux olivier
+[2026-05-09 23:40:02] Déjà présent : sessions_7717835745.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:02] Déjà présent : sessions_7716464445.csv | Mox Buggy
+[2026-05-09 23:40:02] Déjà présent : sessions_7716493386.csv | Boyer P
+[2026-05-09 23:40:02] Déjà présent : sessions_7718259708.csv | MRCP-CLUB-01
+[2026-05-09 23:40:02] Déjà présent : sessions_7718645400.csv | XB2 '20 8.5T
+[2026-05-09 23:40:02] Déjà présent : sessions_7717987320.csv | buggy
+[2026-05-09 23:40:02] Déjà présent : sessions_7718645586.csv | XB4 '16 7.5T
+[2026-05-09 23:40:02] Déjà présent : sessions_7718747658.csv | 3754809 [0]
+[2026-05-09 23:40:02] Déjà présent : sessions_7717784343.csv | 9240743 [0]
+[2026-05-09 23:40:03] Pas de CSV exploitable : 7718135361 | TA 6.2
+[2026-05-09 23:40:03] Déjà présent : sessions_7710823167.csv | Damien
+[2026-05-09 23:40:03] Déjà présent : sessions_7710528918.csv | MRCP-CLUB-01
+[2026-05-09 23:40:03] Déjà présent : sessions_7696726989.csv | buggy
+[2026-05-09 23:40:03] Déjà présent : sessions_7694899914.csv | M.Fatoux
+[2026-05-09 23:40:03] Déjà présent : sessions_7693119606.csv | Damien
+[2026-05-09 23:40:03] Déjà présent : sessions_7690562517.csv | T2M Blitz MATHUNT
+[2026-05-09 23:40:03] Déjà présent : sessions_7690030212.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7690424946.csv | saux olivier
+[2026-05-09 23:40:03] Déjà présent : sessions_7688193261.csv | rc8b4-alexis
+[2026-05-09 23:40:03] Déjà présent : sessions_7688263326.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7682242131.csv | latruite
+[2026-05-09 23:40:03] Déjà présent : sessions_7682242866.csv | rc8b4-alexis
+[2026-05-09 23:40:03] Déjà présent : sessions_7681776369.csv | Titi
+[2026-05-09 23:40:03] Déjà présent : sessions_7681848789.csv | 4079599 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682680731.csv | 6375754 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681881342.csv | Salomon N
+[2026-05-09 23:40:03] Déjà présent : sessions_7681796859.csv | 5340142 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682242344.csv | buggy
+[2026-05-09 23:40:03] Déjà présent : sessions_7682241684.csv | 4723959 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681814184.csv | 2886955 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682244462.csv | blanco louis mbx8e
+[2026-05-09 23:40:03] Déjà présent : sessions_7681781172.csv | 5457405 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681790475.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_7682178003.csv | Xray BL Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7682187663.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7681782426.csv | Puce
+[2026-05-09 23:40:03] Déjà présent : sessions_7681842030.csv | Fabrice Darmoise
+[2026-05-09 23:40:03] Déjà présent : sessions_7681812618.csv | 9591883 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682159010.csv | saux olivier
+[2026-05-09 23:40:03] Déjà présent : sessions_7681775520.csv | Mp9e Victor Ditte
+[2026-05-09 23:40:03] Déjà présent : sessions_7681778529.csv | jeremy mugen
+[2026-05-09 23:40:03] Déjà présent : sessions_7681778466.csv | TT1/8
+[2026-05-09 23:40:03] Déjà présent : sessions_7681814250.csv | LUDO2 CMM47
+[2026-05-09 23:40:03] Déjà présent : sessions_7681780671.csv | 4345215 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681936179.csv | 5891325 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682103873.csv | 3754809 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681777677.csv | JMR
+[2026-05-09 23:40:03] Déjà présent : sessions_7681848936.csv | Lodo_MBX8e
+[2026-05-09 23:40:03] Déjà présent : sessions_7682897634.csv | Damien
+[2026-05-09 23:40:03] Déjà présent : sessions_7681779963.csv | 4771686 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681819191.csv | 7612218 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682160174.csv | puce jm th
+[2026-05-09 23:40:03] Déjà présent : sessions_7681780023.csv | Puce Robin
+[2026-05-09 23:40:03] Déjà présent : sessions_7681818558.csv | 8079667 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682195553.csv | 5682350 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681850370.csv | Mp10e-Fred R
+[2026-05-09 23:40:03] Déjà présent : sessions_7681816593.csv | 9855985 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682386302.csv | Dorian Giannetta
+[2026-05-09 23:40:03] Déjà présent : sessions_7682385663.csv | 9240743 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681776696.csv | Stan mbx8r TH
+[2026-05-09 23:40:03] Déjà présent : sessions_7681803321.csv | M.Fatoux
+[2026-05-09 23:40:03] Déjà présent : sessions_7682391390.csv | 4609463 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682324817.csv | T2M Blitz MATHUNT
+[2026-05-09 23:40:03] Déjà présent : sessions_7681887744.csv | 3397942 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681779063.csv | 7874799 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681881792.csv | 7409591 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681818228.csv | 4765114 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7681813149.csv | sworkz  jp
+[2026-05-09 23:40:03] Déjà présent : sessions_7682313108.csv | 8097636 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682318334.csv | Monster Max
+[2026-05-09 23:40:03] Déjà présent : sessions_7681889202.csv | 6868468 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7682310123.csv | 6054614 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7674873963.csv | Mp9e Victor Ditte
+[2026-05-09 23:40:03] Déjà présent : sessions_7674921663.csv | 8079667 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7678029813.csv | Puce Robin
+[2026-05-09 23:40:03] Déjà présent : sessions_7675127751.csv | puce jm th
+[2026-05-09 23:40:03] Déjà présent : sessions_7674873222.csv | jeremy mugen
+[2026-05-09 23:40:03] Déjà présent : sessions_7676088360.csv | latruite
+[2026-05-09 23:40:03] Déjà présent : sessions_7678227405.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7675216935.csv | Dorian Giannetta
+[2026-05-09 23:40:03] Déjà présent : sessions_7675944807.csv | 4345215 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7676902689.csv | rc8b4-alexis
+[2026-05-09 23:40:03] Déjà présent : sessions_7676227152.csv | T2M Blitz MATHUNT
+[2026-05-09 23:40:03] Déjà présent : sessions_7675892232.csv | 8097636 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7675328778.csv | 9240743 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7675207686.csv | Puce
+[2026-05-09 23:40:03] Déjà présent : sessions_7674912357.csv | Stan mbx8r TH
+[2026-05-09 23:40:03] Déjà présent : sessions_7676169552.csv | Fabrice Darmoise
+[2026-05-09 23:40:03] Déjà présent : sessions_7674922056.csv | 3397942 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7675939641.csv | saux olivier
+[2026-05-09 23:40:03] Déjà présent : sessions_7675356210.csv | sworkz  jp
+[2026-05-09 23:40:03] Déjà présent : sessions_7676719956.csv | Mp10e-Fred R
+[2026-05-09 23:40:03] Déjà présent : sessions_7676372817.csv | Xray BL Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7676887953.csv | 7409591 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7675790025.csv | 4723959 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7674930273.csv | LUDO2 CMM47
+[2026-05-09 23:40:03] Déjà présent : sessions_7675586805.csv | 4079599 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7676539542.csv | JMR
+[2026-05-09 23:40:03] Déjà présent : sessions_7675587723.csv | 7612218 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7675136010.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_7675826001.csv | 3754809 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7674978525.csv | 9591883 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7676148273.csv | 5682350 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7676366424.csv | buggy
+[2026-05-09 23:40:03] Déjà présent : sessions_7675827882.csv | 4219765 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7675558617.csv | blanco louis mbx8e
+[2026-05-09 23:40:03] Déjà présent : sessions_7674913920.csv | Salomon N
+[2026-05-09 23:40:03] Déjà présent : sessions_7674875466.csv | sworkz th
+[2026-05-09 23:40:03] Déjà présent : sessions_7669581966.csv | Damien
+[2026-05-09 23:40:03] Déjà présent : sessions_7669062042.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7668836313.csv | saux olivier
+[2026-05-09 23:40:03] Déjà présent : sessions_7646954754.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_7645117236.csv | Damien
+[2026-05-09 23:40:03] Déjà présent : sessions_7646011680.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7646011743.csv | rc8b4-alexis
+[2026-05-09 23:40:03] Déjà présent : sessions_7644940389.csv | Lodo_MBX8e
+[2026-05-09 23:40:03] Déjà présent : sessions_7642005906.csv | TT1/8
+[2026-05-09 23:40:03] Déjà présent : sessions_7642305972.csv | 4361101
+[2026-05-09 23:40:03] Déjà présent : sessions_7639274709.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7638264459.csv | rc8b4-alexis
+[2026-05-09 23:40:03] Déjà présent : sessions_7638371604.csv | 9240743 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_7638212028.csv | saux olivier
+[2026-05-09 23:40:03] Déjà présent : sessions_7638128508.csv | M.Fatoux
+[2026-05-09 23:40:03] Déjà présent : sessions_7633137396.csv | Xray xb8 24 Grégoire
+[2026-05-09 23:40:03] Déjà présent : sessions_7629902448.csv | 7054303
+[2026-05-09 23:40:03] Déjà présent : sessions_7629924921.csv | 4361101
+[2026-05-09 23:40:03] Déjà présent : sessions_7337089823.csv | rc8
+[2026-05-09 23:40:03] Déjà présent : sessions_7281342356.csv | rc8b4-alexis
+[2026-05-09 23:40:03] Déjà présent : sessions_7082313901.csv | XB2 '20 8.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_7082313883.csv | XB4 '16 7.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_7082313562.csv | XB4 '16 7.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_7082313601.csv | XB2 '20 8.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_7082313511.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_6732589411.csv | 6630898 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_6722728585.csv | XB4 '16 7.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_6722738134.csv | XB2 '20 8.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_6646699942.csv | 6630898 [0]
+[2026-05-09 23:40:03] Déjà présent : sessions_6646711069.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_6647247349.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6600123526.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_6575399046.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6535212186.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6470798908.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_6471126205.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6471090328.csv | fouad ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_6333746832.csv | XB2 '20 8.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_6333747018.csv | XB4 '16 7.5T
+[2026-05-09 23:40:03] Déjà présent : sessions_6254205975.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6223826547.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6170963223.csv | Lodo_T4
+[2026-05-09 23:40:03] Déjà présent : sessions_6170963187.csv | Clement_T4
+[2026-05-09 23:40:03] Déjà présent : sessions_6154324683.csv | BaptisteX
+[2026-05-09 23:40:03] Déjà présent : sessions_6154077087.csv | fouad ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_6153789561.csv | Lodo_T4
+[2026-05-09 23:40:03] Déjà présent : sessions_6153772920.csv | Clement_T4
+[2026-05-09 23:40:03] Déjà présent : sessions_6145152225.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6144225264.csv | fouad ELWARD
+[2026-05-09 23:40:03] Pas de CSV exploitable : 6144175974 | FOUAD ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_6143157444.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_6089249265.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6089424228.csv | fouad ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_6089395887.csv | FOUAD ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_6026117490.csv | BaptisteX
+[2026-05-09 23:40:03] Déjà présent : sessions_6025848942.csv | fouad ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_6016253314.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_6015390157.csv | JMR-e
+[2026-05-09 23:40:03] Déjà présent : sessions_5983072789.csv | stephane mp10e //asso b7
+[2026-05-09 23:40:03] Déjà présent : sessions_5955549658.csv | GT8
+[2026-05-09 23:40:03] Déjà présent : sessions_5942504761.csv | fouad ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_5942361814.csv | Lodo_T4
+[2026-05-09 23:40:03] Déjà présent : sessions_5941054252.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_5929536616.csv | fouad ELWARD
+[2026-05-09 23:40:03] Déjà présent : sessions_5929221469.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] Déjà présent : sessions_5921028199.csv | MatthieuGREGOIRE-1
+[2026-05-09 23:40:03] ----------------------------------------------------------------------
+[2026-05-09 23:40:03] Résumé : téléchargés=0 | déjà présents=197 | échecs/vides=3
+[2026-05-09 23:40:03] Dossier CSV : /opt/mrcp-dashboard/docs/speedhive_csv
+[2026-05-09 23:40:03] ======================================================================
+[2/4] Génération data_v2.json
+OK: data_v2.json généré à deux endroits :
+ - /opt/mrcp-dashboard/docs/data_v2.json
+ - /opt/mrcp-dashboard/docs/speedhive_reports/data_v2.json
+Résumé: {'activities_count': 193, 'pilots_count': 71, 'laps_count': 8705, 'tracks': {'TT1/8': {'laps_count': 8587, 'activities_count': 193, 'pilots_count': 71}, 'TT1/10': {'laps_count': 118, 'activities_count': 15, 'pilots_count': 7}}}
+Qualité: score 0/100 | suspects 6871 | inconnus 16 | overrides exclus 1023 | pistes forcées 0
+ATTENTION: tours suspects détectés. Voir l’onglet Qualité/Admin du dashboard.
+[3/4] Git add
