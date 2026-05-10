@@ -18,7 +18,7 @@ CSV_DIR = ROOT / "speedhive_csv"
 META_FILE = ROOT / "speedhive_sync_meta.json"
 LOG_FILE = ROOT / "speedhive_sync.log"
 
-LIMIT_DATE = datetime(2026, 4, 15)
+LIMIT_DATE_TEXT = "2026-04-15"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
@@ -51,36 +51,22 @@ def save_meta(meta):
     )
 
 
-def parse_activity_date(activity):
+def get_activity_date_text(activity):
     raw = (
         activity.get("startTime")
         or activity.get("start_time")
         or activity.get("date")
         or activity.get("createdAt")
         or activity.get("created_at")
+        or ""
     )
 
-    if not raw:
-        return None
+    raw = str(raw)
 
-    raw = str(raw).replace("Z", "")
+    if len(raw) >= 10 and raw[4:5] == "-" and raw[7:8] == "-":
+        return raw[:10]
 
-    try:
-        return datetime.fromisoformat(raw).replace(tzinfo=None)
-    except Exception:
-        pass
-
-    for fmt in [
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%d",
-        "%d/%m/%Y",
-    ]:
-        try:
-            return datetime.strptime(raw[:19], fmt)
-        except Exception:
-            pass
-
-    return None
+    return ""
 
 
 def get_activities(limit=200):
@@ -93,7 +79,6 @@ def get_activities(limit=200):
     )
 
     response.raise_for_status()
-
     data = response.json()
 
     return data.get("activities", [])
@@ -169,7 +154,7 @@ def main():
     log("=" * 70)
     log("SYNC SPEEDHIVE LINUX")
     log("=" * 70)
-    log(f"Filtre actif : sessions à partir du {LIMIT_DATE.date()}")
+    log(f"Filtre actif : sessions à partir du {LIMIT_DATE_TEXT}")
 
     try:
         activities = get_activities(args.limit)
@@ -180,7 +165,6 @@ def main():
     log(f"Activités récupérées : {len(activities)}")
 
     meta = load_meta()
-
     meta.setdefault("location_id", LOCATION_ID)
     meta.setdefault("downloads", {})
 
@@ -193,21 +177,15 @@ def main():
     for activity in activities:
         activity_id = str(activity.get("id", "")).strip()
         label = activity_label(activity)
-        start_time = (
-            activity.get("startTime")
-            or activity.get("start_time")
-            or activity.get("date")
-            or ""
-        )
 
-        activity_date = parse_activity_date(activity)
+        date_text = get_activity_date_text(activity)
 
-        if activity_date and activity_date < LIMIT_DATE:
-            ignored_old += 1
-            log(f"Ignoré ancien : {activity_id} | {label} | {activity_date.date()}")
-            continue
-
-        if not activity_date:
+        if date_text:
+            if date_text < LIMIT_DATE_TEXT:
+                ignored_old += 1
+                log(f"Ignoré ancien : {activity_id} | {label} | {date_text}")
+                continue
+        else:
             unknown_date += 1
             log(f"Date inconnue, conservé : {activity_id} | {label}")
 
@@ -230,7 +208,7 @@ def main():
                 meta["downloads"][activity_id] = {
                     "activity_id": activity_id,
                     "label": label,
-                    "start_time": start_time,
+                    "start_time": date_text,
                     "csv": path.name,
                     "last_seen": datetime.now().isoformat(timespec="seconds"),
                 }
@@ -244,7 +222,6 @@ def main():
             log(f"Erreur téléchargement {activity_id} | {label} : {exc}")
 
     meta["last_sync"] = datetime.now().isoformat(timespec="seconds")
-
     meta["last_summary"] = {
         "activities": len(activities),
         "downloaded": downloaded,
@@ -252,7 +229,7 @@ def main():
         "failed": failed,
         "ignored_old": ignored_old,
         "unknown_date": unknown_date,
-        "limit_date": LIMIT_DATE.date().isoformat(),
+        "limit_date": LIMIT_DATE_TEXT,
     }
 
     save_meta(meta)
