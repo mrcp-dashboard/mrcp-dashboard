@@ -1,528 +1,71 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>MRCP Dashboard V5.4</title>
-
-  <!-- ===================================================== -->
-  <!-- CSS -->
-  <!-- ===================================================== -->
-
-  <link rel="stylesheet" href="ai_v54.css">
-  <link rel="stylesheet" href="profil_buttons_fix.css">
-
-  <style>
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
-
-    body{
-      background:#0f172a;
-      color:white;
-      font-family:Arial, Helvetica, sans-serif;
-      padding:20px;
-    }
-
-    .header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:20px;
-      flex-wrap:wrap;
-      margin-bottom:30px;
-    }
-
-    .header-left h1{
-      font-size:42px;
-      margin-bottom:8px;
-    }
-
-    .header-left p{
-      color:#94a3b8;
-      font-size:15px;
-    }
-
-    .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:18px;
-      margin-bottom:28px;
-    }
-
-    .stat-card{
-      background:#111827;
-      border-radius:22px;
-      padding:24px;
-      border:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 10px 25px rgba(0,0,0,0.25);
-    }
-
-    .stat-card span{
-      display:block;
-      color:#94a3b8;
-      font-size:14px;
-      margin-bottom:10px;
-    }
-
-    .stat-card strong{
-      font-size:34px;
-      font-weight:900;
-    }
-
-    .section-title{
-      font-size:28px;
-      margin:36px 0 20px;
-    }
-
-    .table-wrapper{
-      overflow:auto;
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,0.08);
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:900px;
-    }
-
-    thead{
-      background:#1e293b;
-    }
-
-    th{
-      text-align:left;
-      padding:16px;
-      font-size:14px;
-      color:#cbd5e1;
-    }
-
-    td{
-      padding:16px;
-      border-top:1px solid rgba(255,255,255,0.05);
-      background:#111827;
-    }
-
-    tr:hover td{
-      background:#172033;
-    }
-
-    .track-badge{
-      display:inline-block;
-      background:#334155;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:bold;
-    }
-
-    .profile-btn{
-      display:inline-block;
-      background:linear-gradient(90deg,#facc15,#fb923c);
-      color:#111827;
-      text-decoration:none;
-      padding:10px 15px;
-      border-radius:999px;
-      font-weight:900;
-      white-space:nowrap;
-    }
-
-    .profile-btn:hover{
-      filter:brightness(1.08);
-    }
-
-    footer{
-      margin-top:60px;
-      text-align:center;
-      color:#64748b;
-      font-size:14px;
-    }
-
-    .loading{
-      padding:30px;
-      text-align:center;
-      color:#94a3b8;
-    }
-
-    .error-box{
-      background:#7f1d1d;
-      padding:18px;
-      border-radius:16px;
-      margin-top:20px;
-    }
-
-    @media(max-width:700px){
-
-      body{
-        padding:14px;
-      }
-
-      .header-left h1{
-        font-size:32px;
-      }
-
-      .stats-grid{
-        grid-template-columns:1fr 1fr;
-      }
-
-      .stat-card strong{
-        font-size:24px;
-      }
-
-    }
-
-  </style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#061224">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MRCP">
+  <title>MRCP Speedhive</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles_v2.css">
 </head>
-
 <body>
-
-  <!-- ===================================================== -->
-  <!-- HEADER -->
-  <!-- ===================================================== -->
-
-  <div class="header">
-
-    <div class="header-left">
-      <h1>?? MRCP Dashboard V5.4</h1>
-      <p>
-        Plateforme digitale club RC � Intelligence � Analyse � Profils pilotes
-      </p>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-main">MRCP</div>
+      <div class="brand-sub">SPEEDHIVE</div>
     </div>
 
+    <nav class="side-nav">
+      <a href="#/" class="nav-link">🏠 <span>Accueil</span></a>
+      <a href="#/mes-chronos" class="nav-link mobile-priority">⏱️ <span>Mes chronos</span></a>
+      <a href="#/live" class="nav-link">📡 <span>Live</span></a>
+      <a href="#/pilotes" class="nav-link">👥 <span>Pilotes</span></a>
+      <a href="#/podiums" class="nav-link">🏆 <span>Podiums</span></a>
+      <button id="adminBtn" class="nav-link nav-button">⚙️ <span>Admin</span></button>
+    </nav>
+
+    <nav id="adminNav" class="side-nav admin-nav hidden">
+      <a href="#/quality" class="nav-link">📊 <span>Qualité</span></a>
+      <a href="#/admin-pilotes" class="nav-link">🧑‍🔧 <span>Pilotes admin</span></a>
+      <a href="#/admin-records" class="nav-link">🛠️ <span>Records admin</span></a>
+      <a href="#/admin" class="nav-link">🔐 <span>Admin</span></a>
+      <button id="adminExit" class="nav-link nav-button">🚪 <span>Quitter</span></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="flag">🏁</div>
+      <strong>MRCP Speedhive</strong>
+      <small>Chronos, progression et records pilotes</small>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="top-pills">
+      <div class="pill">📡 <span>V4.1 Live timing</span></div>
+      <div class="pill">📅 <span id="todayLabel">Aujourd’hui</span></div>
+      <button id="installPwaBtn" class="pill pill-button hidden">Installer l’app</button>
+      <button id="adminBtnTop" class="pill pill-button">⚙️ Admin</button>
+    </div>
+
+    <main id="app">
+      <section class="card">
+        <h2>Chargement...</h2>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>🏁 MRCP Speedhive Dashboard</span>
+      <span id="lastUpdateFooter">Données en cours de chargement</span>
+      <span>📡 V4.1 Live timing</span>
+    </footer>
   </div>
+</div>
 
-  <!-- ===================================================== -->
-  <!-- STATS -->
-  <!-- ===================================================== -->
-
-  <div class="stats-grid">
-
-    <div class="stat-card">
-      <span>Total tours</span>
-      <strong id="total-laps">--</strong>
-    </div>
-
-    <div class="stat-card">
-      <span>Total pilotes</span>
-      <strong id="total-pilots">--</strong>
-    </div>
-
-    <div class="stat-card">
-      <span>Total sessions</span>
-      <strong id="total-sessions">--</strong>
-    </div>
-
-    <div class="stat-card">
-      <span>Meilleur tour club</span>
-      <strong id="best-lap">--</strong>
-    </div>
-
-  </div>
-
-  <!-- ===================================================== -->
-  <!-- PILOTE DU JOUR -->
-  <!-- ===================================================== -->
-
-  <section id="pilot-of-day-card"></section>
-
-  <!-- ===================================================== -->
-  <!-- TABLEAU PILOTES -->
-  <!-- ===================================================== -->
-
-  <h2 class="section-title">?? Pilotes du club</h2>
-
-  <div class="table-wrapper">
-
-    <table>
-
-      <thead>
-        <tr>
-          <th>Pilote</th>
-          <th>Meilleur tour</th>
-          <th>Total tours</th>
-          <th>Piste</th>
-          <th>Profil</th>
-        </tr>
-      </thead>
-
-      <tbody id="pilots-table">
-
-        <tr>
-          <td colspan="5" class="loading">
-            Chargement des donn�es...
-          </td>
-        </tr>
-
-      </tbody>
-
-    </table>
-
-  </div>
-
-  <!-- ===================================================== -->
-  <!-- FOOTER -->
-  <!-- ===================================================== -->
-
-  <footer>
-    MRCP Dashboard V5.4 � Intelligence Club � Live Timing Ready
-  </footer>
-
-  <!-- ===================================================== -->
-  <!-- JAVASCRIPT -->
-  <!-- ===================================================== -->
-
-  <script>
-
-    function toSeconds(value){
-
-      if(value === null || value === undefined)
-        return null;
-
-      if(typeof value === "number")
-        return value;
-
-      if(typeof value === "string"){
-
-        const clean = value
-          .replace(",", ".")
-          .replace("s", "")
-          .trim();
-
-        const n = parseFloat(clean);
-
-        return isNaN(n) ? null : n;
-      }
-
-      return null;
-    }
-
-    function formatTime(seconds){
-
-      if(!seconds)
-        return "-";
-
-      return seconds.toFixed(3) + " s";
-    }
-
-    async function loadDashboard(){
-
-      try{
-
-        const response = await fetch(
-          "data_v2.json?v=" + Date.now()
-        );
-
-        if(!response.ok){
-          throw new Error("Impossible de charger data_v2.json");
-        }
-
-        const data = await response.json();
-
-        const activities = data.activities || [];
-
-        let totalLaps = 0;
-        let bestLap = null;
-
-        const pilotsMap = {};
-
-        activities.forEach(activity => {
-
-          const participants = activity.participants || [];
-
-          participants.forEach(pilot => {
-
-            const pilotId = String(
-              pilot.id ||
-              pilot.pilot_id ||
-              pilot.driver_id ||
-              pilot.transponder ||
-              pilot.transponder_id ||
-              pilot.name ||
-              Math.random()
-            );
-
-            const pilotName =
-              pilot.name ||
-              pilot.driver_name ||
-              pilot.transponder ||
-              "Pilote inconnu";
-
-            const track =
-              activity.track ||
-              "Inconnue";
-
-            const rawLaps =
-              pilot.laps ||
-              pilot.lap_times ||
-              pilot.times ||
-              [];
-
-            let laps = [];
-
-            rawLaps.forEach(lap => {
-
-              let value = null;
-
-              if(typeof lap === "object" && lap !== null){
-
-                value = toSeconds(
-                  lap.time ||
-                  lap.lap_time ||
-                  lap.seconds
-                );
-
-              }else{
-
-                value = toSeconds(lap);
-
-              }
-
-              if(
-                value &&
-                value > 5 &&
-                value < 180
-              ){
-                laps.push(value);
-              }
-
-            });
-
-            if(!pilotsMap[pilotId]){
-
-              pilotsMap[pilotId] = {
-                id:pilotId,
-                name:pilotName,
-                totalLaps:0,
-                bestLap:null,
-                track:track
-              };
-
-            }
-
-            pilotsMap[pilotId].totalLaps += laps.length;
-
-            totalLaps += laps.length;
-
-            if(laps.length){
-
-              const pilotBest = Math.min(...laps);
-
-              if(
-                pilotsMap[pilotId].bestLap === null ||
-                pilotBest < pilotsMap[pilotId].bestLap
-              ){
-                pilotsMap[pilotId].bestLap = pilotBest;
-              }
-
-              if(
-                bestLap === null ||
-                pilotBest < bestLap
-              ){
-                bestLap = pilotBest;
-              }
-
-            }
-
-          });
-
-        });
-
-        const pilots = Object.values(pilotsMap);
-
-        document.getElementById("total-laps").innerText =
-          totalLaps;
-
-        document.getElementById("total-pilots").innerText =
-          pilots.length;
-
-        document.getElementById("total-sessions").innerText =
-          activities.length;
-
-        document.getElementById("best-lap").innerText =
-          formatTime(bestLap);
-
-        const tbody =
-          document.getElementById("pilots-table");
-
-        tbody.innerHTML = "";
-
-        pilots
-          .sort((a,b) => {
-
-            if(a.bestLap === null) return 1;
-            if(b.bestLap === null) return -1;
-
-            return a.bestLap - b.bestLap;
-          })
-          .forEach(pilot => {
-
-            const tr = document.createElement("tr");
-
-            tr.innerHTML = `
-              <td>${pilot.name}</td>
-
-              <td>
-                ${formatTime(pilot.bestLap)}
-              </td>
-
-              <td>
-                ${pilot.totalLaps}
-              </td>
-
-              <td>
-                <span class="track-badge">
-                  ${pilot.track}
-                </span>
-              </td>
-
-              <td>
-                <a
-                  class="profile-btn"
-                  href="pilot.html?id=${encodeURIComponent(pilot.id)}"
-                >
-                  ?? Profil
-                </a>
-              </td>
-            `;
-
-            tbody.appendChild(tr);
-
-          });
-
-      }catch(error){
-
-        console.error(error);
-
-        document.body.innerHTML += `
-          <div class="error-box">
-            ? Erreur chargement data_v2.json
-          </div>
-        `;
-      }
-    }
-
-    loadDashboard();
-
-  </script>
-
-  <!-- ===================================================== -->
-  <!-- IA V5.4 -->
-  <!-- ===================================================== -->
-
-  <script src="ai_v54.js"></script>
-
-  <!-- ===================================================== -->
-  <!-- FIX BOUTONS PROFILS -->
-  <!-- ===================================================== -->
-
-  <script src="profil_buttons_fix.js"></script>
-
+<script src="app_v2.js"></script>
+<script src="pilot_links_v53.js?v=53"></script>
 </body>
 </html>
