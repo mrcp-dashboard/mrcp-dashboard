@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>MRCP Live Timing V5</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #1d3557, #05070a);
+      color: white;
+    }
+
+    header {
+      padding: 25px;
+      text-align: center;
+      background: rgba(0,0,0,0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 15px;
+      color: #ffd166;
+    }
+
+    .container {
+      padding: 25px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.09);
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.35);
+    }
+
+    .big {
+      font-size: 44px;
+      font-weight: bold;
+      color: #06d6a0;
+    }
+
+    .label {
+      opacity: 0.7;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>MRCP Live Timing V5</h1>
+    <div class="status" id="status">Connexion...</div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="label">Dernier tour</div>
+      <div class="big" id="lapTime">--</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">Pilote</div>
+        <div class="value" id="pilot">--</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Piste</div>
+        <div class="value" id="track">--</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Session</div>
+        <div class="value" id="session">--</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Tour n°</div>
+        <div class="value" id="lapNumber">--</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const socket = io("http://192.168.1.2:5056");
+
+    const status = document.getElementById("status");
+
+    socket.on("connect", () => {
+      status.textContent = "Connecté au live timing";
+      status.style.color = "#06d6a0";
+    });
+
+    socket.on("disconnect", () => {
+      status.textContent = "Déconnecté";
+      status.style.color = "#ef476f";
+    });
+
+    socket.on("new_lap", (lap) => {
+      document.getElementById("lapTime").textContent =
+        lap.lap_time || lap.time || "--";
+
+      document.getElementById("pilot").textContent =
+        lap.pilot_name || lap.driver || lap.transponder || "Pilote inconnu";
+
+      document.getElementById("track").textContent =
+        lap.track || "--";
+
+      document.getElementById("session").textContent =
+        lap.activity_name || lap.activity_id || "--";
+
+      document.getElementById("lapNumber").textContent =
+        lap.lap_number || "--";
+    });
+  </script>
+</body>
+</html>
