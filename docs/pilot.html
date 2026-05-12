@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profil pilote MRCP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      color: white;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: rgba(0,0,0,0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat .label {
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .stat .value {
+      font-size: 25px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      text-align: left;
+    }
+
+    th {
+      color: #93c5fd;
+    }
+
+    .qr {
+      text-align: center;
+    }
+
+    .qr img {
+      background: white;
+      padding: 12px;
+      border-radius: 16px;
+      max-width: 220px;
+    }
+
+    a {
+      color: #93c5fd;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 id="pilotName">Profil pilote</h1>
+    <p id="pilotSub">MRCP Dashboard V5.3</p>
+  </header>
+
+  <div class="container">
+
+    <div class="card grid">
+      <div class="stat">
+        <div class="label">Transpondeur</div>
+        <div class="value" id="transponder">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">Meilleur tour</div>
+        <div class="value" id="bestLap">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">Moyenne</div>
+        <div class="value" id="avgLap">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">Total tours</div>
+        <div class="value" id="totalLaps">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Progression</h2>
+      <canvas id="progressChart"></canvas>
+    </div>
+
+    <div class="card qr">
+      <h2>QR Code personnel</h2>
+      <img id="qrImg" alt="QR Code pilote" />
+      <p>À imprimer sur table stands ou fiche pilote.</p>
+    </div>
+
+    <div class="card">
+      <h2>Historique sessions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Piste</th>
+            <th>Meilleur tour</th>
+            <th>Moyenne</th>
+            <th>Tours</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+<script>
+function fmtLap(v) {
+  if (v === null || v === undefined || isNaN(v)) return "-";
+  return Number(v).toFixed(3) + "s";
+}
+
+function getPilotId() {
+  return new URLSearchParams(window.location.search).get("id");
+}
+
+function getPilotKey(p) {
+  return String(
+    p.id ||
+    p.pilot_id ||
+    p.transponder ||
+    p.transponder_id ||
+    p.number ||
+    ""
+  );
+}
+
+function lapPilotKey(lap) {
+  return String(
+    lap.pilot_id ||
+    lap.driver_id ||
+    lap.transponder ||
+    lap.transponder_id ||
+    lap.pilot ||
+    ""
+  );
+}
+
+async function main() {
+  const id = getPilotId();
+
+  if (!id) {
+    document.getElementById("pilotName").textContent = "Pilote introuvable";
+    return;
+  }
+
+  const res = await fetch("data_v2.json?v=" + Date.now());
+  const data = await res.json();
+
+  const pilots = data.pilots || [];
+  const activities = data.activities || [];
+  const laps = data.laps || [];
+
+  const pilot = pilots.find(p => getPilotKey(p) === id) || {};
+
+  const name =
+    pilot.name ||
+    pilot.pilot_name ||
+    pilot.driver ||
+    pilot.driver_name ||
+    "Pilote " + id;
+
+  document.getElementById("pilotName").textContent = name;
+  document.getElementById("pilotSub").textContent = "Profil live pilote MRCP";
+  document.getElementById("transponder").textContent = id;
+  document.getElementById("qrImg").src = "assets/qr/" + id + ".png";
+
+  const pilotLaps = laps.filter(l => lapPilotKey(l) === id);
+
+  const times = pilotLaps
+    .map(l => Number(l.time || l.lap_time || l.laptime || l.seconds))
+    .filter(v => !isNaN(v) && v > 0);
+
+  const best = times.length ? Math.min(...times) : null;
+  const avg = times.length ? times.reduce((a,b) => a+b, 0) / times.length : null;
+
+  document.getElementById("bestLap").textContent = fmtLap(best);
+  document.getElementById("avgLap").textContent = fmtLap(avg);
+  document.getElementById("totalLaps").textContent = times.length;
+
+  const sessions = {};
+
+  for (const lap of pilotLaps) {
+    const aid = lap.activity_id || lap.session_id || lap.activity || lap.source_file || "unknown";
+    if (!sessions[aid]) sessions[aid] = [];
+    sessions[aid].push(lap);
+  }
+
+  const rows = [];
+
+  for (const [sid, sessionLaps] of Object.entries(sessions)) {
+    const activity = activities.find(a =>
+      String(a.id) === String(sid) ||
+      String(a.source_file) === String(sid)
+    ) || {};
+
+    const stimes = sessionLaps
+      .map(l => Number(l.time || l.lap_time || l.laptime || l.seconds))
+      .filter(v => !isNaN(v) && v > 0);
+
+    if (!stimes.length) continue;
+
+    rows.push({
+      date: activity.date_fr || activity.date || "-",
+      track: activity.track || (activity.tracks || []).join(", ") || "-",
+      best: Math.min(...stimes),
+      avg: stimes.reduce((a,b) => a+b, 0) / stimes.length,
+      count: stimes.length
+    });
+  }
+
+  rows.sort((a,b) => String(a.date).localeCompare(String(b.date)));
+
+  const body = document.getElementById("historyBody");
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.track}</td>
+      <td>${fmtLap(r.best)}</td>
+      <td>${fmtLap(r.avg)}</td>
+      <td>${r.count}</td>
+    </tr>
+  `).join("");
+
+  new Chart(document.getElementById("progressChart"), {
+    type: "line",
+    data: {
+      labels: rows.map(r => r.date),
+      datasets: [{
+        label: "Meilleur tour par session",
+        data: rows.map(r => r.best),
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: { color: "white" }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.1)" }
+        },
+        y: {
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.1)" }
+        }
+      }
+    }
+  });
+}
+
+main();
+</script>
+
+</body>
+</html>
