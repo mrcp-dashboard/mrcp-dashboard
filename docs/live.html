@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>MRCP Live Timing V5</title>
+  <title>MRCP Live Timing V5.1</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
   <style>
@@ -14,7 +14,7 @@
     }
 
     header {
-      padding: 25px;
+      padding: 22px;
       text-align: center;
       background: rgba(0,0,0,0.35);
     }
@@ -25,41 +25,41 @@
     }
 
     .status {
-      margin-top: 10px;
-      font-size: 15px;
+      margin-top: 8px;
       color: #ffd166;
     }
 
     .container {
-      padding: 25px;
-      max-width: 900px;
+      padding: 22px;
+      max-width: 1300px;
       margin: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
     }
 
     .card {
       background: rgba(255,255,255,0.09);
       border-radius: 18px;
-      padding: 25px;
-      margin-bottom: 20px;
+      padding: 20px;
       box-shadow: 0 0 30px rgba(0,0,0,0.35);
+    }
+
+    .label {
+      opacity: 0.7;
+      font-size: 13px;
+      text-transform: uppercase;
     }
 
     .big {
       font-size: 44px;
       font-weight: bold;
       color: #06d6a0;
-    }
-
-    .label {
-      opacity: 0.7;
-      font-size: 14px;
-      text-transform: uppercase;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
+      margin-top: 8px;
     }
 
     .value {
@@ -67,48 +67,215 @@
       font-weight: bold;
       margin-top: 8px;
     }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      text-align: left;
+    }
+
+    th {
+      color: #ffd166;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    tr:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .pos {
+      font-weight: bold;
+      color: #06d6a0;
+    }
+
+    .small {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-top: 6px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      margin: 28px 0 12px;
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>MRCP Live Timing V5</h1>
+    <h1>MRCP Live Timing V5.1</h1>
     <div class="status" id="status">Connexion...</div>
+    <div class="small" id="dateInfo">--</div>
   </header>
 
   <div class="container">
-    <div class="card">
-      <div class="label">Dernier tour</div>
-      <div class="big" id="lapTime">--</div>
-    </div>
 
     <div class="grid">
       <div class="card">
-        <div class="label">Pilote</div>
-        <div class="value" id="pilot">--</div>
+        <div class="label">Dernier tour</div>
+        <div class="big" id="latestLap">--</div>
+        <div class="small" id="latestPilot">--</div>
       </div>
 
       <div class="card">
-        <div class="label">Piste</div>
-        <div class="value" id="track">--</div>
+        <div class="label">Record absolu du jour</div>
+        <div class="big" id="bestOverall">--</div>
+        <div class="small" id="bestOverallInfo">--</div>
       </div>
 
       <div class="card">
-        <div class="label">Session</div>
-        <div class="value" id="session">--</div>
-      </div>
-
-      <div class="card">
-        <div class="label">Tour n°</div>
-        <div class="value" id="lapNumber">--</div>
+        <div class="label">Total tours aujourd’hui</div>
+        <div class="big" id="lapsCount">0</div>
+        <div class="small">Tours détectés dans data_v2.json</div>
       </div>
     </div>
+
+    <div class="section-title">Records par piste</div>
+    <div class="grid" id="trackRecords"></div>
+
+    <div class="section-title">Classement pilotes du jour</div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Pilote</th>
+            <th>Meilleur tour</th>
+            <th>Nb tours</th>
+            <th>Piste</th>
+          </tr>
+        </thead>
+        <tbody id="rankingBody">
+          <tr><td colspan="5">Aucune donnée</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Tous les tours du jour</div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Tour</th>
+            <th>Pilote</th>
+            <th>Temps</th>
+            <th>Piste</th>
+            <th>Session</th>
+          </tr>
+        </thead>
+        <tbody id="lapsBody">
+          <tr><td colspan="5">Aucune donnée</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
   <script>
-    const socket = io("http://192.168.1.2:5056");
+    const LIVE_SERVER = "http://192.168.1.2:5056";
+    const socket = io(LIVE_SERVER);
 
     const status = document.getElementById("status");
+
+    function safe(v) {
+      return v === undefined || v === null || v === "" ? "--" : v;
+    }
+
+    function updatePage(data) {
+      document.getElementById("dateInfo").textContent =
+        "Date : " + safe(data.date);
+
+      document.getElementById("lapsCount").textContent =
+        safe(data.laps_count);
+
+      const latest = data.latest_lap;
+
+      if (latest) {
+        document.getElementById("latestLap").textContent =
+          safe(latest.lap_time || latest.time);
+
+        document.getElementById("latestPilot").textContent =
+          safe(latest._pilot || latest.pilot_name || latest.driver || latest.transponder) +
+          " | " +
+          safe(latest.track) +
+          " | Tour " +
+          safe(latest.lap_number);
+      }
+
+      if (data.records && data.records.best_overall) {
+        document.getElementById("bestOverall").textContent =
+          safe(data.records.best_overall.lap_time);
+
+        document.getElementById("bestOverallInfo").textContent =
+          safe(data.records.best_overall.pilot) +
+          " | " +
+          safe(data.records.best_overall.track);
+      }
+
+      const trackRecords = document.getElementById("trackRecords");
+      trackRecords.innerHTML = "";
+
+      if (data.records && data.records.by_track && data.records.by_track.length) {
+        data.records.by_track.forEach(r => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <div class="label">Record ${safe(r.track)}</div>
+            <div class="value">${safe(r.lap_time)}</div>
+            <div class="small">${safe(r.pilot)} | ${safe(r.session)}</div>
+          `;
+          trackRecords.appendChild(div);
+        });
+      } else {
+        trackRecords.innerHTML = `<div class="card">Aucun record piste aujourd’hui</div>`;
+      }
+
+      const rankingBody = document.getElementById("rankingBody");
+      rankingBody.innerHTML = "";
+
+      if (data.ranking && data.ranking.length) {
+        data.ranking.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="pos">${safe(row.position)}</td>
+            <td>${safe(row.pilot)}</td>
+            <td>${safe(row.best_lap)}</td>
+            <td>${safe(row.laps_count)}</td>
+            <td>${safe(row.track)}</td>
+          `;
+          rankingBody.appendChild(tr);
+        });
+      } else {
+        rankingBody.innerHTML = `<tr><td colspan="5">Aucun classement aujourd’hui</td></tr>`;
+      }
+
+      const lapsBody = document.getElementById("lapsBody");
+      lapsBody.innerHTML = "";
+
+      if (data.laps && data.laps.length) {
+        data.laps.forEach(lap => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${safe(lap.lap_number)}</td>
+            <td>${safe(lap._pilot || lap.pilot_name || lap.driver || lap.transponder)}</td>
+            <td>${safe(lap.lap_time || lap.time)}</td>
+            <td>${safe(lap.track)}</td>
+            <td>${safe(lap.activity_name || lap.activity_id)}</td>
+          `;
+          lapsBody.appendChild(tr);
+        });
+      } else {
+        lapsBody.innerHTML = `<tr><td colspan="5">Aucun tour aujourd’hui</td></tr>`;
+      }
+    }
 
     socket.on("connect", () => {
       status.textContent = "Connecté au live timing";
@@ -120,22 +287,17 @@
       status.style.color = "#ef476f";
     });
 
-    socket.on("new_lap", (lap) => {
-      document.getElementById("lapTime").textContent =
-        lap.lap_time || lap.time || "--";
-
-      document.getElementById("pilot").textContent =
-        lap.pilot_name || lap.driver || lap.transponder || "Pilote inconnu";
-
-      document.getElementById("track").textContent =
-        lap.track || "--";
-
-      document.getElementById("session").textContent =
-        lap.activity_name || lap.activity_id || "--";
-
-      document.getElementById("lapNumber").textContent =
-        lap.lap_number || "--";
+    socket.on("live_update", (data) => {
+      updatePage(data);
     });
+
+    fetch(LIVE_SERVER + "/api/live")
+      .then(r => r.json())
+      .then(data => updatePage(data))
+      .catch(() => {
+        status.textContent = "Impossible de charger les données live";
+        status.style.color = "#ef476f";
+      });
   </script>
 </body>
 </html>
