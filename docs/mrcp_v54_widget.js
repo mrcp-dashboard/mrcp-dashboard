@@ -1,237 +1,161 @@
 (function () {
 
-  async function loadPilotOfDay() {
+  function toSeconds(l) {
+    if (typeof l === "number") return l;
 
-    try {
-
-      const response = await fetch("data_v2.json?v=" + Date.now());
-      const data = await response.json();
-
-      const activities = data.activities || [];
-
-      const pilots = {};
-
-      activities.forEach(activity => {
-
-        (activity.participants || []).forEach(p => {
-
-          const id =
-            p.id ||
-            p.pilot_id ||
-            p.transponder ||
-            p.name;
-
-          if (!id) return;
-
-          if (!pilots[id]) {
-
-            pilots[id] = {
-              id,
-              name:
-                p.name ||
-                p.driver_name ||
-                p.transponder ||
-                "Pilote",
-              laps:[]
-            };
-          }
-
-          const laps =
-            p.laps ||
-            p.lap_times ||
-            p.times ||
-            [];
-
-          laps.forEach(l => {
-
-            let v = null;
-
-            if (typeof l === "number")
-              v = l;
-
-            if (typeof l === "string")
-              v = parseFloat(
-                l.replace(",", ".").replace("s", "")
-              );
-
-            if (
-              v &&
-              v > 5 &&
-              v < 180
-            ) {
-              pilots[id].laps.push(v);
-            }
-
-          });
-
-        });
-
-      });
-
-      const pilotsArray =
-        Object.values(pilots)
-          .filter(p => p.laps.length);
-
-      if (!pilotsArray.length)
-        return;
-
-      pilotsArray.forEach(p => {
-
-        p.bestLap = Math.min(...p.laps);
-
-        const avg =
-          p.laps.reduce((a,b)=>a+b,0) /
-          p.laps.length;
-
-        const variance =
-          p.laps.reduce((s,v)=>
-            s + Math.pow(v-avg,2)
-          ,0) / p.laps.length;
-
-        const regularity =
-          Math.max(0,100-Math.sqrt(variance)*10);
-
-        p.score =
-          (100 - p.bestLap) +
-          regularity +
-          (p.laps.length / 5);
-
-      });
-
-      pilotsArray.sort((a,b)=>b.score-a.score);
-
-      const pilot = pilotsArray[0];
-
-      const widget = document.createElement("section");
-
-      widget.innerHTML = `
-        <div class="v54-widget">
-
-          <div class="v54-badge">
-            üèÜ PILOTE DU JOUR
-          </div>
-
-          <h2>${pilot.name}</h2>
-
-          <div class="v54-grid">
-
-            <div>
-              <span>Meilleur tour</span>
-              <strong>${pilot.bestLap.toFixed(3)} s</strong>
-            </div>
-
-            <div>
-              <span>Total tours</span>
-              <strong>${pilot.laps.length}</strong>
-            </div>
-
-          </div>
-
-          <a
-            class="v54-profile-btn"
-            href="pilot.html?id=${encodeURIComponent(pilot.id)}"
-          >
-            üë§ Voir profil pilote
-          </a>
-
-        </div>
-      `;
-
-      const app =
-        document.querySelector("#app");
-
-      if (app)
-        app.prepend(widget);
-
-    } catch(e) {
-
-      console.error(
-        "Erreur widget V5.4",
-        e
-      );
-
+    if (typeof l === "string") {
+      const v = parseFloat(l.replace(",", ".").replace("s", "").trim());
+      return isNaN(v) ? null : v;
     }
 
+    if (typeof l === "object" && l !== null) {
+      return toSeconds(l.time || l.lap_time || l.seconds || l.value);
+    }
+
+    return null;
   }
 
-  const style =
-    document.createElement("style");
+  async function buildV54Widget() {
+    if (document.getElementById("mrcp-v54-widget")) {
+    return;
+  }
+    const app = document.getElementById("app");
+    if (!app) return;
 
-  style.innerHTML = `
+    const response = await fetch("data_v2.json?v=" + Date.now());
+    const data = await response.json();
 
-    .v54-widget{
-      background:linear-gradient(
-        135deg,
-        #111827,
-        #1e293b
-      );
-      border-radius:24px;
-      padding:24px;
-      margin-bottom:20px;
-      color:white;
-      border:1px solid rgba(255,255,255,.08);
+    const pilots = {};
+
+    (data.activities || []).forEach(activity => {
+      (activity.participants || []).forEach(p => {
+        const id = String(
+          p.id ||
+          p.pilot_id ||
+          p.transponder ||
+          p.transponder_id ||
+          p.name ||
+          ""
+        );
+
+        if (!id) return;
+
+        if (!pilots[id]) {
+          pilots[id] = {
+            id,
+            name: p.name || p.driver_name || p.transponder || "Pilote inconnu",
+            laps: []
+          };
+        }
+
+        const raw = p.laps || p.lap_times || p.times || [];
+
+        raw.forEach(l => {
+          const sec = toSeconds(l);
+          if (sec && sec > 5 && sec < 180) {
+            pilots[id].laps.push(sec);
+          }
+        });
+      });
+    });
+
+    const list = Object.values(pilots).filter(p => p.laps.length);
+
+    if (!list.length) {
+      console.warn("V5.4 : aucun pilote trouvÈ");
+      return;
     }
 
-    .v54-badge{
-      display:inline-block;
-      background:linear-gradient(
-        90deg,
-        #facc15,
-        #fb923c
-      );
-      color:#111827;
-      padding:8px 14px;
-      border-radius:999px;
-      font-weight:900;
-      margin-bottom:14px;
-    }
+    list.forEach(p => {
+      const best = Math.min(...p.laps);
+      const avg = p.laps.reduce((a, b) => a + b, 0) / p.laps.length;
+      const variance = p.laps.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / p.laps.length;
+      const regularity = Math.max(0, 100 - Math.sqrt(variance) * 10);
 
-    .v54-widget h2{
-      font-size:32px;
-      margin-bottom:16px;
-    }
+      p.bestLap = best;
+      p.score = regularity + p.laps.length / 5 + (100 - best);
+    });
 
-    .v54-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:20px;
-    }
+    list.sort((a, b) => b.score - a.score);
 
-    .v54-grid div{
-      background:rgba(255,255,255,.06);
-      border-radius:16px;
-      padding:14px;
-    }
+    const pilot = list[0];
 
-    .v54-grid span{
-      display:block;
-      opacity:.7;
-      margin-bottom:6px;
-      font-size:13px;
-    }
+    const section = document.createElement("section");
+    section.id = "mrcp-v54-widget";
+    section.innerHTML = `
+      <div style="
+        background:linear-gradient(135deg,#111827,#1e293b);
+        color:white;
+        border-radius:24px;
+        padding:24px;
+        margin:0 0 22px 0;
+        border:1px solid rgba(255,255,255,.12);
+        box-shadow:0 14px 34px rgba(0,0,0,.25);
+      ">
+        <div style="
+          display:inline-block;
+          background:linear-gradient(90deg,#facc15,#fb923c);
+          color:#111827;
+          padding:8px 14px;
+          border-radius:999px;
+          font-weight:900;
+          margin-bottom:14px;
+        ">
+          ?? PILOTE DU JOUR
+        </div>
 
-    .v54-grid strong{
-      font-size:22px;
-    }
+        <h2 style="font-size:32px;margin:0 0 14px 0;">
+          ${pilot.name}
+        </h2>
 
-    .v54-profile-btn{
-      display:inline-block;
-      background:white;
-      color:#111827;
-      text-decoration:none;
-      padding:12px 18px;
-      border-radius:999px;
-      font-weight:900;
-    }
+        <div style="
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+          gap:12px;
+          margin-bottom:18px;
+        ">
+          <div style="background:rgba(255,255,255,.08);padding:14px;border-radius:16px;">
+            <span style="display:block;opacity:.7;margin-bottom:6px;">Meilleur tour</span>
+            <strong style="font-size:22px;">${pilot.bestLap.toFixed(3)} s</strong>
+          </div>
 
-  `;
+          <div style="background:rgba(255,255,255,.08);padding:14px;border-radius:16px;">
+            <span style="display:block;opacity:.7;margin-bottom:6px;">Total tours</span>
+            <strong style="font-size:22px;">${pilot.laps.length}</strong>
+          </div>
 
-  document.head.appendChild(style);
+          <div style="background:rgba(255,255,255,.08);padding:14px;border-radius:16px;">
+            <span style="display:block;opacity:.7;margin-bottom:6px;">Score V5.4</span>
+            <strong style="font-size:22px;">${pilot.score.toFixed(0)} pts</strong>
+          </div>
+        </div>
 
-  window.addEventListener(
-    "load",
-    loadPilotOfDay
-  );
+        <a href="pilot.html?id=${encodeURIComponent(pilot.id)}" style="
+          display:inline-block;
+          background:white;
+          color:#111827;
+          text-decoration:none;
+          padding:12px 18px;
+          border-radius:999px;
+          font-weight:900;
+        ">
+          ?? Voir profil pilote
+        </a>
+      </div>
+    `;
+
+    app.prepend(section);
+
+    console.log("V5.4 pilote du jour affichÈ :", pilot.name);
+  }
+
+  function startV54() {
+    setTimeout(buildV54Widget, 1000);
+    setTimeout(buildV54Widget, 2500);
+    setTimeout(buildV54Widget, 5000);
+  }
+
+  window.addEventListener("load", startV54);
+  window.addEventListener("hashchange", startV54);
 
 })();
