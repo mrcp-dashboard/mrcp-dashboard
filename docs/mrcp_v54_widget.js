@@ -1,5 +1,8 @@
 (function () {
 
+  if (window.MRCP_V54_WIDGET_INSTALLED) return;
+  window.MRCP_V54_WIDGET_INSTALLED = true;
+
   function toSeconds(l) {
     if (typeof l === "number") return l;
 
@@ -16,6 +19,10 @@
   }
 
   async function buildV54Widget() {
+
+    if (document.getElementById("mrcp-v54-widget")) {
+      return;
+    }
     if (document.getElementById("mrcp-v54-widget")) {
     return;
   }
@@ -150,9 +157,7 @@
   }
 
   function startV54() {
-    setTimeout(buildV54Widget, 1000);
-    setTimeout(buildV54Widget, 2500);
-    setTimeout(buildV54Widget, 5000);
+    setTimeout(buildV54Widget, 1500);
   }
 
   window.addEventListener("load", startV54);
