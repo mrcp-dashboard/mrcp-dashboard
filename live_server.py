@@ -4,7 +4,6 @@ import json
 import time
 import os
 from threading import Thread
-from datetime import datetime
 
 DATA_FILE = "/opt/mrcp-dashboard/docs/data_v2.json"
 
@@ -20,21 +19,6 @@ def load_data():
 
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
-
-
-def parse_lap_date(lap):
-    raw = (
-        lap.get("date")
-        or lap.get("activity_date")
-        or lap.get("datetime")
-        or lap.get("timestamp")
-        or ""
-    )
-
-    if not raw:
-        return ""
-
-    return str(raw)[:10]
 
 
 def lap_seconds(lap):
@@ -65,26 +49,53 @@ def pilot_name(lap):
     )
 
 
-def today_laps(data):
-    today = datetime.now().strftime("%Y-%m-%d")
+def activity_key(lap):
+    return (
+        lap.get("activity_id")
+        or lap.get("activity_name")
+        or lap.get("session_id")
+        or lap.get("session")
+        or ""
+    )
+
+
+def activity_label(lap):
+    return (
+        lap.get("activity_name")
+        or lap.get("activity_id")
+        or lap.get("session")
+        or "Session inconnue"
+    )
+
+
+def latest_session_laps(data):
     laps = data.get("laps", [])
 
-    filtered = []
+    if not laps:
+        return []
+
+    latest_activity = None
+
+    # On prend la première activité trouvée dans data_v2.json
+    # car le fichier est généralement déjà trié du plus récent au plus ancien.
     for lap in laps:
-        d = parse_lap_date(lap)
-        if d == today:
+        key = activity_key(lap)
+        if key:
+            latest_activity = key
+            break
+
+    if not latest_activity:
+        return []
+
+    filtered = []
+
+    for lap in laps:
+        if activity_key(lap) == latest_activity:
             lap["_pilot"] = pilot_name(lap)
             lap["_seconds"] = lap_seconds(lap)
             filtered.append(lap)
 
-    return sorted(
-        filtered,
-        key=lambda x: (
-            str(x.get("date") or x.get("activity_date") or ""),
-            int(x.get("lap_number") or 0)
-        ),
-        reverse=True
-    )
+    return filtered
 
 
 def build_ranking(laps):
@@ -107,6 +118,7 @@ def build_ranking(laps):
             if sec < pilots[p]["best_seconds"]:
                 pilots[p]["best_seconds"] = sec
                 pilots[p]["best_lap"] = lap.get("lap_time") or lap.get("time")
+                pilots[p]["track"] = lap.get("track") or pilots[p]["track"]
 
     ranking = list(pilots.values())
     ranking.sort(key=lambda x: x["best_seconds"])
@@ -126,8 +138,10 @@ def build_records(laps):
     best = min(valid, key=lambda x: x["_seconds"])
 
     by_track = {}
+
     for lap in valid:
         track = lap.get("track") or "Non classé"
+
         if track not in by_track or lap["_seconds"] < by_track[track]["_seconds"]:
             by_track[track] = lap
 
@@ -136,14 +150,14 @@ def build_records(laps):
             "pilot": best["_pilot"],
             "lap_time": best.get("lap_time") or best.get("time"),
             "track": best.get("track") or "",
-            "session": best.get("activity_name") or best.get("activity_id") or "",
+            "session": activity_label(best),
         },
         "by_track": [
             {
                 "track": track,
                 "pilot": lap["_pilot"],
                 "lap_time": lap.get("lap_time") or lap.get("time"),
-                "session": lap.get("activity_name") or lap.get("activity_id") or "",
+                "session": activity_label(lap),
             }
             for track, lap in by_track.items()
         ]
@@ -152,16 +166,19 @@ def build_records(laps):
 
 def build_payload():
     data = load_data()
-    laps = today_laps(data)
+    laps = latest_session_laps(data)
+
+    session_name = activity_label(laps[0]) if laps else "Aucune session"
 
     return {
         "status": "ok",
-        "date": datetime.now().strftime("%Y-%m-%d"),
+        "mode": "Dernière session MRCP",
+        "session_name": session_name,
         "laps_count": len(laps),
         "latest_lap": laps[0] if laps else None,
         "ranking": build_ranking(laps),
         "records": build_records(laps),
-        "laps": laps[:500]
+        "laps": laps[:1000],
     }
 
 
@@ -176,7 +193,7 @@ def watcher():
             if signature != last_signature:
                 last_signature = signature
                 socketio.emit("live_update", payload)
-                print("Live update envoyé :", payload["laps_count"], "tours")
+                print("Live update envoyé :", payload["session_name"], payload["laps_count"], "tours")
 
         except Exception as e:
             print("Erreur live watcher:", e)
@@ -188,7 +205,8 @@ def watcher():
 def index():
     return jsonify({
         "status": "ok",
-        "service": "MRCP Live Timing V5.1",
+        "service": "MRCP Live Timing V5.2",
+        "mode": "Dernière session MRCP",
         "data_file": DATA_FILE
     })
 

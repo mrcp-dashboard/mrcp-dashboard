@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>MRCP Live Timing V5.1</title>
+  <title>MRCP Live Timing V5.2</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
   <style>
@@ -106,42 +106,61 @@
       font-size: 24px;
       margin: 28px 0 12px;
     }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 26px;
+      }
+
+      .big {
+        font-size: 34px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 7px;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>MRCP Live Timing V5.1</h1>
+    <h1>MRCP Live Timing V5.2</h1>
     <div class="status" id="status">Connexion...</div>
-    <div class="small" id="dateInfo">--</div>
+    <div class="small" id="modeInfo">Dernière session MRCP</div>
+    <div class="small" id="sessionInfo">--</div>
   </header>
 
   <div class="container">
 
     <div class="grid">
       <div class="card">
-        <div class="label">Dernier tour</div>
+        <div class="label">Dernier tour de la session</div>
         <div class="big" id="latestLap">--</div>
         <div class="small" id="latestPilot">--</div>
       </div>
 
       <div class="card">
-        <div class="label">Record absolu du jour</div>
+        <div class="label">Record session</div>
         <div class="big" id="bestOverall">--</div>
         <div class="small" id="bestOverallInfo">--</div>
       </div>
 
       <div class="card">
-        <div class="label">Total tours aujourd’hui</div>
+        <div class="label">Total tours session</div>
         <div class="big" id="lapsCount">0</div>
-        <div class="small">Tours détectés dans data_v2.json</div>
+        <div class="small">Tours détectés dans la dernière session</div>
       </div>
     </div>
 
     <div class="section-title">Records par piste</div>
     <div class="grid" id="trackRecords"></div>
 
-    <div class="section-title">Classement pilotes du jour</div>
+    <div class="section-title">Classement pilotes de la session</div>
     <div class="card">
       <table>
         <thead>
@@ -159,7 +178,7 @@
       </table>
     </div>
 
-    <div class="section-title">Tous les tours du jour</div>
+    <div class="section-title">Tous les tours de la session</div>
     <div class="card">
       <table>
         <thead>
@@ -190,8 +209,11 @@
     }
 
     function updatePage(data) {
-      document.getElementById("dateInfo").textContent =
-        "Date : " + safe(data.date);
+      document.getElementById("modeInfo").textContent =
+        safe(data.mode);
+
+      document.getElementById("sessionInfo").textContent =
+        "Session : " + safe(data.session_name);
 
       document.getElementById("lapsCount").textContent =
         safe(data.laps_count);
@@ -208,6 +230,9 @@
           safe(latest.track) +
           " | Tour " +
           safe(latest.lap_number);
+      } else {
+        document.getElementById("latestLap").textContent = "--";
+        document.getElementById("latestPilot").textContent = "Aucun tour trouvé";
       }
 
       if (data.records && data.records.best_overall) {
@@ -218,6 +243,9 @@
           safe(data.records.best_overall.pilot) +
           " | " +
           safe(data.records.best_overall.track);
+      } else {
+        document.getElementById("bestOverall").textContent = "--";
+        document.getElementById("bestOverallInfo").textContent = "Aucun record session";
       }
 
       const trackRecords = document.getElementById("trackRecords");
@@ -235,7 +263,7 @@
           trackRecords.appendChild(div);
         });
       } else {
-        trackRecords.innerHTML = `<div class="card">Aucun record piste aujourd’hui</div>`;
+        trackRecords.innerHTML = `<div class="card">Aucun record piste sur cette session</div>`;
       }
 
       const rankingBody = document.getElementById("rankingBody");
@@ -254,7 +282,7 @@
           rankingBody.appendChild(tr);
         });
       } else {
-        rankingBody.innerHTML = `<tr><td colspan="5">Aucun classement aujourd’hui</td></tr>`;
+        rankingBody.innerHTML = `<tr><td colspan="5">Aucun classement session</td></tr>`;
       }
 
       const lapsBody = document.getElementById("lapsBody");
@@ -273,7 +301,7 @@
           lapsBody.appendChild(tr);
         });
       } else {
-        lapsBody.innerHTML = `<tr><td colspan="5">Aucun tour aujourd’hui</td></tr>`;
+        lapsBody.innerHTML = `<tr><td colspan="5">Aucun tour sur cette session</td></tr>`;
       }
     }
 
