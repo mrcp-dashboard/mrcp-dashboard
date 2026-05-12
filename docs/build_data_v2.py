@@ -304,6 +304,26 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], overrides: dict[s
     }
 
 
+
+def normalize_corrections(corrections):
+    """Accepte plusieurs formats de corrections pilotes."""
+    if not isinstance(corrections, dict):
+        return {}, {}
+
+    name_map = {}
+    merge_map = {}
+
+    for source in ("name_map", "transponders"):
+        for k, v in corrections.get(source, {}).items():
+            name_map[str(k).replace("/0", "").strip()] = v
+
+    for source in ("merge_map", "names"):
+        for k, v in corrections.get(source, {}).items():
+            merge_map[str(k).strip()] = v
+
+    return name_map, merge_map
+
+
 def build() -> dict[str, Any]:
     corrections = load_corrections()
     pilots = load_pilots()
