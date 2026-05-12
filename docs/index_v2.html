@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>MRCP Dashboard V5.4</title>
 
+  <!-- ===================================================== -->
+  <!-- CSS -->
+  <!-- ===================================================== -->
+
   <link rel="stylesheet" href="ai_v54.css">
+  <link rel="stylesheet" href="profil_buttons_fix.css">
 
   <style>
+
     *{
       margin:0;
       padding:0;
@@ -21,58 +29,67 @@
       padding:20px;
     }
 
-    .topbar{
+    .header{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:30px;
       gap:20px;
       flex-wrap:wrap;
+      margin-bottom:30px;
     }
 
-    .title h1{
+    .header-left h1{
       font-size:42px;
-      margin-bottom:6px;
+      margin-bottom:8px;
     }
 
-    .title p{
+    .header-left p{
       color:#94a3b8;
+      font-size:15px;
     }
 
-    .main-grid{
+    .stats-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
       gap:18px;
-      margin-bottom:25px;
+      margin-bottom:28px;
     }
 
-    .card{
-      background:#1e293b;
-      border-radius:20px;
-      padding:22px;
+    .stat-card{
+      background:#111827;
+      border-radius:22px;
+      padding:24px;
       border:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 10px 25px rgba(0,0,0,0.25);
     }
 
-    .card span{
+    .stat-card span{
       display:block;
       color:#94a3b8;
+      font-size:14px;
       margin-bottom:10px;
     }
 
-    .card strong{
+    .stat-card strong{
       font-size:34px;
+      font-weight:900;
     }
 
     .section-title{
-      font-size:26px;
-      margin:35px 0 20px;
+      font-size:28px;
+      margin:36px 0 20px;
+    }
+
+    .table-wrapper{
+      overflow:auto;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.08);
     }
 
     table{
       width:100%;
       border-collapse:collapse;
-      overflow:hidden;
-      border-radius:18px;
+      min-width:900px;
     }
 
     thead{
@@ -88,56 +105,121 @@
 
     td{
       padding:16px;
-      border-top:1px solid rgba(255,255,255,0.06);
+      border-top:1px solid rgba(255,255,255,0.05);
       background:#111827;
     }
 
-    .pilot-btn{
-      background:#facc15;
+    tr:hover td{
+      background:#172033;
+    }
+
+    .track-badge{
+      display:inline-block;
+      background:#334155;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:bold;
+    }
+
+    .profile-btn{
+      display:inline-block;
+      background:linear-gradient(90deg,#facc15,#fb923c);
       color:#111827;
       text-decoration:none;
-      padding:8px 14px;
+      padding:10px 15px;
       border-radius:999px;
-      font-weight:bold;
-      display:inline-block;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .profile-btn:hover{
+      filter:brightness(1.08);
     }
 
     footer{
-      margin-top:50px;
+      margin-top:60px;
       text-align:center;
       color:#64748b;
       font-size:14px;
     }
+
+    .loading{
+      padding:30px;
+      text-align:center;
+      color:#94a3b8;
+    }
+
+    .error-box{
+      background:#7f1d1d;
+      padding:18px;
+      border-radius:16px;
+      margin-top:20px;
+    }
+
+    @media(max-width:700px){
+
+      body{
+        padding:14px;
+      }
+
+      .header-left h1{
+        font-size:32px;
+      }
+
+      .stats-grid{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .stat-card strong{
+        font-size:24px;
+      }
+
+    }
+
   </style>
+
 </head>
 
 <body>
 
-  <div class="topbar">
-    <div class="title">
-      <h1>üèÅ MRCP Dashboard V5.4</h1>
-      <p>Plateforme digitale club RC ‚Ä¢ Intelligence ‚Ä¢ Analyse ‚Ä¢ Profils pilotes</p>
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+  <div class="header">
+
+    <div class="header-left">
+      <h1>?? MRCP Dashboard V5.4</h1>
+      <p>
+        Plateforme digitale club RC ï Intelligence ï Analyse ï Profils pilotes
+      </p>
     </div>
+
   </div>
 
-  <div class="main-grid">
+  <!-- ===================================================== -->
+  <!-- STATS -->
+  <!-- ===================================================== -->
 
-    <div class="card">
+  <div class="stats-grid">
+
+    <div class="stat-card">
       <span>Total tours</span>
       <strong id="total-laps">--</strong>
     </div>
 
-    <div class="card">
+    <div class="stat-card">
       <span>Total pilotes</span>
       <strong id="total-pilots">--</strong>
     </div>
 
-    <div class="card">
+    <div class="stat-card">
       <span>Total sessions</span>
       <strong id="total-sessions">--</strong>
     </div>
 
-    <div class="card">
+    <div class="stat-card">
       <span>Meilleur tour club</span>
       <strong id="best-lap">--</strong>
     </div>
@@ -145,7 +227,7 @@
   </div>
 
   <!-- ===================================================== -->
-  <!-- V5.4 PILOTE DU JOUR -->
+  <!-- PILOTE DU JOUR -->
   <!-- ===================================================== -->
 
   <section id="pilot-of-day-card"></section>
@@ -154,43 +236,101 @@
   <!-- TABLEAU PILOTES -->
   <!-- ===================================================== -->
 
-  <h2 class="section-title">üë§ Pilotes du club</h2>
+  <h2 class="section-title">?? Pilotes du club</h2>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Pilote</th>
-        <th>Meilleur tour</th>
-        <th>Total tours</th>
-        <th>Profil</th>
-      </tr>
-    </thead>
+  <div class="table-wrapper">
 
-    <tbody id="pilots-table"></tbody>
-  </table>
+    <table>
+
+      <thead>
+        <tr>
+          <th>Pilote</th>
+          <th>Meilleur tour</th>
+          <th>Total tours</th>
+          <th>Piste</th>
+          <th>Profil</th>
+        </tr>
+      </thead>
+
+      <tbody id="pilots-table">
+
+        <tr>
+          <td colspan="5" class="loading">
+            Chargement des donnÈes...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- FOOTER -->
+  <!-- ===================================================== -->
 
   <footer>
-    MRCP Dashboard V5.4 ‚Ä¢ Intelligence Club ‚Ä¢ Live Ready
+    MRCP Dashboard V5.4 ï Intelligence Club ï Live Timing Ready
   </footer>
 
   <!-- ===================================================== -->
-  <!-- SCRIPTS -->
+  <!-- JAVASCRIPT -->
   <!-- ===================================================== -->
 
   <script>
 
-    async function loadDashboard() {
+    function toSeconds(value){
 
-      try {
+      if(value === null || value === undefined)
+        return null;
 
-        const response = await fetch("data_v2.json?v=" + Date.now());
+      if(typeof value === "number")
+        return value;
+
+      if(typeof value === "string"){
+
+        const clean = value
+          .replace(",", ".")
+          .replace("s", "")
+          .trim();
+
+        const n = parseFloat(clean);
+
+        return isNaN(n) ? null : n;
+      }
+
+      return null;
+    }
+
+    function formatTime(seconds){
+
+      if(!seconds)
+        return "-";
+
+      return seconds.toFixed(3) + " s";
+    }
+
+    async function loadDashboard(){
+
+      try{
+
+        const response = await fetch(
+          "data_v2.json?v=" + Date.now()
+        );
+
+        if(!response.ok){
+          throw new Error("Impossible de charger data_v2.json");
+        }
+
         const data = await response.json();
 
         const activities = data.activities || [];
 
         let totalLaps = 0;
-        let pilotsMap = {};
         let bestLap = null;
+
+        const pilotsMap = {};
 
         activities.forEach(activity => {
 
@@ -198,12 +338,15 @@
 
           participants.forEach(pilot => {
 
-            const pilotId =
+            const pilotId = String(
               pilot.id ||
               pilot.pilot_id ||
+              pilot.driver_id ||
               pilot.transponder ||
+              pilot.transponder_id ||
               pilot.name ||
-              Math.random();
+              Math.random()
+            );
 
             const pilotName =
               pilot.name ||
@@ -211,7 +354,11 @@
               pilot.transponder ||
               "Pilote inconnu";
 
-            const lapsRaw =
+            const track =
+              activity.track ||
+              "Inconnue";
+
+            const rawLaps =
               pilot.laps ||
               pilot.lap_times ||
               pilot.times ||
@@ -219,58 +366,68 @@
 
             let laps = [];
 
-            lapsRaw.forEach(l => {
+            rawLaps.forEach(lap => {
 
               let value = null;
 
-              if (typeof l === "number") value = l;
+              if(typeof lap === "object" && lap !== null){
 
-              if (typeof l === "string") {
-                value = parseFloat(
-                  l.replace(",", ".").replace("s", "")
+                value = toSeconds(
+                  lap.time ||
+                  lap.lap_time ||
+                  lap.seconds
                 );
+
+              }else{
+
+                value = toSeconds(lap);
+
               }
 
-              if (
+              if(
                 value &&
                 value > 5 &&
                 value < 180
-              ) {
+              ){
                 laps.push(value);
               }
 
             });
 
-            totalLaps += laps.length;
+            if(!pilotsMap[pilotId]){
 
-            if (!pilotsMap[pilotId]) {
               pilotsMap[pilotId] = {
-                id: pilotId,
-                name: pilotName,
-                totalLaps: 0,
-                bestLap: null
+                id:pilotId,
+                name:pilotName,
+                totalLaps:0,
+                bestLap:null,
+                track:track
               };
+
             }
 
             pilotsMap[pilotId].totalLaps += laps.length;
 
-            if (laps.length) {
+            totalLaps += laps.length;
 
-              const best = Math.min(...laps);
+            if(laps.length){
 
-              if (
+              const pilotBest = Math.min(...laps);
+
+              if(
                 pilotsMap[pilotId].bestLap === null ||
-                best < pilotsMap[pilotId].bestLap
-              ) {
-                pilotsMap[pilotId].bestLap = best;
+                pilotBest < pilotsMap[pilotId].bestLap
+              ){
+                pilotsMap[pilotId].bestLap = pilotBest;
               }
 
-              if (
+              if(
                 bestLap === null ||
-                best < bestLap
-              ) {
-                bestLap = best;
+                pilotBest < bestLap
+              ){
+                bestLap = pilotBest;
               }
+
             }
 
           });
@@ -279,18 +436,29 @@
 
         const pilots = Object.values(pilotsMap);
 
-        document.getElementById("total-laps").innerText = totalLaps;
-        document.getElementById("total-pilots").innerText = pilots.length;
-        document.getElementById("total-sessions").innerText = activities.length;
-        document.getElementById("best-lap").innerText =
-          bestLap ? bestLap.toFixed(3) + " s" : "--";
+        document.getElementById("total-laps").innerText =
+          totalLaps;
 
-        const table = document.getElementById("pilots-table");
+        document.getElementById("total-pilots").innerText =
+          pilots.length;
+
+        document.getElementById("total-sessions").innerText =
+          activities.length;
+
+        document.getElementById("best-lap").innerText =
+          formatTime(bestLap);
+
+        const tbody =
+          document.getElementById("pilots-table");
+
+        tbody.innerHTML = "";
 
         pilots
           .sort((a,b) => {
-            if (a.bestLap === null) return 1;
-            if (b.bestLap === null) return -1;
+
+            if(a.bestLap === null) return 1;
+            if(b.bestLap === null) return -1;
+
             return a.bestLap - b.bestLap;
           })
           .forEach(pilot => {
@@ -299,31 +467,42 @@
 
             tr.innerHTML = `
               <td>${pilot.name}</td>
-              <td>${pilot.bestLap ? pilot.bestLap.toFixed(3) + " s" : "-"}</td>
-              <td>${pilot.totalLaps}</td>
+
               <td>
-                <a class="pilot-btn" href="pilot.html?id=${encodeURIComponent(pilot.id)}">
-                  üë§ Profil
+                ${formatTime(pilot.bestLap)}
+              </td>
+
+              <td>
+                ${pilot.totalLaps}
+              </td>
+
+              <td>
+                <span class="track-badge">
+                  ${pilot.track}
+                </span>
+              </td>
+
+              <td>
+                <a
+                  class="profile-btn"
+                  href="pilot.html?id=${encodeURIComponent(pilot.id)}"
+                >
+                  ?? Profil
                 </a>
               </td>
             `;
 
-            table.appendChild(tr);
+            tbody.appendChild(tr);
 
           });
 
-      } catch(error) {
+      }catch(error){
 
         console.error(error);
 
         document.body.innerHTML += `
-          <div style="
-            background:#7f1d1d;
-            margin-top:20px;
-            padding:20px;
-            border-radius:16px;
-          ">
-            Erreur chargement data_v2.json
+          <div class="error-box">
+            ? Erreur chargement data_v2.json
           </div>
         `;
       }
@@ -333,8 +512,17 @@
 
   </script>
 
+  <!-- ===================================================== -->
   <!-- IA V5.4 -->
+  <!-- ===================================================== -->
+
   <script src="ai_v54.js"></script>
+
+  <!-- ===================================================== -->
+  <!-- FIX BOUTONS PROFILS -->
+  <!-- ===================================================== -->
+
+  <script src="profil_buttons_fix.js"></script>
 
 </body>
 </html>
