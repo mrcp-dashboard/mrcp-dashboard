@@ -2,71 +2,339 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#061224">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="MRCP">
-  <title>MRCP Speedhive</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles_v2.css">
-  <link rel="stylesheet" href="mrcp_v54_pilote_jour.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MRCP Dashboard V5.4</title>
+
+  <link rel="stylesheet" href="ai_v54.css">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      background:#0f172a;
+      color:white;
+      font-family:Arial, Helvetica, sans-serif;
+      padding:20px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .title h1{
+      font-size:42px;
+      margin-bottom:6px;
+    }
+
+    .title p{
+      color:#94a3b8;
+    }
+
+    .main-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:18px;
+      margin-bottom:25px;
+    }
+
+    .card{
+      background:#1e293b;
+      border-radius:20px;
+      padding:22px;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .card span{
+      display:block;
+      color:#94a3b8;
+      margin-bottom:10px;
+    }
+
+    .card strong{
+      font-size:34px;
+    }
+
+    .section-title{
+      font-size:26px;
+      margin:35px 0 20px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:18px;
+    }
+
+    thead{
+      background:#1e293b;
+    }
+
+    th{
+      text-align:left;
+      padding:16px;
+      font-size:14px;
+      color:#cbd5e1;
+    }
+
+    td{
+      padding:16px;
+      border-top:1px solid rgba(255,255,255,0.06);
+      background:#111827;
+    }
+
+    .pilot-btn{
+      background:#facc15;
+      color:#111827;
+      text-decoration:none;
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:bold;
+      display:inline-block;
+    }
+
+    footer{
+      margin-top:50px;
+      text-align:center;
+      color:#64748b;
+      font-size:14px;
+    }
+  </style>
 </head>
+
 <body>
-<div class="app-shell">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-main">MRCP</div>
-      <div class="brand-sub">SPEEDHIVE</div>
+
+  <div class="topbar">
+    <div class="title">
+      <h1>🏁 MRCP Dashboard V5.4</h1>
+      <p>Plateforme digitale club RC • Intelligence • Analyse • Profils pilotes</p>
     </div>
-
-    <nav class="side-nav">
-      <a href="#/" class="nav-link">🏠 <span>Accueil</span></a>
-      <a href="#/mes-chronos" class="nav-link mobile-priority">⏱️ <span>Mes chronos</span></a>
-      <a href="#/live" class="nav-link">📡 <span>Live</span></a>
-      <a href="#/pilotes" class="nav-link">👥 <span>Pilotes</span></a>
-      <a href="#/podiums" class="nav-link">🏆 <span>Podiums</span></a>
-      <button id="adminBtn" class="nav-link nav-button">⚙️ <span>Admin</span></button>
-    </nav>
-
-    <nav id="adminNav" class="side-nav admin-nav hidden">
-      <a href="#/quality" class="nav-link">📊 <span>Qualité</span></a>
-      <a href="#/admin-pilotes" class="nav-link">🧑‍🔧 <span>Pilotes admin</span></a>
-      <a href="#/admin-records" class="nav-link">🛠️ <span>Records admin</span></a>
-      <a href="#/admin" class="nav-link">🔐 <span>Admin</span></a>
-      <button id="adminExit" class="nav-link nav-button">🚪 <span>Quitter</span></button>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="flag">🏁</div>
-      <strong>MRCP Speedhive</strong>
-      <small>Chronos, progression et records pilotes</small>
-    </div>
-  </aside>
-
-  <div class="main-area">
-    <div class="top-pills">
-      <div class="pill">📡 <span>V4.1 Live timing</span></div>
-      <div class="pill">📅 <span id="todayLabel">Aujourd’hui</span></div>
-      <button id="installPwaBtn" class="pill pill-button hidden">Installer l’app</button>
-      <button id="adminBtnTop" class="pill pill-button">⚙️ Admin</button>
-    </div>
-
-    <main id="app">
-      <section class="card">
-        <h2>Chargement...</h2>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <span>🏁 MRCP Speedhive Dashboard</span>
-      <span id="lastUpdateFooter">Données en cours de chargement</span>
-      <span>📡 V4.1 Live timing</span>
-    </footer>
   </div>
-</div>
 
-<script src="app_v2.js"></script>
-<script src="pilot_links_v53.js?v=53"></script>
+  <div class="main-grid">
+
+    <div class="card">
+      <span>Total tours</span>
+      <strong id="total-laps">--</strong>
+    </div>
+
+    <div class="card">
+      <span>Total pilotes</span>
+      <strong id="total-pilots">--</strong>
+    </div>
+
+    <div class="card">
+      <span>Total sessions</span>
+      <strong id="total-sessions">--</strong>
+    </div>
+
+    <div class="card">
+      <span>Meilleur tour club</span>
+      <strong id="best-lap">--</strong>
+    </div>
+
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- V5.4 PILOTE DU JOUR -->
+  <!-- ===================================================== -->
+
+  <section id="pilot-of-day-card"></section>
+
+  <!-- ===================================================== -->
+  <!-- TABLEAU PILOTES -->
+  <!-- ===================================================== -->
+
+  <h2 class="section-title">👤 Pilotes du club</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Pilote</th>
+        <th>Meilleur tour</th>
+        <th>Total tours</th>
+        <th>Profil</th>
+      </tr>
+    </thead>
+
+    <tbody id="pilots-table"></tbody>
+  </table>
+
+  <footer>
+    MRCP Dashboard V5.4 • Intelligence Club • Live Ready
+  </footer>
+
+  <!-- ===================================================== -->
+  <!-- SCRIPTS -->
+  <!-- ===================================================== -->
+
+  <script>
+
+    async function loadDashboard() {
+
+      try {
+
+        const response = await fetch("data_v2.json?v=" + Date.now());
+        const data = await response.json();
+
+        const activities = data.activities || [];
+
+        let totalLaps = 0;
+        let pilotsMap = {};
+        let bestLap = null;
+
+        activities.forEach(activity => {
+
+          const participants = activity.participants || [];
+
+          participants.forEach(pilot => {
+
+            const pilotId =
+              pilot.id ||
+              pilot.pilot_id ||
+              pilot.transponder ||
+              pilot.name ||
+              Math.random();
+
+            const pilotName =
+              pilot.name ||
+              pilot.driver_name ||
+              pilot.transponder ||
+              "Pilote inconnu";
+
+            const lapsRaw =
+              pilot.laps ||
+              pilot.lap_times ||
+              pilot.times ||
+              [];
+
+            let laps = [];
+
+            lapsRaw.forEach(l => {
+
+              let value = null;
+
+              if (typeof l === "number") value = l;
+
+              if (typeof l === "string") {
+                value = parseFloat(
+                  l.replace(",", ".").replace("s", "")
+                );
+              }
+
+              if (
+                value &&
+                value > 5 &&
+                value < 180
+              ) {
+                laps.push(value);
+              }
+
+            });
+
+            totalLaps += laps.length;
+
+            if (!pilotsMap[pilotId]) {
+              pilotsMap[pilotId] = {
+                id: pilotId,
+                name: pilotName,
+                totalLaps: 0,
+                bestLap: null
+              };
+            }
+
+            pilotsMap[pilotId].totalLaps += laps.length;
+
+            if (laps.length) {
+
+              const best = Math.min(...laps);
+
+              if (
+                pilotsMap[pilotId].bestLap === null ||
+                best < pilotsMap[pilotId].bestLap
+              ) {
+                pilotsMap[pilotId].bestLap = best;
+              }
+
+              if (
+                bestLap === null ||
+                best < bestLap
+              ) {
+                bestLap = best;
+              }
+            }
+
+          });
+
+        });
+
+        const pilots = Object.values(pilotsMap);
+
+        document.getElementById("total-laps").innerText = totalLaps;
+        document.getElementById("total-pilots").innerText = pilots.length;
+        document.getElementById("total-sessions").innerText = activities.length;
+        document.getElementById("best-lap").innerText =
+          bestLap ? bestLap.toFixed(3) + " s" : "--";
+
+        const table = document.getElementById("pilots-table");
+
+        pilots
+          .sort((a,b) => {
+            if (a.bestLap === null) return 1;
+            if (b.bestLap === null) return -1;
+            return a.bestLap - b.bestLap;
+          })
+          .forEach(pilot => {
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+              <td>${pilot.name}</td>
+              <td>${pilot.bestLap ? pilot.bestLap.toFixed(3) + " s" : "-"}</td>
+              <td>${pilot.totalLaps}</td>
+              <td>
+                <a class="pilot-btn" href="pilot.html?id=${encodeURIComponent(pilot.id)}">
+                  👤 Profil
+                </a>
+              </td>
+            `;
+
+            table.appendChild(tr);
+
+          });
+
+      } catch(error) {
+
+        console.error(error);
+
+        document.body.innerHTML += `
+          <div style="
+            background:#7f1d1d;
+            margin-top:20px;
+            padding:20px;
+            border-radius:16px;
+          ">
+            Erreur chargement data_v2.json
+          </div>
+        `;
+      }
+    }
+
+    loadDashboard();
+
+  </script>
+
+  <!-- IA V5.4 -->
+  <script src="ai_v54.js"></script>
+
 </body>
 </html>
