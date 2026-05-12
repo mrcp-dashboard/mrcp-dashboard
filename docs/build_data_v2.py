@@ -329,6 +329,11 @@ def build() -> dict[str, Any]:
     pilots = load_pilots()
     overrides = load_lap_overrides()
     name_map, merge_map = build_transponder_maps(pilots, corrections)
+
+    # Compatibilité avec corrections.json exporté depuis l'admin web
+    extra_name_map, extra_merge_map = normalize_corrections(corrections)
+    name_map.update(extra_name_map)
+    merge_map.update(extra_merge_map)
     quality_collector = {"suspicious_laps": [], "ignored_raw_laps": [], "excluded_laps": []}
 
     activities = []
