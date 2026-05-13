@@ -1,3 +1,6 @@
+cd /opt/mrcp-dashboard/docs
+
+cat > mrcp_v60_live.js <<'JS'
 let previousSignature = null;
 let data = null;
 let bestKnownLap = null;
@@ -32,7 +35,7 @@ function resolvePilotName(p){
 
     const txt = String(c).trim();
 
-    // Ignore les numÃ©ros de puce purs
+    // Ignore les numéros de puce purs
     if(/^\d+$/.test(txt)) continue;
 
     // Ignore les textes trop courts
@@ -41,7 +44,7 @@ function resolvePilotName(p){
     return txt;
   }
 
-  // Fallback si aucun vrai nom trouvÃ©
+  // Fallback si aucun vrai nom trouvé
   return "Puce " + (
     p.transponder ||
     p.transponder_id ||
@@ -108,22 +111,22 @@ function renderLive(){
     <div class="item">
       <strong>${a.date_fr || a.date || "Session"}</strong>
       <small>
-        ${a.laps_count || 0} tours â€”
-        ${a.pilot_count || 0} pilotes â€”
+        ${a.laps_count || 0} tours —
+        ${a.pilot_count || 0} pilotes —
         meilleur : ${fmtLap(a.best_lap)}
         ${a.best_pilot || ""}
       </small>
     </div>
-  `).join("") || "<div class='item'>Aucune activitÃ© dÃ©tectÃ©e</div>";
+  `).join("") || "<div class='item'>Aucune activité détectée</div>";
 }
 
 function renderRecords(){
   document.getElementById("recordFeed").innerHTML = records.slice(-20).reverse().map(r=>`
     <div class="item record">
-      <strong>ğŸ† Nouveau record : ${fmtLap(r.lap)}</strong>
-      <small>${r.pilot} â€” ${r.time}</small>
+      <strong>?? Nouveau record : ${fmtLap(r.lap)}</strong>
+      <small>${r.pilot} — ${r.time}</small>
     </div>
-  `).join("") || "<div class='item'>Aucun record dÃ©tectÃ© depuis ouverture de la page</div>";
+  `).join("") || "<div class='item'>Aucun record détecté depuis ouverture de la page</div>";
 }
 
 function renderSpeaker(){
@@ -131,14 +134,14 @@ function renderSpeaker(){
 
   if(!latest){
     document.getElementById("speakerBox").innerHTML =
-      "En attente de donnÃ©es live...";
+      "En attente de données live...";
     return;
   }
 
   document.getElementById("speakerBox").innerHTML = `
-    DerniÃ¨re session dÃ©tectÃ©e :<br>
+    Dernière session détectée :<br>
     <strong>${latest.date_fr || latest.date}</strong><br>
-    ${latest.laps_count || 0} tours enregistrÃ©s.<br>
+    ${latest.laps_count || 0} tours enregistrés.<br>
     Meilleur tour :
     <strong>${fmtLap(latest.best_lap)}</strong>
     ${
@@ -162,7 +165,7 @@ function renderPilots(filter=""){
       <span>${fmtLap(p.best)}</span>
       <span>${p.sessions} sessions</span>
     </div>
-  `).join("") || "<div class='item'>Aucun pilote trouvÃ©</div>";
+  `).join("") || "<div class='item'>Aucun pilote trouvé</div>";
 }
 
 function detectRecord(){
@@ -198,9 +201,9 @@ async function loadData(){
     previousSignature = sig;
 
     document.getElementById("liveDot").classList.add("ok");
-    document.getElementById("liveStatus").textContent = "Live connectÃ©";
+    document.getElementById("liveStatus").textContent = "Live connecté";
     document.getElementById("lastUpdate").textContent =
-      "DerniÃ¨re mise Ã  jour : " + nowText();
+      "Dernière mise à jour : " + nowText();
 
     renderLive();
     renderRecords();
@@ -209,7 +212,7 @@ async function loadData(){
 
   }catch(e){
     document.getElementById("liveDot").classList.remove("ok");
-    document.getElementById("liveStatus").textContent = "Erreur donnÃ©es";
+    document.getElementById("liveStatus").textContent = "Erreur données";
     console.error("Erreur chargement data_v2.json", e);
   }
 }
@@ -230,3 +233,4 @@ document.getElementById("pilotSearch").addEventListener("input",e=>{
 
 loadData();
 setInterval(loadData,15000);
+JS
