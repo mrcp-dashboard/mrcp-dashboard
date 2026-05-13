@@ -303,116 +303,83 @@ function renderRating(){
 
 
 
-function computeBadges(){
 
+
+function computeBadges(){
   const ranking = computeRating();
 
   return ranking.map((p,index)=>{
-
     const badges = [];
 
     if(index === 0){
-      badges.push({
-        text:"👑 King Club",
-        class:"badge-gold"
-      });
-    }
-
-    if(p.laps >= 5000){
-      badges.push({
-        text:"🏁 Endurance",
-        class:"badge-red"
-      });
-    }
-
-    if(p.laps >= 1000){
-      badges.push({
-        text:"🔥 Rouleur fou",
-        class:"badge-purple"
-      });
-    }
-
-    if(p.laps >= 200){
-      badges.push({
-        text:"🚀 Très actif",
-        class:"badge-green"
-      });
-    }
-
-    if(p.sessions >= 10){
-      badges.push({
-        text:"🎯 Régulier",
-        class:"badge-pill"
-      });
+      badges.push({text:"👑 King Club", class:"badge-gold"});
     }
 
     if(index <= 2){
-      badges.push({
-        text:"⚡ Top 3 MRCP",
-        class:"badge-gold"
-      });
+      badges.push({text:"⚡ Top 3 MRCP", class:"badge-gold"});
+    }
+
+    if(p.laps >= 5000){
+      badges.push({text:"🏁 Endurance", class:"badge-red"});
+    }
+
+    if(p.laps >= 1000){
+      badges.push({text:"🔥 Rouleur fou", class:"badge-purple"});
+    }
+
+    if(p.laps >= 200){
+      badges.push({text:"🚀 Très actif", class:"badge-green"});
+    }
+
+    if(p.sessions >= 10){
+      badges.push({text:"🎯 Régulier", class:"badge-blue"});
     }
 
     if(p.best && p.best < 35){
-      badges.push({
-        text:"⚡ Speed Master",
-        class:"badge-red"
-      });
+      badges.push({text:"⚡ Speed Master", class:"badge-red"});
+    }
+
+    if(!badges.length){
+      badges.push({text:"🔰 Rookie", class:"badge-blue"});
     }
 
     return {
       ...p,
       badges
     };
-
   });
-
 }
 
 function renderBadges(){
-
-  const pilots =
-    computeBadges().slice(0,50);
-
-  const el =
-    document.getElementById("badgesList");
-
+  const el = document.getElementById("badgesList");
   if(!el) return;
 
-  el.innerHTML =
-    pilots.map(p=>`
+  const pilots = computeBadges().slice(0,80);
 
+  if(!pilots.length){
+    el.innerHTML = "<div class='item'>Aucun pilote trouvé pour les badges</div>";
+    return;
+  }
+
+  el.innerHTML = pilots.map(p=>`
     <div class="badge-card">
-
       <div class="badge-header">
-
-        <div class="badge-name">
-          ${p.name}
+        <div>
+          <div class="badge-name">${p.name}</div>
+          <div class="rating-small">${p.laps} tours — ${p.sessions} sessions — best ${fmtLap(p.best)}</div>
         </div>
-
-        <div class="badge-rating">
-          ${p.rating} pts
-        </div>
-
+        <div class="badge-rating">${p.rating} pts</div>
       </div>
 
       <div class="badges-row">
-
-        ${
-          p.badges.map(b=>`
-            <div class="badge-pill ${b.class}">
-              ${b.text}
-            </div>
-          `).join("")
-        }
-
+        ${p.badges.map(b=>`
+          <div class="badge-pill ${b.class}">
+            ${b.text}
+          </div>
+        `).join("")}
       </div>
-
     </div>
-
-  `).join("")
-
-  || "<div class='item'>Aucun badge</div>";
+  `).join("");
 }
 
 
@@ -461,6 +428,7 @@ async function loadData(){
     renderSpeaker();
     renderPilots(document.getElementById("pilotSearch")?.value || "");
     renderRating();
+    renderBadges();
     renderBadges();
 
   }catch(e){
