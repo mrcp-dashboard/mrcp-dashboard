@@ -25,9 +25,9 @@
       <button data-view="records">Records</button>
       <button data-view="speaker">Speaker</button>
       <button data-view="pilots">Pilotes</button>
-      <button data-view="rating" data-admin="1">MRCP Rating</button>
-      <button data-view="badges" data-admin="1">Badges</button>
-      <button data-view="hall" data-admin="1">Hall of Fame</button>
+      <button data-view="rating">MRCP Rating</button>
+      <button data-view="badges">Badges</button>
+      <button data-view="hall">Hall of Fame</button>
       <a href="pilot_v65.html" target="_blank" style="padding:14px 22px;border-radius:16px;background:#00aa77;color:white;text-decoration:none;font-weight:bold">📱 Profil pilote</a>
     </nav>
 
@@ -108,33 +108,6 @@
 
 <a class="mrcp-home-link" href="index_v2.html">← Accueil MRCP</a>
 <div class="mrcp-version-pill">MRCP V6.6 Premium</div>
-
-<script>
-
-/* MRCP ADMIN MODE */
-
-(function(){
-
-  const params =
-    new URLSearchParams(window.location.search);
-
-  const isAdmin =
-    params.get("admin") === "1";
-
-  if(isAdmin){
-    console.log("MRCP admin mode");
-    return;
-  }
-
-  document
-    .querySelectorAll("[data-admin='1']")
-    .forEach(el=>{
-      el.style.display = "none";
-    });
-
-})();
-
-</script>
 
 </body>
 </html>

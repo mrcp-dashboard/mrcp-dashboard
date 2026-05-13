@@ -27,14 +27,14 @@
       <a href="#/live" class="nav-link">📡 <span>Live</span></a>
       <a href="#/pilotes" class="nav-link">👥 <span>Pilotes</span></a>
       <a href="#/podiums" class="nav-link">🏆 <span>Podiums</span></a>
-      <button id="adminBtn" class="nav-link nav-button">⚙️ <span data-admin="1">Admin</span></button>
+      <button id="adminBtn" class="nav-link nav-button">⚙️ <span data-admin="1" data-admin="1">Admin</span></button>
     </nav>
 
     <nav id="adminNav" class="side-nav admin-nav hidden">
-      <a href="#/quality" class="nav-link">📊 <span data-admin="1">Qualité</span></a>
+      <a href="#/quality" class="nav-link">📊 <span data-admin="1" data-admin="1">Qualité</span></a>
       <a href="#/admin-pilotes" class="nav-link">🧑‍🔧 <span>Pilotes admin</span></a>
       <a href="#/admin-records" class="nav-link">🛠️ <span>Records admin</span></a>
-      <a href="#/admin" class="nav-link">🔐 <span data-admin="1">Admin</span></a>
+      <a href="#/admin" class="nav-link">🔐 <span data-admin="1" data-admin="1">Admin</span></a>
       <button id="adminExit" class="nav-link nav-button">🚪 <span>Quitter</span></button>
     </nav>
 
@@ -101,6 +101,20 @@
     console.log("MRCP index admin mode");
     return;
   }
+
+  document.querySelectorAll("[data-admin='1']").forEach(el=>{
+    el.style.display = "none";
+  });
+})();
+</script>
+
+<script>
+/* MRCP INDEX ADMIN ONLY */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const isAdmin = params.get("admin") === "1";
+
+  if(isAdmin) return;
 
   document.querySelectorAll("[data-admin='1']").forEach(el=>{
     el.style.display = "none";
