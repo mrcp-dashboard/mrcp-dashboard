@@ -16,29 +16,88 @@ function getActivities(){
   return data?.activities || [];
 }
 
+function resolvePilotName(p){
+  const candidates = [
+    p.display_name,
+    p.pilot_name,
+    p.driver_name,
+    p.driver,
+    p.pilot,
+    p.full_name,
+    p.name
+  ];
+
+  for(const c of candidates){
+    if(!c) continue;
+
+    const txt = String(c).trim();
+
+    // Ignore les numéros de puce purs
+    if(/^\d+$/.test(txt)) continue;
+
+    // Ignore les textes trop courts
+    if(txt.length < 2) continue;
+
+    return txt;
+  }
+
+  // Fallback si aucun vrai nom trouvé
+  return "Puce " + (
+    p.transponder ||
+    p.transponder_id ||
+    p.chip ||
+    p.name ||
+    "inconnue"
+  );
+}
+
 function getPilots(){
   const pilots = {};
+
   getActivities().forEach(a=>{
     (a.participants || []).forEach(p=>{
-      const name = p.name || p.pilot || p.driver || p.transponder || "Pilote inconnu";
-      if(!pilots[name]) pilots[name] = {name,laps:0,best:null,sessions:0,lastDate:a.date};
-      const laps = p.laps_count || p.lap_count || (p.laps ? p.laps.length : 0) || 0;
+      const name = resolvePilotName(p);
+
+      if(!pilots[name]){
+        pilots[name] = {
+          name,
+          laps:0,
+          best:null,
+          sessions:0,
+          lastDate:a.date
+        };
+      }
+
+      const laps =
+        p.laps_count ||
+        p.lap_count ||
+        (p.laps ? p.laps.length : 0) ||
+        0;
+
       pilots[name].laps += laps;
       pilots[name].sessions += 1;
       pilots[name].lastDate = a.date || pilots[name].lastDate;
 
-      const best = p.best_lap || p.best || p.bestLap;
+      const best =
+        p.best_lap ||
+        p.best ||
+        p.bestLap;
+
       if(best && (!pilots[name].best || best < pilots[name].best)){
         pilots[name].best = best;
       }
     });
   });
+
   return Object.values(pilots);
 }
 
 function makeSignature(){
   const activities = getActivities();
-  const totalLaps = data?.laps_count || activities.reduce((s,a)=>s+(a.laps_count||0),0);
+  const totalLaps =
+    data?.laps_count ||
+    activities.reduce((s,a)=>s+(a.laps_count||0),0);
+
   return `${activities.length}-${totalLaps}`;
 }
 
@@ -48,7 +107,12 @@ function renderLive(){
   document.getElementById("liveFeed").innerHTML = activities.map(a=>`
     <div class="item">
       <strong>${a.date_fr || a.date || "Session"}</strong>
-      <small>${a.laps_count || 0} tours — ${a.pilot_count || 0} pilotes — meilleur : ${fmtLap(a.best_lap)} ${a.best_pilot || ""}</small>
+      <small>
+        ${a.laps_count || 0} tours —
+        ${a.pilot_count || 0} pilotes —
+        meilleur : ${fmtLap(a.best_lap)}
+        ${a.best_pilot || ""}
+      </small>
     </div>
   `).join("") || "<div class='item'>Aucune activité détectée</div>";
 }
@@ -66,7 +130,8 @@ function renderSpeaker(){
   const latest = [...getActivities()].slice(-1)[0];
 
   if(!latest){
-    document.getElementById("speakerBox").innerHTML = "En attente de données live...";
+    document.getElementById("speakerBox").innerHTML =
+      "En attente de données live...";
     return;
   }
 
@@ -74,8 +139,13 @@ function renderSpeaker(){
     Dernière session détectée :<br>
     <strong>${latest.date_fr || latest.date}</strong><br>
     ${latest.laps_count || 0} tours enregistrés.<br>
-    Meilleur tour : <strong>${fmtLap(latest.best_lap)}</strong>
-    ${latest.best_pilot ? "par <strong>" + latest.best_pilot + "</strong>" : ""}
+    Meilleur tour :
+    <strong>${fmtLap(latest.best_lap)}</strong>
+    ${
+      latest.best_pilot
+        ? "par <strong>" + latest.best_pilot + "</strong>"
+        : ""
+    }
   `;
 }
 
@@ -129,7 +199,8 @@ async function loadData(){
 
     document.getElementById("liveDot").classList.add("ok");
     document.getElementById("liveStatus").textContent = "Live connecté";
-    document.getElementById("lastUpdate").textContent = "Dernière mise à jour : " + nowText();
+    document.getElementById("lastUpdate").textContent =
+      "Dernière mise à jour : " + nowText();
 
     renderLive();
     renderRecords();
@@ -139,6 +210,7 @@ async function loadData(){
   }catch(e){
     document.getElementById("liveDot").classList.remove("ok");
     document.getElementById("liveStatus").textContent = "Erreur données";
+    console.error("Erreur chargement data_v2.json", e);
   }
 }
 
@@ -146,6 +218,7 @@ document.querySelectorAll("nav button").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+
     btn.classList.add("active");
     document.getElementById("view-" + btn.dataset.view).classList.add("active");
   });
