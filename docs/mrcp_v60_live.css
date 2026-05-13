@@ -197,3 +197,68 @@ footer{
   }
 
 }
+
+
+.badges-list{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.badge-card{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:20px;
+}
+
+.badge-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.badge-name{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.badge-rating{
+  color:#ffe680;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.badges-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.badge-pill{
+  padding:10px 16px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#3557ff,#6d8cff);
+  color:white;
+  font-weight:bold;
+  font-size:15px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+
+.badge-gold{
+  background:linear-gradient(135deg,#ffcc33,#ff9900);
+}
+
+.badge-red{
+  background:linear-gradient(135deg,#ff4d4d,#b30000);
+}
+
+.badge-green{
+  background:linear-gradient(135deg,#00cc88,#007755);
+}
+
+.badge-purple{
+  background:linear-gradient(135deg,#9b59ff,#5e17eb);
+}
+
