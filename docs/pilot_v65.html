@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>MRCP Pilote V6.5</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="pilot_v65.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>MRCP Pilote</h1>
+      <p>Profil live V6.5</p>
+    </header>
+
+    <section class="search-box">
+      <input id="pilotSearch" placeholder="Rechercher ton nom pilote...">
+      <div id="searchResults"></div>
+    </section>
+
+    <section id="profile" class="profile hidden">
+      <div class="hero">
+        <h2 id="pilotName">Pilote</h2>
+        <div id="pilotRating" class="rating">-- pts</div>
+      </div>
+
+      <div id="badges" class="badges"></div>
+
+      <div class="stats">
+        <div><strong id="bestLap">-</strong><span>Best lap</span></div>
+        <div><strong id="totalLaps">0</strong><span>Tours</span></div>
+        <div><strong id="sessions">0</strong><span>Sessions</span></div>
+      </div>
+
+      <h3>Historique récent</h3>
+      <div id="history" class="history"></div>
+    </section>
+  </div>
+
+  <script src="pilot_v65.js"></script>
+</body>
+</html>
