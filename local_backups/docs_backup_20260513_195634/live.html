@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>MRCP Live Timing V5.2</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #1d3557, #05070a);
+      color: white;
+    }
+
+    header {
+      padding: 22px;
+      text-align: center;
+      background: rgba(0,0,0,0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    .status {
+      margin-top: 8px;
+      color: #ffd166;
+    }
+
+    .container {
+      padding: 22px;
+      max-width: 1300px;
+      margin: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.09);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.35);
+    }
+
+    .label {
+      opacity: 0.7;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .big {
+      font-size: 44px;
+      font-weight: bold;
+      color: #06d6a0;
+      margin-top: 8px;
+    }
+
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      text-align: left;
+    }
+
+    th {
+      color: #ffd166;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    tr:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .pos {
+      font-weight: bold;
+      color: #06d6a0;
+    }
+
+    .small {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-top: 6px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      margin: 28px 0 12px;
+    }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 26px;
+      }
+
+      .big {
+        font-size: 34px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 7px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>MRCP Live Timing V5.2</h1>
+    <div class="status" id="status">Connexion...</div>
+    <div class="small" id="modeInfo">Dernière session MRCP</div>
+    <div class="small" id="sessionInfo">--</div>
+  </header>
+
+  <div class="container">
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">Dernier tour de la session</div>
+        <div class="big" id="latestLap">--</div>
+        <div class="small" id="latestPilot">--</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Record session</div>
+        <div class="big" id="bestOverall">--</div>
+        <div class="small" id="bestOverallInfo">--</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Total tours session</div>
+        <div class="big" id="lapsCount">0</div>
+        <div class="small">Tours détectés dans la dernière session</div>
+      </div>
+    </div>
+
+    <div class="section-title">Records par piste</div>
+    <div class="grid" id="trackRecords"></div>
+
+    <div class="section-title">Classement pilotes de la session</div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Pilote</th>
+            <th>Meilleur tour</th>
+            <th>Nb tours</th>
+            <th>Piste</th>
+          </tr>
+        </thead>
+        <tbody id="rankingBody">
+          <tr><td colspan="5">Aucune donnée</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Tous les tours de la session</div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Tour</th>
+            <th>Pilote</th>
+            <th>Temps</th>
+            <th>Piste</th>
+            <th>Session</th>
+          </tr>
+        </thead>
+        <tbody id="lapsBody">
+          <tr><td colspan="5">Aucune donnée</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    const LIVE_SERVER = "http://192.168.1.2:5056";
+    const socket = io(LIVE_SERVER);
+
+    const status = document.getElementById("status");
+
+    function safe(v) {
+      return v === undefined || v === null || v === "" ? "--" : v;
+    }
+
+    function updatePage(data) {
+      document.getElementById("modeInfo").textContent =
+        safe(data.mode);
+
+      document.getElementById("sessionInfo").textContent =
+        "Session : " + safe(data.session_name);
+
+      document.getElementById("lapsCount").textContent =
+        safe(data.laps_count);
+
+      const latest = data.latest_lap;
+
+      if (latest) {
+        document.getElementById("latestLap").textContent =
+          safe(latest.lap_time || latest.time);
+
+        document.getElementById("latestPilot").textContent =
+          safe(latest._pilot || latest.pilot_name || latest.driver || latest.transponder) +
+          " | " +
+          safe(latest.track) +
+          " | Tour " +
+          safe(latest.lap_number);
+      } else {
+        document.getElementById("latestLap").textContent = "--";
+        document.getElementById("latestPilot").textContent = "Aucun tour trouvé";
+      }
+
+      if (data.records && data.records.best_overall) {
+        document.getElementById("bestOverall").textContent =
+          safe(data.records.best_overall.lap_time);
+
+        document.getElementById("bestOverallInfo").textContent =
+          safe(data.records.best_overall.pilot) +
+          " | " +
+          safe(data.records.best_overall.track);
+      } else {
+        document.getElementById("bestOverall").textContent = "--";
+        document.getElementById("bestOverallInfo").textContent = "Aucun record session";
+      }
+
+      const trackRecords = document.getElementById("trackRecords");
+      trackRecords.innerHTML = "";
+
+      if (data.records && data.records.by_track && data.records.by_track.length) {
+        data.records.by_track.forEach(r => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <div class="label">Record ${safe(r.track)}</div>
+            <div class="value">${safe(r.lap_time)}</div>
+            <div class="small">${safe(r.pilot)} | ${safe(r.session)}</div>
+          `;
+          trackRecords.appendChild(div);
+        });
+      } else {
+        trackRecords.innerHTML = `<div class="card">Aucun record piste sur cette session</div>`;
+      }
+
+      const rankingBody = document.getElementById("rankingBody");
+      rankingBody.innerHTML = "";
+
+      if (data.ranking && data.ranking.length) {
+        data.ranking.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="pos">${safe(row.position)}</td>
+            <td>${safe(row.pilot)}</td>
+            <td>${safe(row.best_lap)}</td>
+            <td>${safe(row.laps_count)}</td>
+            <td>${safe(row.track)}</td>
+          `;
+          rankingBody.appendChild(tr);
+        });
+      } else {
+        rankingBody.innerHTML = `<tr><td colspan="5">Aucun classement session</td></tr>`;
+      }
+
+      const lapsBody = document.getElementById("lapsBody");
+      lapsBody.innerHTML = "";
+
+      if (data.laps && data.laps.length) {
+        data.laps.forEach(lap => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${safe(lap.lap_number)}</td>
+            <td>${safe(lap._pilot || lap.pilot_name || lap.driver || lap.transponder)}</td>
+            <td>${safe(lap.lap_time || lap.time)}</td>
+            <td>${safe(lap.track)}</td>
+            <td>${safe(lap.activity_name || lap.activity_id)}</td>
+          `;
+          lapsBody.appendChild(tr);
+        });
+      } else {
+        lapsBody.innerHTML = `<tr><td colspan="5">Aucun tour sur cette session</td></tr>`;
+      }
+    }
+
+    socket.on("connect", () => {
+      status.textContent = "Connecté au live timing";
+      status.style.color = "#06d6a0";
+    });
+
+    socket.on("disconnect", () => {
+      status.textContent = "Déconnecté";
+      status.style.color = "#ef476f";
+    });
+
+    socket.on("live_update", (data) => {
+      updatePage(data);
+    });
+
+    fetch(LIVE_SERVER + "/api/live")
+      .then(r => r.json())
+      .then(data => updatePage(data))
+      .catch(() => {
+        status.textContent = "Impossible de charger les données live";
+        status.style.color = "#ef476f";
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#202b5f,#050713 70%);
+  color:white;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;
+}
+#tv-app{
+  width:100vw;
+  height:100vh;
+  padding:32px;
+  display:flex;
+  flex-direction:column;
+}
+.tv-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:2px solid rgba(255,255,255,.18);
+  padding-bottom:20px;
+}
+.tv-header h1{
+  margin:0;
+  font-size:56px;
+  letter-spacing:3px;
+}
+.tv-header p{
+  margin:6px 0 0;
+  color:#b9c7ff;
+  font-size:22px;
+}
+.tv-clock{
+  font-size:58px;
+  font-weight:bold;
+}
+main{
+  flex:1;
+  position:relative;
+}
+.tv-screen{
+  display:none;
+  height:100%;
+  animation:fade .8s ease;
+}
+.tv-screen.active{
+  display:block;
+}
+.tv-screen h2{
+  font-size:44px;
+  margin:32px 0;
+}
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:28px;
+}
+.card,.rank-row,.stat-box,.heat-cell{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;
+  padding:26px;
+  box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+.card-title{
+  color:#b9c7ff;
+  font-size:22px;
+}
+.card-value{
+  font-size:48px;
+  font-weight:bold;
+  margin-top:12px;
+}
+.card-sub{
+  color:#ddd;
+  font-size:20px;
+  margin-top:8px;
+}
+.ranking{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.rank-row{
+  display:grid;
+  grid-template-columns:90px 1fr 180px 180px;
+  align-items:center;
+  font-size:32px;
+}
+.rank-pos{
+  font-size:42px;
+  font-weight:bold;
+}
+.big-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:28px;
+}
+.stat-box strong{
+  display:block;
+  font-size:54px;
+}
+.stat-box span{
+  color:#b9c7ff;
+  font-size:22px;
+}
+.heatmap{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:18px;
+}
+.heat-cell{
+  min-height:120px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+.heat-cell strong{
+  font-size:34px;
+}
+.heat-cell span{
+  margin-top:8px;
+  color:#ddd;
+}
+footer{
+  display:flex;
+  justify-content:space-between;
+  padding-top:18px;
+  border-top:2px solid rgba(255,255,255,.18);
+  color:#b9c7ff;
+  font-size:22px;
+}
+@keyframes fade{
+  from{opacity:0;transform:scale(.98)}
+  to{opacity:1;transform:scale(1)}
+}

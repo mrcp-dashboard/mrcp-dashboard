@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profil pilote MRCP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      color: white;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: rgba(0,0,0,0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .label {
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .value {
+      font-size: 25px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      text-align: left;
+    }
+
+    th {
+      color: #93c5fd;
+    }
+
+    .qr {
+      text-align: center;
+    }
+
+    .qr img {
+      background: white;
+      padding: 12px;
+      border-radius: 16px;
+      max-width: 220px;
+    }
+
+    .warning {
+      background: rgba(239,68,68,0.18);
+      border: 1px solid rgba(239,68,68,0.45);
+      padding: 15px;
+      border-radius: 14px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 id="pilotName">Profil pilote</h1>
+    <p id="pilotSub">MRCP Dashboard V5.3</p>
+  </header>
+
+  <div class="container">
+
+    <div id="warning" class="warning"></div>
+
+    <div class="card grid">
+      <div class="stat">
+        <div class="label">Transpondeur / ID</div>
+        <div class="value" id="transponder">-</div>
+      </div>
+
+      <div class="stat">
+        <div class="label">Meilleur tour</div>
+        <div class="value" id="bestLap">-</div>
+      </div>
+
+      <div class="stat">
+        <div class="label">Moyenne</div>
+        <div class="value" id="avgLap">-</div>
+      </div>
+
+      <div class="stat">
+        <div class="label">Total tours</div>
+        <div class="value" id="totalLaps">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Progression</h2>
+      <canvas id="progressChart"></canvas>
+    </div>
+
+    <div class="card qr">
+      <h2>QR Code personnel</h2>
+      <img id="qrImg" alt="QR Code pilote" />
+      <p>À imprimer sur table stands ou fiche pilote.</p>
+    </div>
+
+    <div class="card">
+      <h2>Historique sessions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Piste</th>
+            <th>Meilleur tour</th>
+            <th>Moyenne</th>
+            <th>Tours</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+<script>
+function fmtLap(v) {
+  if (v === null || v === undefined || isNaN(v)) return "-";
+  return Number(v).toFixed(3) + "s";
+}
+
+function getPilotId() {
+  return new URLSearchParams(window.location.search).get("id");
+}
+
+function showWarning(msg) {
+  const el = document.getElementById("warning");
+  el.style.display = "block";
+  el.textContent = msg;
+}
+
+function cleanId(v) {
+  if (v === null || v === undefined) return "";
+  return String(v).trim();
+}
+
+function getPilotKey(p) {
+  return cleanId(
+    p.id ||
+    p.pilot_id ||
+    p.driver_id ||
+    p.transponder ||
+    p.transponder_id ||
+    p.number ||
+    p.name ||
+    p.pilot_name ||
+    ""
+  );
+}
+
+function lapPilotKey(lap) {
+  return cleanId(
+    lap.pilot_id ||
+    lap.driver_id ||
+    lap.transponder ||
+    lap.transponder_id ||
+    lap.number ||
+    lap.pilot ||
+    lap.pilot_name ||
+    lap.driver ||
+    ""
+  );
+}
+
+function getLapTime(lap) {
+  const raw =
+    lap.time ||
+    lap.lap_time ||
+    lap.laptime ||
+    lap.seconds ||
+    lap.lapTime ||
+    lap.lap_time_seconds ||
+    lap.value ||
+    lap.duration;
+
+  const n = Number(raw);
+  return isNaN(n) ? null : n;
+}
+
+function getParticipantName(p) {
+  return (
+    p.name ||
+    p.pilot_name ||
+    p.driver ||
+    p.driver_name ||
+    p.display_name ||
+    "Pilote"
+  );
+}
+
+function buildLapsFromActivities(activities) {
+  const out = [];
+
+  for (const activity of activities) {
+    const participants = activity.participants || [];
+
+    for (const participant of participants) {
+      const participantLaps =
+        participant.laps ||
+        participant.tours ||
+        participant.results ||
+        participant.lap_times ||
+        participant.lapTimes ||
+        [];
+
+      for (const lap of participantLaps) {
+        out.push({
+          ...lap,
+          activity_id: activity.id,
+          activity_date: activity.date,
+          activity_date_fr: activity.date_fr,
+          activity_track: activity.track,
+          activity_tracks: activity.tracks,
+          pilot_id:
+            participant.id ||
+            participant.pilot_id ||
+            participant.driver_id ||
+            participant.transponder ||
+            participant.transponder_id ||
+            participant.number ||
+            participant.name ||
+            participant.pilot_name,
+          pilot_name: getParticipantName(participant)
+        });
+      }
+    }
+  }
+
+  return out;
+}
+
+async function main() {
+  const id = cleanId(getPilotId());
+
+  if (!id) {
+    showWarning("Aucun ID pilote dans l'URL. Exemple : pilot.html?id=6028027");
+    return;
+  }
+
+  const res = await fetch("data_v2.json?v=" + Date.now());
+  const data = await res.json();
+
+  const activities = data.activities || [];
+  let laps = data.laps || [];
+
+  if (!laps.length) {
+    laps = buildLapsFromActivities(activities);
+  }
+
+  let pilot = null;
+
+  const pilots = data.pilots || [];
+  pilot = pilots.find(p => getPilotKey(p) === id);
+
+  if (!pilot) {
+    for (const activity of activities) {
+      for (const p of activity.participants || []) {
+        if (getPilotKey(p) === id) {
+          pilot = p;
+          break;
+        }
+      }
+      if (pilot) break;
+    }
+  }
+
+  const name = pilot ? getParticipantName(pilot) : "Pilote " + id;
+
+  document.getElementById("pilotName").textContent = name;
+  document.getElementById("pilotSub").textContent = "Profil live pilote MRCP";
+  document.getElementById("transponder").textContent = id;
+  document.getElementById("qrImg").src = "assets/qr/" + id + ".png";
+
+  const pilotLaps = laps.filter(l => lapPilotKey(l) === id);
+
+  const times = pilotLaps
+    .map(getLapTime)
+    .filter(v => v !== null && v > 0);
+
+  if (!times.length) {
+    showWarning("Profil trouvé, mais aucun tour n'a été reconnu pour cet ID. Il faudra peut-être utiliser le nom pilote au lieu du transpondeur dans l'URL.");
+  }
+
+  const best = times.length ? Math.min(...times) : null;
+  const avg = times.length ? times.reduce((a,b) => a+b, 0) / times.length : null;
+
+  document.getElementById("bestLap").textContent = fmtLap(best);
+  document.getElementById("avgLap").textContent = fmtLap(avg);
+  document.getElementById("totalLaps").textContent = times.length;
+
+  const sessions = {};
+
+  for (const lap of pilotLaps) {
+    const aid = lap.activity_id || lap.session_id || lap.activity || lap.source_file || "unknown";
+
+    if (!sessions[aid]) {
+      sessions[aid] = {
+        laps: [],
+        date: lap.activity_date_fr || lap.activity_date || "-",
+        track: lap.activity_track || "-"
+      };
+    }
+
+    sessions[aid].laps.push(lap);
+  }
+
+  const rows = [];
+
+  for (const [sid, session] of Object.entries(sessions)) {
+    const stimes = session.laps
+      .map(getLapTime)
+      .filter(v => v !== null && v > 0);
+
+    if (!stimes.length) continue;
+
+    rows.push({
+      date: session.date,
+      track: session.track,
+      best: Math.min(...stimes),
+      avg: stimes.reduce((a,b) => a+b, 0) / stimes.length,
+      count: stimes.length
+    });
+  }
+
+  rows.sort((a,b) => String(a.date).localeCompare(String(b.date)));
+
+  document.getElementById("historyBody").innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.track}</td>
+      <td>${fmtLap(r.best)}</td>
+      <td>${fmtLap(r.avg)}</td>
+      <td>${r.count}</td>
+    </tr>
+  `).join("");
+
+  new Chart(document.getElementById("progressChart"), {
+    type: "line",
+    data: {
+      labels: rows.map(r => r.date),
+      datasets: [{
+        label: "Meilleur tour par session",
+        data: rows.map(r => r.best),
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: { color: "white" }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.1)" }
+        },
+        y: {
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.1)" }
+        }
+      }
+    }
+  });
+}
+
+main();
+</script>
+
+</body>
+</html>

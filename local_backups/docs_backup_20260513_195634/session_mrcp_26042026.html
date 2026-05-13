@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRCP - 26/04/2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#222535;--border:#2e3250;--accent:#e63946;--gold:#FFD700;--silver:#C0C0C0;--bronze:#CD7F32;--text:#e8eaf0;--muted:#7b82a8;--green:#2ecc71;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;}
+header{background:linear-gradient(135deg,#1a1d27,#16192a);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.logo{font-size:24px;font-weight:900;}.logo span{color:var(--accent);}
+.subtitle{color:var(--muted);font-size:13px;margin-top:3px;}
+.badge{margin-left:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;color:var(--muted);}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;display:flex;gap:4px;overflow-x:auto;}
+.nav-btn{padding:12px 18px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.nav-btn.active{color:var(--text);border-bottom-color:var(--accent);}
+.tab-content{display:none;}.tab-content.active{display:block;}
+main{max-width:1400px;margin:0 auto;padding:28px 24px;}
+.section-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;margin-top:28px;}
+.section-title:first-child{margin-top:0;}
+.podium{display:flex;gap:10px;justify-content:center;align-items:flex-end;flex-wrap:wrap;}
+.podium-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 24px;text-align:center;flex:1;min-width:140px;max-width:240px;transition:transform .2s;}
+.podium-card:hover{transform:translateY(-3px);}
+.podium-card.p1{border-color:var(--gold);background:linear-gradient(160deg,#1e1a08,#1a1d27);}
+.podium-card.p2{border-color:var(--silver);background:linear-gradient(160deg,#141416,#1a1d27);}
+.podium-card.p3{border-color:var(--bronze);background:linear-gradient(160deg,#1a1208,#1a1d27);}
+.podium-rank{font-size:28px;margin-bottom:4px;}.podium-name{font-size:13px;font-weight:700;margin:5px 0 2px;}
+.podium-time{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin:5px 0;}
+.podium-card.p1 .podium-time{color:var(--gold);}.podium-card.p2 .podium-time{color:var(--silver);}.podium-card.p3 .podium-time{color:var(--bronze);}
+.podium-label{font-size:10px;color:var(--muted);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.pilot-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.pilot-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.pilot-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.pilot-name{font-weight:700;font-size:13px;}.pilot-laps{margin-left:auto;background:var(--surface2);border-radius:5px;padding:2px 8px;font-size:10px;color:var(--muted);}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1e2136;}
+.stat-row:last-child{border:none;}.stat-label{font-size:10px;color:var(--muted);}.stat-value{font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;}.stat-value.best{color:var(--green);}
+.bar-track{margin-top:10px;}.bar-label{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:4px;}.bar-bg{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;}.bar-fill{height:100%;border-radius:3px;}
+.table-wrapper{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto;}
+.data-table{width:100%;border-collapse:collapse;font-size:12px;}
+.data-table th{background:var(--surface2);padding:8px 12px;text-align:left;font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;}
+.data-table td{padding:7px 12px;border-bottom:1px solid #1e2136;}
+.data-table tr:hover td{background:var(--surface2);}.data-table tr.top3 td{font-weight:600;}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;font-size:10px;font-weight:700;background:var(--surface2);color:var(--muted);}
+.rank-badge.r1{background:#3d3200;color:var(--gold);}.rank-badge.r2{background:#252525;color:var(--silver);}.rank-badge.r3{background:#2a1a08;color:var(--bronze);}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}.best-time{color:var(--green);font-weight:700;font-variant-numeric:tabular-nums;}
+.bar-mini{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;display:inline-block;width:60px;vertical-align:middle;margin-right:4px;}.bar-mini-fill{height:100%;border-radius:3px;}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:800px){.charts-grid{grid-template-columns:1fr;}}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.chart-card.full-width{grid-column:1/-1;}
+.chart-title{font-size:12px;font-weight:700;margin-bottom:3px;}.chart-sub{font-size:10px;color:var(--muted);margin-bottom:14px;}
+.pilot-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.tab-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;}
+.tab-btn.active{color:#fff;border-color:transparent;}
+.evo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;}
+.evo-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.evo-name{font-size:13px;font-weight:700;margin-bottom:12px;}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:32px;}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="logo">Session <span>MRCP</span></div>
+  <div class="subtitle">26/04/2026 &middot; Tours 31s&ndash;50s &middot; 14 pilote(s)</div></div>
+  <div class="badge">&#127937; 26 Avril 2026</div>
+</header>
+<nav>
+  <button class="nav-btn active" onclick="showTab('session',this)">&#127937; Session</button>
+  <button class="nav-btn" onclick="showTab('classement',this)">&#128203; Classement</button>
+  <button class="nav-btn" onclick="showTab('graphiques',this)">&#128200; Graphiques</button>
+  <button class="nav-btn" onclick="showTab('tours',this)">&#128269; Tours</button>
+  <button class="nav-btn" onclick="showTab('evolution',this)">&#128197; Evolution</button>
+</nav>
+<main>
+<div id="tab-session" class="tab-content active">
+  <div class="section-title">Podium &mdash; Meilleur tour</div>
+  <div class="podium" id="podium"></div>
+  <div class="section-title">Statistiques par pilote</div>
+  <div class="stats-grid" id="statsGrid"></div>
+</div>
+<div id="tab-classement" class="tab-content">
+  <div class="section-title">Classement complet</div>
+  <div class="table-wrapper"><table class="data-table">
+    <thead><tr><th>Rang</th><th>Pilote</th><th>Meilleur</th><th>Moyenne</th><th>Mediane</th><th>Ec-type</th><th>Tours</th><th>Regularite</th></tr></thead>
+    <tbody id="rankingBody"></tbody>
+  </table></div>
+</div>
+<div id="tab-graphiques" class="tab-content">
+  <div class="charts-grid">
+    <div class="chart-card full-width"><div class="chart-title">Meilleur tour par pilote</div><div class="chart-sub">Du plus rapide au plus lent</div><canvas id="chartBest" height="140"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Meilleur tour vs Moyenne</div><div class="chart-sub">Top 14 pilotes</div><canvas id="chartBestMean" height="280"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Consistance (Ecart-type)</div><div class="chart-sub">Plus bas = plus regulier</div><canvas id="chartStd" height="280"></canvas></div>
+    <div class="chart-card full-width"><div class="chart-title">Courbe de progression &mdash; Top 10</div><div class="chart-sub">Tours tries du plus rapide au plus lent</div><canvas id="chartLine" height="200"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Radar &mdash; Top 6</div><div class="chart-sub">Multi-criteres normalises</div><canvas id="chartRadar" height="320"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Volume de tours</div><div class="chart-sub">Tours valides par pilote</div><canvas id="chartCount" height="320"></canvas></div>
+  </div>
+</div>
+<div id="tab-tours" class="tab-content">
+  <div class="section-title">Detail des tours par pilote</div>
+  <div class="pilot-tabs" id="pilotTabs"></div>
+  <div class="table-wrapper"><table class="data-table">
+    <thead><tr><th>Rang</th><th>Temps</th><th>Secondes</th><th>Ecart meilleur</th><th>Percentile</th></tr></thead>
+    <tbody id="lapTableBody"></tbody>
+  </table></div>
+</div>
+<div id="tab-evolution" class="tab-content">
+  <div class="section-title">Evolution dans le temps</div>
+  <div class="chart-card" style="margin-bottom:16px"><canvas id="evoGlobal" height="160"></canvas></div>
+  <div class="evo-grid" id="evoGrid"></div>
+</div>
+</main>
+<footer>Session MRCP 26/04/2026 &middot; Tours 31s&ndash;50s &middot; Genere automatiquement</footer>
+<script>
+var STATS = [{"id": "2866100", "name": "Inconnu #2866100", "best": 31.188, "mean": 36.431, "median": 34.178, "worst": 47.578, "std": 5.1, "count": 9, "best_fmt": "0:00:31.188", "mean_fmt": "0:00:36.431"}, {"id": "7196952", "name": "Stephne Audifax", "best": 31.2, "mean": 37.364, "median": 38.111, "worst": 48.71, "std": 4.826, "count": 14, "best_fmt": "0:00:31.200", "mean_fmt": "0:00:37.364"}, {"id": "7064819", "name": "Mathieu Gregoire", "best": 31.458, "mean": 41.818, "median": 41.767, "worst": 48.969, "std": 3.902, "count": 31, "best_fmt": "0:00:31.458", "mean_fmt": "0:00:41.818"}, {"id": "7518662", "name": "Jean-Marie Riviere", "best": 31.613, "mean": 39.271, "median": 38.312, "worst": 48.621, "std": 3.535, "count": 51, "best_fmt": "0:00:31.613", "mean_fmt": "0:00:39.271"}, {"id": "2873646", "name": "Inconnu #2873646", "best": 31.999, "mean": 37.915, "median": 37.074, "worst": 45.753, "std": 4.794, "count": 9, "best_fmt": "0:00:31.999", "mean_fmt": "0:00:37.915"}, {"id": "8046737", "name": "Gregoire Barroso", "best": 33.675, "mean": 37.325, "median": 35.486, "worst": 49.499, "std": 4.154, "count": 35, "best_fmt": "0:00:33.675", "mean_fmt": "0:00:37.325"}, {"id": "9626492", "name": "Pierre Boyer", "best": 34.072, "mean": 38.851, "median": 37.467, "worst": 49.958, "std": 3.97, "count": 129, "best_fmt": "0:00:34.072", "mean_fmt": "0:00:38.851"}, {"id": "9240743", "name": "Anthony Gomes", "best": 34.293, "mean": 37.998, "median": 36.662, "worst": 49.006, "std": 3.29, "count": 52, "best_fmt": "0:00:34.293", "mean_fmt": "0:00:37.998"}, {"id": "4703065", "name": "Amaury Mox", "best": 34.342, "mean": 39.341, "median": 38.079, "worst": 49.472, "std": 4.124, "count": 107, "best_fmt": "0:00:34.342", "mean_fmt": "0:00:39.341"}, {"id": "7264035", "name": "Olivier Saux", "best": 34.677, "mean": 41.131, "median": 38.783, "worst": 49.769, "std": 4.824, "count": 27, "best_fmt": "0:00:34.677", "mean_fmt": "0:00:41.131"}, {"id": "6028027", "name": "Monplaisi Mathieu", "best": 37.178, "mean": 41.658, "median": 40.464, "worst": 49.625, "std": 3.56, "count": 37, "best_fmt": "0:00:37.178", "mean_fmt": "0:00:41.658"}, {"id": "5362908", "name": "Cyrille Majeste Labourdenne", "best": 37.704, "mean": 42.248, "median": 41.69, "worst": 49.591, "std": 2.766, "count": 55, "best_fmt": "0:00:37.704", "mean_fmt": "0:00:42.248"}, {"id": "4254924", "name": "Gwenael Marques", "best": 38.582, "mean": 43.869, "median": 43.247, "worst": 49.642, "std": 2.732, "count": 51, "best_fmt": "0:00:38.582", "mean_fmt": "0:00:43.869"}, {"id": "3851227", "name": "Damien Ibargaray", "best": 38.66, "mean": 41.924, "median": 41.793, "worst": 48.424, "std": 1.909, "count": 43, "best_fmt": "0:00:38.660", "mean_fmt": "0:00:41.924"}];
+var LAPS = {"4703065": [34.342, 34.406, 34.658, 34.707, 34.769, 34.94, 35.011, 35.035, 35.179, 35.245, 35.35, 35.415, 35.538, 35.549, 35.569, 35.595, 35.67, 35.697, 35.743, 35.746, 35.76, 35.763, 35.803, 35.805, 35.944, 35.968, 36.316, 36.354, 36.37, 36.458, 36.496, 36.508, 36.545, 36.607, 36.636, 36.656, 36.684, 36.691, 36.712, 36.903, 37.008, 37.04, 37.061, 37.158, 37.165, 37.236, 37.308, 37.388, 37.496, 37.593, 37.775, 37.922, 37.951, 38.079, 38.262, 38.273, 38.279, 38.447, 38.578, 38.814, 38.863, 39.025, 39.044, 39.124, 39.158, 39.313, 39.401, 39.436, 39.7, 39.735, 39.758, 39.997, 40.023, 40.05, 40.321, 40.392, 40.505, 40.69, 40.727, 40.882, 40.967, 41.177, 41.645, 41.916, 42.082, 42.119, 42.12, 42.235, 43.506, 43.599, 44.756, 45.096, 45.606, 45.646, 46.602, 47.47, 47.531, 47.538, 47.949, 47.97, 48.041, 48.062, 48.196, 48.362, 48.37, 49.339, 49.472], "9626492": [34.072, 34.12, 34.553, 34.557, 34.713, 34.741, 34.942, 34.986, 35.002, 35.011, 35.13, 35.14, 35.144, 35.155, 35.158, 35.18, 35.19, 35.294, 35.399, 35.472, 35.56, 35.588, 35.595, 35.597, 35.613, 35.658, 35.678, 35.769, 35.87, 35.875, 35.973, 35.986, 36.015, 36.048, 36.061, 36.176, 36.188, 36.189, 36.201, 36.202, 36.23, 36.25, 36.409, 36.439, 36.472, 36.481, 36.52, 36.528, 36.562, 36.572, 36.583, 36.616, 36.834, 36.951, 37.004, 37.011, 37.021, 37.107, 37.139, 37.18, 37.22, 37.223, 37.288, 37.394, 37.467, 37.493, 37.591, 37.721, 37.756, 37.826, 37.915, 37.939, 37.944, 38.098, 38.128, 38.287, 38.404, 38.476, 38.581, 38.657, 38.741, 38.949, 38.95, 39.059, 39.218, 39.247, 39.255, 39.269, 39.299, 39.463, 39.527, 39.572, 39.584, 39.633, 39.884, 39.885, 40.001, 40.327, 40.391, 40.986, 41.084, 41.621, 41.763, 41.834, 42.378, 42.667, 42.928, 43.084, 43.155, 43.174, 43.221, 43.919, 44.1, 44.139, 44.36, 45.039, 45.341, 45.342, 46.737, 47.203, 47.204, 47.612, 48.336, 48.374, 48.629, 49.532, 49.791, 49.871, 49.958], "7064819": [31.458, 32.245, 34.541, 39.223, 39.844, 39.977, 40.09, 40.278, 40.416, 40.444, 41.077, 41.345, 41.422, 41.503, 41.681, 41.767, 41.826, 41.966, 42.323, 42.599, 42.655, 43.441, 43.502, 43.968, 44.43, 45.152, 45.192, 47.15, 47.561, 48.318, 48.969], "7518662": [31.613, 34.343, 35.258, 35.587, 35.69, 35.862, 36.144, 36.162, 36.246, 36.341, 36.866, 36.997, 37.023, 37.059, 37.063, 37.199, 37.434, 37.563, 37.581, 37.681, 37.683, 37.859, 37.907, 38.14, 38.233, 38.312, 38.444, 38.575, 38.676, 38.727, 38.749, 38.831, 39.358, 39.459, 39.822, 39.991, 40.059, 40.715, 41.009, 41.681, 42.019, 42.785, 42.946, 44.296, 44.709, 45.13, 45.737, 45.774, 45.928, 46.936, 48.621], "7264035": [34.677, 35.416, 36.049, 36.492, 36.611, 36.656, 36.661, 37.671, 37.788, 37.794, 37.815, 38.383, 38.675, 38.783, 39.936, 40.26, 41.861, 43.696, 43.861, 45.079, 45.836, 46.117, 47.975, 48.502, 49.069, 49.107, 49.769], "9240743": [34.293, 34.622, 34.661, 35.022, 35.135, 35.255, 35.301, 35.497, 35.534, 35.621, 35.653, 35.819, 35.877, 36.033, 36.047, 36.11, 36.273, 36.285, 36.312, 36.34, 36.369, 36.463, 36.507, 36.529, 36.545, 36.579, 36.662, 36.68, 36.792, 37.264, 37.338, 37.385, 37.387, 37.418, 37.498, 37.747, 37.923, 38.005, 38.307, 38.69, 40.686, 40.696, 40.903, 40.978, 41.514, 42.282, 43.823, 44.66, 44.784, 45.207, 45.593, 49.006], "7196952": [31.2, 31.781, 32.425, 33.593, 34.108, 34.874, 35.334, 38.111, 38.607, 39.109, 40.492, 41.064, 43.688, 48.71], "5362908": [37.704, 38.475, 38.482, 38.559, 38.642, 38.715, 38.783, 39.348, 39.421, 39.599, 39.635, 39.845, 40.29, 40.563, 40.667, 40.71, 40.732, 40.735, 40.885, 40.943, 40.995, 41.043, 41.069, 41.229, 41.372, 41.527, 41.619, 41.69, 41.826, 41.967, 42.094, 42.117, 42.318, 42.444, 42.464, 42.768, 42.843, 43.467, 43.6, 43.627, 43.837, 44.236, 44.409, 44.472, 44.576, 44.688, 44.932, 45.188, 45.689, 46.082, 46.449, 46.893, 48.42, 49.34, 49.591], "8046737": [33.675, 33.945, 34.258, 34.523, 34.526, 34.562, 34.613, 34.65, 34.79, 34.869, 35.028, 35.142, 35.222, 35.244, 35.318, 35.387, 35.429, 35.486, 35.522, 35.608, 35.664, 35.721, 36.003, 36.2, 36.218, 37.073, 37.256, 40.261, 40.699, 42.555, 43.084, 43.658, 46.684, 47.992, 49.499], "4254924": [38.582, 39.42, 39.865, 40.077, 40.122, 40.351, 40.915, 41.121, 41.251, 41.254, 41.563, 41.648, 41.968, 42.048, 42.316, 42.492, 42.559, 42.733, 42.823, 42.936, 42.952, 42.997, 43.039, 43.119, 43.171, 43.247, 43.743, 43.744, 44.031, 44.048, 44.075, 44.205, 44.344, 44.64, 44.744, 45.172, 45.288, 45.445, 45.557, 45.935, 46.014, 46.257, 46.417, 48.031, 48.102, 48.293, 48.375, 48.549, 49.026, 49.08, 49.642], "2873646": [31.999, 32.116, 33.55, 36.752, 37.074, 38.878, 40.15, 44.965, 45.753], "2866100": [31.188, 31.778, 32.77, 33.791, 34.178, 35.924, 38.831, 41.837, 47.578], "3851227": [38.66, 39.297, 39.438, 39.538, 39.945, 39.985, 39.991, 40.09, 40.247, 40.373, 40.627, 40.676, 40.911, 40.939, 40.945, 41.155, 41.364, 41.446, 41.485, 41.633, 41.744, 41.793, 41.868, 41.916, 42.033, 42.084, 42.125, 42.201, 42.348, 42.42, 42.573, 42.661, 42.916, 42.918, 42.944, 43.081, 43.348, 44.086, 44.155, 44.246, 45.556, 46.532, 48.424], "6028027": [37.178, 37.188, 37.312, 37.518, 37.622, 37.895, 38.642, 38.67, 38.675, 38.755, 39.072, 39.529, 39.587, 39.713, 39.954, 39.979, 40.323, 40.463, 40.464, 40.485, 40.555, 40.606, 40.851, 41.906, 43.303, 43.904, 44.065, 44.125, 45.625, 45.672, 46.067, 46.108, 46.378, 46.788, 48.174, 48.56, 49.625]};
+var HISTORY = {"8046737": {"name": "Gregoire Barroso", "sessions": [{"date": "01/05/2026", "best": 34.02, "mean": 36.774, "std": 3.317, "count": 44}, {"date": "02/05/2026", "best": 33.678, "mean": 36.558, "std": 2.166, "count": 28}, {"date": "2026-04-26", "best": 33.675, "mean": 37.325, "std": 4.154, "count": 35}, {"date": "2026-05-01", "best": 34.02, "mean": 36.774, "std": 3.317, "count": 44}, {"date": "26/04/2026", "best": 33.675, "mean": 37.325, "std": 4.154, "count": 35}]}, "7264035": {"name": "Olivier Saux", "sessions": [{"date": "02/05/2026", "best": 35.649, "mean": 37.173, "std": 1.075, "count": 6}, {"date": "2026-04-26", "best": 34.677, "mean": 41.131, "std": 4.824, "count": 27}, {"date": "26/04/2026", "best": 34.677, "mean": 41.131, "std": 4.824, "count": 27}]}, "7064819": {"name": "Mathieu Gregoire", "sessions": [{"date": "02/05/2026", "best": 43.621, "mean": 45.01, "std": 1.389, "count": 2}, {"date": "2026-04-26", "best": 31.458, "mean": 41.818, "std": 3.902, "count": 31}, {"date": "26/04/2026", "best": 31.458, "mean": 41.818, "std": 3.902, "count": 31}]}, "2866100": {"name": "Inconnu #2866100", "sessions": [{"date": "2026-04-26", "best": 31.188, "mean": 36.431, "std": 5.1, "count": 9}, {"date": "26/04/2026", "best": 31.188, "mean": 36.431, "std": 5.1, "count": 9}]}, "7196952": {"name": "Stephne Audifax", "sessions": [{"date": "2026-04-26", "best": 31.2, "mean": 37.364, "std": 4.826, "count": 14}, {"date": "26/04/2026", "best": 31.2, "mean": 37.364, "std": 4.826, "count": 14}]}, "7518662": {"name": "Jean-Marie Riviere", "sessions": [{"date": "2026-04-26", "best": 31.613, "mean": 39.271, "std": 3.535, "count": 51}, {"date": "26/04/2026", "best": 31.613, "mean": 39.271, "std": 3.535, "count": 51}]}, "2873646": {"name": "Inconnu #2873646", "sessions": [{"date": "2026-04-26", "best": 31.999, "mean": 37.915, "std": 4.794, "count": 9}, {"date": "26/04/2026", "best": 31.999, "mean": 37.915, "std": 4.794, "count": 9}]}, "9626492": {"name": "Pierre Boyer", "sessions": [{"date": "2026-04-26", "best": 34.072, "mean": 38.851, "std": 3.97, "count": 129}, {"date": "26/04/2026", "best": 34.072, "mean": 38.851, "std": 3.97, "count": 129}]}, "9240743": {"name": "Anthony Gomes", "sessions": [{"date": "2026-04-26", "best": 34.293, "mean": 37.998, "std": 3.29, "count": 52}, {"date": "26/04/2026", "best": 34.293, "mean": 37.998, "std": 3.29, "count": 52}]}, "4703065": {"name": "Amaury Mox", "sessions": [{"date": "2026-04-26", "best": 34.342, "mean": 39.341, "std": 4.124, "count": 107}, {"date": "26/04/2026", "best": 34.342, "mean": 39.341, "std": 4.124, "count": 107}]}, "6028027": {"name": "Monplaisi Mathieu", "sessions": [{"date": "2026-04-26", "best": 37.178, "mean": 41.658, "std": 3.56, "count": 37}, {"date": "26/04/2026", "best": 37.178, "mean": 41.658, "std": 3.56, "count": 37}]}, "5362908": {"name": "Cyrille Majeste Labourdenne", "sessions": [{"date": "2026-04-26", "best": 37.704, "mean": 42.248, "std": 2.766, "count": 55}, {"date": "26/04/2026", "best": 37.704, "mean": 42.248, "std": 2.766, "count": 55}]}, "4254924": {"name": "Gwenael Marques", "sessions": [{"date": "01/05/2026", "best": 43.447, "mean": 47.201, "std": 1.954, "count": 14}, {"date": "2026-04-26", "best": 38.582, "mean": 43.869, "std": 2.732, "count": 51}, {"date": "2026-05-01", "best": 43.447, "mean": 47.201, "std": 1.954, "count": 14}, {"date": "26/04/2026", "best": 38.582, "mean": 43.869, "std": 2.732, "count": 51}]}, "3851227": {"name": "Damien Ibargaray", "sessions": [{"date": "2026-04-26", "best": 38.66, "mean": 41.924, "std": 1.909, "count": 43}, {"date": "26/04/2026", "best": 38.66, "mean": 41.924, "std": 1.909, "count": 43}]}, "3754809": {"name": "Louis Fourniols", "sessions": [{"date": "2026-04-26", "best": 38.694, "mean": 43.45, "std": 3.573, "count": 8}, {"date": "26/04/2026", "best": 38.694, "mean": 43.45, "std": 3.573, "count": 8}]}, "9415016": {"name": "Dorian Giannetta", "sessions": [{"date": "01/05/2026", "best": 32.024, "mean": 34.008, "std": 2.628, "count": 59}, {"date": "2026-05-01", "best": 32.024, "mean": 34.008, "std": 2.628, "count": 59}]}};
+var PALETTE = ["#e63946", "#4cc9f0", "#f4a261", "#2ecc71", "#a855f7", "#ffd166", "#ff6b6b", "#06d6a0", "#118ab2", "#ef476f", "#ffd700", "#8ecae6", "#e9c46a", "#f77f00", "#d62828", "#023e8a", "#80b918", "#ff99c8", "#c77dff", "#48cae4", "#74c69d", "#52b788", "#ffb703", "#fb8500", "#219ebc", "#e76f51", "#264653", "#2a9d8f", "#9b2226", "#005f73"];
+var LAPMIN_VAL = 31;
+var LAPMAX_VAL = 50;
+
+function showTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='graphiques'&&!window._charts){buildCharts();window._charts=true;}
+  if(name==='evolution'){buildEvo();}
+}
+
+function fmt(s){var m=Math.floor(s/60),sec=s-m*60;var ss=sec.toFixed(3);if(ss.length<6)ss='0'+ss;return m+':'+ss;}
+function colr(i,a){var c=PALETTE[i%PALETTE.length];if(a===undefined||a===1)return c;var r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);return 'rgba('+r+','+g+','+b+','+a+')';}
+function norm(vals,inv){var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);if(mx===mn)return vals.map(function(){return 50;});return vals.map(function(v){return inv?(1-(v-mn)/(mx-mn))*100:((v-mn)/(mx-mn))*100;});}
+function sortD(d){try{var p=d.split('/');return p[2]+'-'+p[1]+'-'+p[0];}catch(e){return d;}}
+
+var sorted=STATS.slice().sort(function(a,b){return a.best-b.best;});
+var maxStd=Math.max.apply(null,sorted.map(function(s){return s.std||0;}));
+var medals=['&#127945;','&#129352;','&#129353;'];
+
+// PODIUM
+sorted.slice(0,3).forEach(function(s,i){
+  var c=document.createElement('div');
+  c.className='podium-card p'+(i+1);
+  var t1=s.best_fmt.indexOf(':')>-1?s.best_fmt.split(':').slice(1).join(':'):s.best_fmt;
+  var t2=s.mean_fmt.indexOf(':')>-1?s.mean_fmt.split(':').slice(1).join(':'):s.mean_fmt;
+  c.innerHTML='<div class="podium-rank">'+medals[i]+'</div>'
+    +'<div class="podium-name">'+s.name+'</div>'
+    +'<div class="podium-time">'+t1+'</div>'
+    +'<div class="podium-label">Moy. '+t2+'</div>';
+  document.getElementById('podium').appendChild(c);
+});
+
+// STATS CARDS
+sorted.forEach(function(s,i){
+  var cons=s.std?Math.round((1-s.std/maxStd)*100):100;
+  var t1=s.best_fmt.indexOf(':')>-1?s.best_fmt.split(':').slice(1).join(':'):s.best_fmt;
+  var t2=s.mean_fmt.indexOf(':')>-1?s.mean_fmt.split(':').slice(1).join(':'):s.mean_fmt;
+  var c=document.createElement('div');c.className='pilot-card';
+  c.innerHTML='<div class="pilot-header">'
+    +'<div class="pilot-dot" style="background:'+PALETTE[i]+'"></div>'
+    +'<div class="pilot-name">'+s.name+'</div>'
+    +'<div class="pilot-laps">'+s.count+' tours</div></div>'
+    +'<div class="stat-row"><span class="stat-label">Meilleur</span><span class="stat-value best">'+t1+'</span></div>'
+    +'<div class="stat-row"><span class="stat-label">Moyenne</span><span class="stat-value">'+t2+'</span></div>'
+    +'<div class="stat-row"><span class="stat-label">Mediane</span><span class="stat-value">'+fmt(s.median)+'</span></div>'
+    +'<div class="stat-row"><span class="stat-label">Pire</span><span class="stat-value">'+fmt(s.worst)+'</span></div>'
+    +'<div class="stat-row"><span class="stat-label">Ec-type</span><span class="stat-value">'+s.std.toFixed(3)+'s</span></div>'
+    +'<div class="bar-track"><div class="bar-label"><span>Regularite</span><span>'+cons+'%</span></div>'
+    +'<div class="bar-bg"><div class="bar-fill" style="width:'+cons+'%;background:'+PALETTE[i]+'"></div></div></div>';
+  document.getElementById('statsGrid').appendChild(c);
+});
+
+// CLASSEMENT
+sorted.forEach(function(s,i){
+  var cons=s.std?Math.round((1-s.std/maxStd)*100):100;
+  var t1=s.best_fmt.indexOf(':')>-1?s.best_fmt.split(':').slice(1).join(':'):s.best_fmt;
+  var t2=s.mean_fmt.indexOf(':')>-1?s.mean_fmt.split(':').slice(1).join(':'):s.mean_fmt;
+  var tr=document.createElement('tr');if(i<3)tr.classList.add('top3');
+  tr.innerHTML='<td><span class="rank-badge '+(i<3?'r'+(i+1):'')+'">'+( i+1)+'</span></td>'
+    +'<td><span class="dot" style="background:'+PALETTE[i]+'"></span>'+s.name+'</td>'
+    +'<td class="best-time">'+t1+'</td>'
+    +'<td style="font-variant-numeric:tabular-nums">'+t2+'</td>'
+    +'<td style="font-variant-numeric:tabular-nums">'+fmt(s.median)+'</td>'
+    +'<td>'+s.std.toFixed(3)+'s</td><td>'+s.count+'</td>'
+    +'<td><div class="bar-mini"><div class="bar-mini-fill" style="width:'+cons+'%;background:'+PALETTE[i]+'"></div></div>'+cons+'%</td>';
+  document.getElementById('rankingBody').appendChild(tr);
+});
+
+// CHARTS (lazy)
+function buildCharts(){
+  var cOpts={responsive:true,plugins:{legend:{labels:{color:'#7b82a8',font:{size:10}}}},scales:{x:{ticks:{color:'#7b82a8',font:{size:9}},grid:{color:'#1e2136'}},y:{ticks:{color:'#7b82a8',font:{size:9}},grid:{color:'#1e2136'}}}};
+  var top20=sorted.slice(0,14);
+  var sn=function(s){return s.name.split(' ')[0];};
+
+  new Chart(document.getElementById('chartBest'),{type:'bar',
+    data:{labels:sorted.map(function(s){return s.name;}),datasets:[{label:'Meilleur (s)',data:sorted.map(function(s){return s.best;}),backgroundColor:sorted.map(function(_,i){return colr(i,.85);}),borderRadius:4}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#7b82a8',font:{size:8},maxRotation:40},grid:{color:'#1e2136'}},y:{min:LAPMIN_VAL,max:LAPMAX_VAL,ticks:{color:'#7b82a8',callback:function(v){return fmt(v);}},grid:{color:'#1e2136'}}}}});
+
+  new Chart(document.getElementById('chartBestMean'),{type:'bar',
+    data:{labels:top20.map(sn),datasets:[{label:'Meilleur',data:top20.map(function(s){return s.best;}),backgroundColor:top20.map(function(_,i){return colr(i,.9);}),borderRadius:4},{label:'Moyenne',data:top20.map(function(s){return s.mean;}),backgroundColor:top20.map(function(_,i){return colr(i,.35);}),borderRadius:4}]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#7b82a8',font:{size:10}}}},scales:{x:{ticks:{color:'#7b82a8',font:{size:9},maxRotation:35},grid:{color:'#1e2136'}},y:{min:LAPMIN_VAL,max:LAPMAX_VAL,ticks:{color:'#7b82a8',callback:function(v){return fmt(v);}},grid:{color:'#1e2136'}}}}});
+
+  new Chart(document.getElementById('chartStd'),{type:'bar',
+    data:{labels:top20.map(sn),datasets:[{label:'Ec-type',data:top20.map(function(s){return s.std;}),backgroundColor:top20.map(function(_,i){return colr(i,.85);}),borderRadius:4}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#7b82a8',font:{size:9},maxRotation:35},grid:{color:'#1e2136'}},y:{ticks:{color:'#7b82a8'},grid:{color:'#1e2136'},beginAtZero:true}}}});
+
+  var lineData=sorted.slice(0,10).map(function(s,i){
+    return {label:sn(s),data:LAPS[s.id].slice().sort(function(a,b){return a-b;}),borderColor:PALETTE[i],backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3};
+  });
+  new Chart(document.getElementById('chartLine'),{type:'line',
+    data:{labels:Array.from({length:150},function(_,i){return i+1;}),datasets:lineData},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#7b82a8',font:{size:10}}}},scales:{x:{ticks:{color:'#7b82a8',maxTicksLimit:15},grid:{color:'#1e2136'}},y:{min:LAPMIN_VAL,max:LAPMAX_VAL,ticks:{color:'#7b82a8',callback:function(v){return fmt(v);}},grid:{color:'#1e2136'}}}}});
+
+  var topR=sorted.slice(0,6);
+  new Chart(document.getElementById('chartRadar'),{type:'radar',
+    data:{labels:['Meilleur','Moyenne','Regularite','Volume','Top 10%'],
+      datasets:topR.map(function(s,i){
+        var top10avg=(function(){var l=LAPS[s.id].slice().sort(function(a,b){return a-b;});var n=Math.max(1,Math.floor(l.length*.1));return l.slice(0,n).reduce(function(a,b){return a+b;},0)/n;})();
+        return {label:sn(s),data:[norm(topR.map(function(x){return x.best;}),true)[i],norm(topR.map(function(x){return x.mean;}),true)[i],norm(topR.map(function(x){return x.std||0;}),true)[i],norm(topR.map(function(x){return x.count;}),false)[i],norm(topR.map(function(x){var l=LAPS[x.id].slice().sort(function(a,b){return a-b;});var n=Math.max(1,Math.floor(l.length*.1));return l.slice(0,n).reduce(function(a,b){return a+b;},0)/n;}),true)[i]],borderColor:PALETTE[i],backgroundColor:colr(i,.1),pointBackgroundColor:PALETTE[i],borderWidth:2};
+      })},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#7b82a8',font:{size:10}}}},scales:{r:{ticks:{display:false},grid:{color:'#2e3250'},pointLabels:{color:'#7b82a8',font:{size:10}},angleLines:{color:'#2e3250'},min:0,max:100}}}});
+
+  new Chart(document.getElementById('chartCount'),{type:'doughnut',
+    data:{labels:sorted.map(function(s){return s.name;}),datasets:[{data:sorted.map(function(s){return s.count;}),backgroundColor:PALETTE,borderWidth:2,borderColor:'#1a1d27'}]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#7b82a8',font:{size:10}},position:'bottom'}}}});
+}
+
+// LAP TABLE
+var activeId=sorted[0].id;
+function renderLapTable(pid){
+  var laps=LAPS[pid].slice().sort(function(a,b){return a-b;}),best=laps[0];
+  var html='';
+  laps.forEach(function(t,i){
+    var delta=t-best,pct=Math.round((1-i/laps.length)*100);
+    var rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    var ds=i===0?'<span style="color:#2ecc71">Meilleur</span>':'<span style="color:#e63946">+'+delta.toFixed(3)+'s</span>';
+    var pidx=sorted.findIndex(function(s){return s.id===pid;});
+    html+='<tr class="'+(i===0?'best-lap':'')+'">'
+      +'<td><span class="rank-badge '+rc+'">'+(i+1)+'</span></td>'
+      +'<td>'+fmt(t)+'</td><td>'+t.toFixed(3)+'s</td><td>'+ds+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:6px">'
+      +'<div style="width:'+pct+'px;max-width:90px;height:4px;background:'+PALETTE[pidx]+';border-radius:3px;opacity:.7"></div>'
+      +pct+'%</div></td></tr>';
+  });
+  document.getElementById('lapTableBody').innerHTML=html;
+}
+
+var tabsEl=document.getElementById('pilotTabs');
+sorted.forEach(function(s,i){
+  var btn=document.createElement('button');
+  btn.className='tab-btn'+(s.id===activeId?' active':'');
+  btn.textContent=s.name.split(' ')[0];
+  if(s.id===activeId){btn.style.background=PALETTE[i];btn.style.color='#fff';}
+  btn.onclick=function(){
+    activeId=s.id;
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');b.style.background='';b.style.color='';});
+    btn.classList.add('active');btn.style.background=PALETTE[i];btn.style.color='#fff';
+    renderLapTable(s.id);
+  };
+  tabsEl.appendChild(btn);
+});
+renderLapTable(activeId);
+
+// EVOLUTION
+var evoBuilt=false;
+function buildEvo(){
+  if(evoBuilt)return;evoBuilt=true;
+  var pids=Object.keys(HISTORY).filter(function(pid){return HISTORY[pid].sessions.length>=2&&HISTORY[pid].name.indexOf('Inconnu')<0;});
+  if(!pids.length){
+    document.getElementById('evoGlobal').parentElement.innerHTML='<div style="color:var(--muted);padding:20px;text-align:center">Pas encore assez de sessions pour afficher l evolution.</div>';
+    return;
+  }
+  var allD=[...new Set(pids.reduce(function(acc,pid){return acc.concat(HISTORY[pid].sessions.map(function(s){return s.date;}));},[] ))].sort(function(a,b){return sortD(a).localeCompare(sortD(b));});
+  new Chart(document.getElementById('evoGlobal'),{type:'line',
+    data:{labels:allD,datasets:pids.map(function(pid,i){var p=HISTORY[pid];return {label:p.name.split(' ')[0],data:allD.map(function(d){var s=p.sessions.find(function(s){return s.date===d;});return s?s.best:null;}),borderColor:PALETTE[i%PALETTE.length],backgroundColor:'transparent',pointRadius:5,borderWidth:2,tension:.3,spanGaps:false};})},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#7b82a8',font:{size:10}}}},scales:{x:{ticks:{color:'#7b82a8',font:{size:9}},grid:{color:'#1e2136'}},y:{ticks:{color:'#7b82a8',callback:function(v){return fmt(v);}},grid:{color:'#1e2136'}}}}});
+  var eg=document.getElementById('evoGrid');
+  pids.forEach(function(pid,idx){
+    var p=HISTORY[pid];var col=PALETTE[idx%PALETTE.length];
+    var card=document.createElement('div');card.className='evo-card';
+    var cid='evo_'+pid;
+    var sess=p.sessions.slice().sort(function(a,b){return sortD(a.date).localeCompare(sortD(b.date));});
+    card.innerHTML='<div class="evo-name" style="color:'+col+'">'+p.name+'</div><canvas id="'+cid+'" height="160"></canvas>';
+    eg.appendChild(card);
+    new Chart(document.getElementById(cid),{type:'line',
+      data:{labels:sess.map(function(s){return s.date;}),datasets:[{label:'Meilleur',data:sess.map(function(s){return s.best;}),borderColor:col,backgroundColor:'transparent',pointRadius:5,borderWidth:2,tension:.3},{label:'Moyenne',data:sess.map(function(s){return s.mean;}),borderColor:col,backgroundColor:col+'22',pointRadius:3,borderWidth:1.5,tension:.3,borderDash:[4,3]}]},
+      options:{responsive:true,plugins:{legend:{labels:{color:'#7b82a8',font:{size:9}}}},scales:{x:{ticks:{color:'#7b82a8',font:{size:8}},grid:{color:'#1e2136'}},y:{ticks:{color:'#7b82a8',callback:function(v){return fmt(v);}},grid:{color:'#1e2136'}}}}});
+  });
+}
+</script></body></html>

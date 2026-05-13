@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#061224">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MRCP">
+  <title>MRCP Speedhive</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles_v2.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-main">MRCP</div>
+      <div class="brand-sub">SPEEDHIVE</div>
+    </div>
+
+    <nav class="side-nav">
+      <a href="#/" class="nav-link">🏠 <span>Accueil</span></a>
+      <a href="#/mes-chronos" class="nav-link mobile-priority">⏱️ <span>Mes chronos</span></a>
+      <a href="#/live" class="nav-link">📡 <span>Live</span></a>
+      <a href="#/pilotes" class="nav-link">👥 <span>Pilotes</span></a>
+      <a href="#/podiums" class="nav-link">🏆 <span>Podiums</span></a>
+      <button id="adminBtn" class="nav-link nav-button">⚙️ <span>Admin</span></button>
+    </nav>
+
+    <nav id="adminNav" class="side-nav admin-nav hidden">
+      <a href="#/quality" class="nav-link">📊 <span>Qualité</span></a>
+      <a href="#/admin-pilotes" class="nav-link">🧑‍🔧 <span>Pilotes admin</span></a>
+      <a href="#/admin-records" class="nav-link">🛠️ <span>Records admin</span></a>
+      <a href="#/admin" class="nav-link">🔐 <span>Admin</span></a>
+      <button id="adminExit" class="nav-link nav-button">🚪 <span>Quitter</span></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="flag">🏁</div>
+      <strong>MRCP Speedhive</strong>
+      <small>Chronos, progression et records pilotes</small>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="top-pills">
+      <div class="pill">📡 <span>V4.1 Live timing</span></div>
+      <div class="pill">📅 <span id="todayLabel">Aujourd’hui</span></div>
+      <button id="installPwaBtn" class="pill pill-button hidden">Installer l’app</button>
+      <button id="adminBtnTop" class="pill pill-button">⚙️ Admin</button>
+    </div>
+
+    <main id="app">
+      <section class="card">
+        <h2>Chargement...</h2>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>🏁 MRCP Speedhive Dashboard</span>
+      <span id="lastUpdateFooter">Données en cours de chargement</span>
+      <span>📡 V4.1 Live timing</span>
+    </footer>
+  </div>
+</div>
+
+<script src="app_v2.js"></script>
+<script src="pilot_links_v53.js?v=53"></script>
+</body>
+</html>

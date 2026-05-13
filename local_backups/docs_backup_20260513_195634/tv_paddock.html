@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>MRCP TV Paddock V5.5</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="mrcp_v55_tv.css">
+  <link rel="stylesheet" href="mrcp_v66_premium.css?v=66">
+</head>
+<body>
+  <div id="tv-app">
+    <header class="tv-header">
+      <div>
+        <h1>MRCP TV PADDOCK</h1>
+        <p>Live club racing dashboard</p>
+      </div>
+      <div class="tv-clock" id="clock">--:--</div>
+    </header>
+
+    <main id="screen-container">
+      <section class="tv-screen active" data-title="Records live">
+        <h2>🏆 Records live</h2>
+        <div id="recordsLive" class="cards-grid"></div>
+      </section>
+
+      <section class="tv-screen" data-title="Top pilotes">
+        <h2>🔥 Top pilotes actifs</h2>
+        <div id="topPilots" class="ranking"></div>
+      </section>
+
+      <section class="tv-screen" data-title="Activité club">
+        <h2>📊 Activité club</h2>
+        <div id="clubStats" class="big-stats"></div>
+      </section>
+
+      <section class="tv-screen" data-title="Heatmap">
+        <h2>🌡️ Heatmap activité</h2>
+        <div id="heatmap" class="heatmap"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span id="screenName">Records live</span>
+      <span>MRCP Dashboard V5.5</span>
+    </footer>
+  </div>
+
+  <script src="mrcp_v55_tv.js"></script>
+
+<a class="mrcp-home-link" href="index_v2.html">← Accueil MRCP</a>
+<div class="mrcp-version-pill">MRCP V6.6 Premium</div>
+</body>
+</html>
