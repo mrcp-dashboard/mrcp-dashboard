@@ -122,3 +122,32 @@ footer{
   nav{overflow:auto}
   .pilot-card{grid-template-columns:1fr}
 }
+
+.speaker-title{
+  font-size:26px;
+  color:#b8c7ff;
+  margin-bottom:18px;
+}
+
+.speaker-line{
+  margin:14px 0;
+}
+
+.speaker-alert{
+  background:rgba(255,216,74,.14);
+  border:1px solid rgba(255,216,74,.6);
+  padding:18px;
+  border-radius:18px;
+  margin-bottom:22px;
+  color:#ffe680;
+  font-weight:bold;
+}
+
+.speaker-script{
+  margin-top:26px;
+  padding:20px;
+  border-radius:18px;
+  background:rgba(53,87,255,.18);
+  font-size:24px;
+  color:#ffffff;
+}

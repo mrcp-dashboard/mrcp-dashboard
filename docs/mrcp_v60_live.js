@@ -1,6 +1,3 @@
-cd /opt/mrcp-dashboard/docs
-
-cat > mrcp_v60_live.js <<'JS'
 let previousSignature = null;
 let data = null;
 let bestKnownLap = null;
@@ -35,16 +32,12 @@ function resolvePilotName(p){
 
     const txt = String(c).trim();
 
-    // Ignore les numÈros de puce purs
     if(/^\d+$/.test(txt)) continue;
-
-    // Ignore les textes trop courts
     if(txt.length < 2) continue;
 
     return txt;
   }
 
-  // Fallback si aucun vrai nom trouvÈ
   return "Puce " + (
     p.transponder ||
     p.transponder_id ||
@@ -58,7 +51,9 @@ function getPilots(){
   const pilots = {};
 
   getActivities().forEach(a=>{
+
     (a.participants || []).forEach(p=>{
+
       const name = resolvePilotName(p);
 
       if(!pilots[name]){
@@ -89,7 +84,9 @@ function getPilots(){
       if(best && (!pilots[name].best || best < pilots[name].best)){
         pilots[name].best = best;
       }
+
     });
+
   });
 
   return Object.values(pilots);
@@ -97,6 +94,7 @@ function getPilots(){
 
 function makeSignature(){
   const activities = getActivities();
+
   const totalLaps =
     data?.laps_count ||
     activities.reduce((s,a)=>s+(a.laps_count||0),0);
@@ -105,92 +103,227 @@ function makeSignature(){
 }
 
 function renderLive(){
-  const activities = [...getActivities()].slice(-10).reverse();
 
-  document.getElementById("liveFeed").innerHTML = activities.map(a=>`
+  const activities =
+    [...getActivities()]
+    .slice(-10)
+    .reverse();
+
+  document.getElementById("liveFeed").innerHTML =
+    activities.map(a=>`
+
     <div class="item">
       <strong>${a.date_fr || a.date || "Session"}</strong>
+
       <small>
-        ${a.laps_count || 0} tours ó
-        ${a.pilot_count || 0} pilotes ó
+        ${a.laps_count || 0} tours ‚Äî
+        ${a.pilot_count || 0} pilotes ‚Äî
         meilleur : ${fmtLap(a.best_lap)}
         ${a.best_pilot || ""}
       </small>
     </div>
-  `).join("") || "<div class='item'>Aucune activitÈ dÈtectÈe</div>";
+
+  `).join("")
+
+  || "<div class='item'>Aucune activit√© d√©tect√©e</div>";
 }
 
 function renderRecords(){
-  document.getElementById("recordFeed").innerHTML = records.slice(-20).reverse().map(r=>`
+
+  document.getElementById("recordFeed").innerHTML =
+    records
+    .slice(-20)
+    .reverse()
+    .map(r=>`
+
     <div class="item record">
-      <strong>?? Nouveau record : ${fmtLap(r.lap)}</strong>
-      <small>${r.pilot} ó ${r.time}</small>
+      <strong>üèÜ Nouveau record : ${fmtLap(r.lap)}</strong>
+      <small>${r.pilot} ‚Äî ${r.time}</small>
     </div>
-  `).join("") || "<div class='item'>Aucun record dÈtectÈ depuis ouverture de la page</div>";
+
+  `).join("")
+
+  || "<div class='item'>Aucun record d√©tect√©</div>";
 }
 
 function renderSpeaker(){
-  const latest = [...getActivities()].slice(-1)[0];
+
+  const latest =
+    [...getActivities()].slice(-1)[0];
+
+  const pilots =
+    getPilots().sort((a,b)=>b.laps-a.laps);
+
+  const topPilot = pilots[0];
 
   if(!latest){
+
     document.getElementById("speakerBox").innerHTML =
-      "En attente de donnÈes live...";
+      "En attente de donn√©es live...";
+
     return;
   }
 
+  const bestLap =
+    latest.best_lap
+      ? fmtLap(latest.best_lap)
+      : "-";
+
+  const bestPilot =
+    latest.best_pilot || "pilote inconnu";
+
+  const laps =
+    latest.laps_count || 0;
+
+  const pilotCount =
+    latest.pilot_count || 0;
+
+  let recordHtml = "";
+
+  if(records.length){
+
+    const r = records[records.length - 1];
+
+    recordHtml = `
+      <div class="speaker-alert">
+        üèÜ Nouveau record d√©tect√© :
+        ${r.pilot} en ${fmtLap(r.lap)}
+      </div>
+    `;
+  }
+
   document.getElementById("speakerBox").innerHTML = `
-    DerniËre session dÈtectÈe :<br>
-    <strong>${latest.date_fr || latest.date}</strong><br>
-    ${latest.laps_count || 0} tours enregistrÈs.<br>
-    Meilleur tour :
-    <strong>${fmtLap(latest.best_lap)}</strong>
+
+    ${recordHtml}
+
+    <div class="speaker-title">
+      üéôÔ∏è Speaker Mode
+    </div>
+
+    <div class="speaker-line">
+      Derni√®re session d√©tect√©e :
+      <strong>${latest.date_fr || latest.date}</strong>
+    </div>
+
+    <div class="speaker-line">
+      <strong>${laps}</strong> tours enregistr√©s
+      avec <strong>${pilotCount}</strong> pilotes.
+    </div>
+
+    <div class="speaker-line">
+      Meilleur chrono :
+      <strong>${bestLap}</strong>
+      par
+      <strong>${bestPilot}</strong>
+    </div>
+
     ${
-      latest.best_pilot
-        ? "par <strong>" + latest.best_pilot + "</strong>"
-        : ""
+      topPilot
+      ?
+      `
+      <div class="speaker-line">
+        üî• Pilote le plus actif :
+        <strong>${topPilot.name}</strong>
+        avec
+        <strong>${topPilot.laps}</strong>
+        tours.
+      </div>
+      `
+      :
+      ""
     }
+
+    <div class="speaker-script">
+      ‚ÄúSession mise √† jour au MRCP.
+      ${laps} tours enregistr√©s.
+      Meilleur chrono pour ${bestPilot}
+      en ${bestLap}.
+      ${
+        topPilot
+        ?
+        "Le pilote le plus actif est " +
+        topPilot.name +
+        " avec " +
+        topPilot.laps +
+        " tours."
+        :
+        ""
+      }‚Äù
+    </div>
+
   `;
 }
 
 function renderPilots(filter=""){
-  const pilots = getPilots()
-    .filter(p=>p.name.toLowerCase().includes(filter.toLowerCase()))
+
+  const pilots =
+    getPilots()
+    .filter(p=>
+      p.name
+      .toLowerCase()
+      .includes(filter.toLowerCase())
+    )
     .sort((a,b)=>b.laps-a.laps)
     .slice(0,100);
 
-  document.getElementById("pilotList").innerHTML = pilots.map(p=>`
+  document.getElementById("pilotList").innerHTML =
+    pilots.map(p=>`
+
     <div class="pilot-card">
       <strong>${p.name}</strong>
       <span>${p.laps} tours</span>
       <span>${fmtLap(p.best)}</span>
       <span>${p.sessions} sessions</span>
     </div>
-  `).join("") || "<div class='item'>Aucun pilote trouvÈ</div>";
+
+  `).join("")
+
+  || "<div class='item'>Aucun pilote trouv√©</div>";
 }
 
 function detectRecord(){
+
   const activities = getActivities();
 
   activities.forEach(a=>{
-    if(a.best_lap && (!bestKnownLap || a.best_lap < bestKnownLap)){
+
+    if(
+      a.best_lap &&
+      (
+        !bestKnownLap ||
+        a.best_lap < bestKnownLap
+      )
+    ){
+
       bestKnownLap = a.best_lap;
+
       records.push({
         lap:a.best_lap,
         pilot:a.best_pilot || "Pilote inconnu",
         time:nowText()
       });
     }
+
   });
 }
 
 async function loadData(){
+
   try{
-    const res = await fetch("data_v2.json?ts=" + Date.now());
+
+    const res =
+      await fetch(
+        "data_v2.json?ts=" + Date.now()
+      );
+
     data = await res.json();
 
     const sig = makeSignature();
 
-    if(previousSignature && previousSignature !== sig){
+    if(
+      previousSignature &&
+      previousSignature !== sig
+    ){
       detectRecord();
     }
 
@@ -200,37 +333,75 @@ async function loadData(){
 
     previousSignature = sig;
 
-    document.getElementById("liveDot").classList.add("ok");
-    document.getElementById("liveStatus").textContent = "Live connectÈ";
-    document.getElementById("lastUpdate").textContent =
-      "DerniËre mise ‡ jour : " + nowText();
+    document
+      .getElementById("liveDot")
+      .classList.add("ok");
+
+    document
+      .getElementById("liveStatus")
+      .textContent = "Live connect√©";
+
+    document
+      .getElementById("lastUpdate")
+      .textContent =
+        "Derni√®re mise √† jour : " +
+        nowText();
 
     renderLive();
     renderRecords();
     renderSpeaker();
-    renderPilots(document.getElementById("pilotSearch").value || "");
+
+    renderPilots(
+      document.getElementById("pilotSearch").value || ""
+    );
 
   }catch(e){
-    document.getElementById("liveDot").classList.remove("ok");
-    document.getElementById("liveStatus").textContent = "Erreur donnÈes";
-    console.error("Erreur chargement data_v2.json", e);
+
+    document
+      .getElementById("liveDot")
+      .classList.remove("ok");
+
+    document
+      .getElementById("liveStatus")
+      .textContent = "Erreur donn√©es";
+
+    console.error(e);
   }
 }
 
-document.querySelectorAll("nav button").forEach(btn=>{
+document
+.querySelectorAll("nav button")
+.forEach(btn=>{
+
   btn.addEventListener("click",()=>{
-    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+
+    document
+    .querySelectorAll("nav button")
+    .forEach(b=>b.classList.remove("active"));
+
+    document
+    .querySelectorAll(".view")
+    .forEach(v=>v.classList.remove("active"));
 
     btn.classList.add("active");
-    document.getElementById("view-" + btn.dataset.view).classList.add("active");
+
+    document
+    .getElementById(
+      "view-" + btn.dataset.view
+    )
+    .classList.add("active");
   });
+
 });
 
-document.getElementById("pilotSearch").addEventListener("input",e=>{
+document
+.getElementById("pilotSearch")
+.addEventListener("input",e=>{
+
   renderPilots(e.target.value);
+
 });
 
 loadData();
+
 setInterval(loadData,15000);
-JS
