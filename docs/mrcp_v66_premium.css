@@ -1,0 +1,130 @@
+
+:root{
+  --mrcp-bg:#050814;
+  --mrcp-panel:rgba(255,255,255,.085);
+  --mrcp-border:rgba(255,255,255,.14);
+  --mrcp-blue:#3557ff;
+  --mrcp-gold:#ffe680;
+  --mrcp-muted:#b8c7ff;
+}
+
+body{
+  background:
+    radial-gradient(circle at top left,rgba(53,87,255,.28),transparent 34%),
+    radial-gradient(circle at top right,rgba(255,216,74,.14),transparent 28%),
+    var(--mrcp-bg)!important;
+}
+
+header{
+  box-shadow:0 18px 60px rgba(0,0,0,.28);
+}
+
+nav{
+  flex-wrap:wrap;
+}
+
+nav button,
+nav a{
+  transition:.18s ease;
+}
+
+nav button:hover,
+nav a:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.15);
+}
+
+.item,
+.pilot-card,
+.rating-card,
+.badge-card,
+.hall-card,
+.speaker-box{
+  backdrop-filter:blur(12px);
+  box-shadow:0 14px 40px rgba(0,0,0,.22);
+}
+
+.mrcp-home-link{
+  position:fixed;
+  left:18px;
+  bottom:18px;
+  z-index:99999;
+  background:rgba(255,255,255,.12);
+  color:white;
+  text-decoration:none;
+  padding:12px 16px;
+  border-radius:999px;
+  font-weight:bold;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 30px rgba(0,0,0,.28);
+}
+
+.mrcp-version-pill{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:99999;
+  background:rgba(53,87,255,.24);
+  color:#dce4ff;
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:13px;
+  border:1px solid rgba(255,255,255,.14);
+}
+
+@media(max-width:900px){
+  .live-app{
+    padding:12px!important;
+  }
+
+  header{
+    padding:18px!important;
+    border-radius:18px!important;
+  }
+
+  h1{
+    font-size:28px!important;
+  }
+
+  h2{
+    font-size:24px!important;
+  }
+
+  nav{
+    display:grid!important;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px!important;
+  }
+
+  nav button,
+  nav a{
+    width:100%;
+    text-align:center;
+    padding:13px 10px!important;
+    font-size:14px!important;
+  }
+
+  .stats,
+  .big-stats,
+  .cards-grid,
+  .hall-grid{
+    grid-template-columns:1fr!important;
+  }
+
+  .rating-card,
+  .pilot-card{
+    grid-template-columns:1fr!important;
+  }
+
+  .speaker-box{
+    font-size:22px!important;
+  }
+
+  .mrcp-home-link,
+  .mrcp-version-pill{
+    position:static;
+    display:block;
+    margin:16px 0 0;
+    text-align:center;
+  }
+}
