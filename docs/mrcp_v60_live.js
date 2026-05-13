@@ -254,7 +254,9 @@ function renderSpeaker(){
   `;
 }
 
-function renderPilots(filter=""){
+function renderRating();
+
+    renderPilots(filter=""){
 
   const pilots =
     getPilots()
@@ -280,6 +282,123 @@ function renderPilots(filter=""){
 
   || "<div class='item'>Aucun pilote trouvé</div>";
 }
+
+
+
+function computeRating(){
+
+  const pilots = getPilots();
+
+  if(!pilots.length){
+    return [];
+  }
+
+  let globalBest = null;
+
+  pilots.forEach(p=>{
+    if(p.best && (!globalBest || p.best < globalBest)){
+      globalBest = p.best;
+    }
+  });
+
+  return pilots.map(p=>{
+
+    const bestScore =
+      p.best && globalBest
+      ? Math.max(
+          0,
+          400 - ((p.best - globalBest) * 100)
+        )
+      : 0;
+
+    const activityScore =
+      Math.min(250, p.laps * 0.4);
+
+    const sessionScore =
+      Math.min(150, p.sessions * 5);
+
+    const regularityScore =
+      p.best
+      ? Math.max(
+          0,
+          200 - (p.best * 2)
+        )
+      : 0;
+
+    const total =
+      Math.round(
+        bestScore +
+        activityScore +
+        sessionScore +
+        regularityScore
+      );
+
+    return {
+      ...p,
+      rating:total
+    };
+
+  })
+  .sort((a,b)=>b.rating-a.rating);
+}
+
+function renderRating(){
+
+  const ranking =
+    computeRating().slice(0,50);
+
+  document.getElementById("ratingList").innerHTML =
+    ranking.map((p,i)=>`
+
+    <div class="rating-card">
+
+      <div class="rating-rank">
+        #${i+1}
+      </div>
+
+      <div>
+        <div class="rating-name">
+          ${p.name}
+        </div>
+
+        <div class="rating-small">
+          ${p.sessions} sessions
+        </div>
+      </div>
+
+      <div>
+        <div class="rating-score">
+          ${p.rating}
+        </div>
+
+        <div class="rating-small">
+          MRCP pts
+        </div>
+      </div>
+
+      <div>
+        <strong>${p.laps}</strong><br>
+        <span class="rating-small">tours</span>
+      </div>
+
+      <div>
+        <strong>${fmtLap(p.best)}</strong><br>
+        <span class="rating-small">best</span>
+      </div>
+
+      <div>
+        <span class="rating-small">
+          activité club
+        </span>
+      </div>
+
+    </div>
+
+  `).join("")
+  ||
+  "<div class='item'>Aucun pilote</div>";
+}
+
 
 function detectRecord(){
 
@@ -351,6 +470,8 @@ async function loadData(){
     renderRecords();
     renderSpeaker();
 
+    renderRating();
+
     renderPilots(
       document.getElementById("pilotSearch").value || ""
     );
@@ -398,7 +519,9 @@ document
 .getElementById("pilotSearch")
 .addEventListener("input",e=>{
 
-  renderPilots(e.target.value);
+  renderRating();
+
+    renderPilots(e.target.value);
 
 });
 

@@ -151,3 +151,49 @@ footer{
   font-size:24px;
   color:#ffffff;
 }
+
+
+.rating-list{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.rating-card{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;
+  padding:18px;
+  display:grid;
+  grid-template-columns:80px 1fr 120px 120px 120px 120px;
+  align-items:center;
+  gap:12px;
+}
+
+.rating-rank{
+  font-size:34px;
+  font-weight:bold;
+}
+
+.rating-name{
+  font-size:22px;
+  font-weight:bold;
+}
+
+.rating-score{
+  font-size:28px;
+  color:#ffe680;
+  font-weight:bold;
+}
+
+.rating-small{
+  color:#b8c7ff;
+}
+
+@media(max-width:900px){
+
+  .rating-card{
+    grid-template-columns:1fr;
+  }
+
+}
