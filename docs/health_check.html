@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>MRCP Health Check</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="mrcp_v66_premium.css">
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;color:white;padding:24px}
+    .box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:20px;margin-bottom:16px}
+    .ok{color:#2cff8f}
+    .warn{color:#ffe680}
+    .bad{color:#ff6b6b}
+    h1{margin-top:0}
+  </style>
+</head>
+<body>
+  <h1>🩺 MRCP Health Check</h1>
+
+  <div class="box">
+    <h2>État données</h2>
+    <div id="status">Chargement...</div>
+  </div>
+
+  <div class="box">
+    <h2>Résumé</h2>
+    <div id="summary"></div>
+  </div>
+
+  <div class="box">
+    <h2>Liens rapides</h2>
+    <p><a href="index_v2.html">Dashboard principal</a></p>
+    <p><a href="live_center.html">Live Center</a></p>
+    <p><a href="tv_paddock.html">TV Paddock</a></p>
+    <p><a href="pilot_v65.html">Profil pilote</a></p>
+  </div>
+
+<script>
+function fmt(n){return Number(n||0).toLocaleString("fr-FR")}
+
+fetch("data_v2.json?ts="+Date.now())
+.then(r=>r.json())
+.then(data=>{
+  const activities = data.activities || [];
+  const pilots = data.pilots_count || 0;
+  const laps = data.laps_count || activities.reduce((s,a)=>s+(a.laps_count||0),0);
+  const quality = data.quality_score ?? "-";
+
+  document.getElementById("status").innerHTML =
+    "<span class='ok'>✅ data_v2.json chargé correctement</span>";
+
+  document.getElementById("summary").innerHTML = `
+    <p>Sessions : <strong>${fmt(activities.length)}</strong></p>
+    <p>Pilotes : <strong>${fmt(pilots)}</strong></p>
+    <p>Tours : <strong>${fmt(laps)}</strong></p>
+    <p>Qualité : <strong>${quality}</strong></p>
+    <p>Dernier contrôle : <strong>${new Date().toLocaleString("fr-FR")}</strong></p>
+  `;
+})
+.catch(e=>{
+  document.getElementById("status").innerHTML =
+    "<span class='bad'>❌ Impossible de charger data_v2.json</span>";
+  document.getElementById("summary").innerHTML =
+    "<p>Vérifie que data_v2.json existe dans /docs et que GitHub Pages est à jour.</p>";
+});
+</script>
+</body>
+</html>
