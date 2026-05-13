@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>MRCP Live Center V6</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="mrcp_v60_live.css">
+</head>
+<body>
+  <div class="live-app">
+    <header>
+      <div>
+        <h1>MRCP LIVE CENTER</h1>
+        <p>V6.0 — live timing intelligent</p>
+      </div>
+      <div class="status">
+        <span id="liveDot"></span>
+        <strong id="liveStatus">Connexion données...</strong>
+      </div>
+    </header>
+
+    <nav>
+      <button class="active" data-view="live">Live</button>
+      <button data-view="records">Records</button>
+      <button data-view="speaker">Speaker</button>
+      <button data-view="pilots">Pilotes</button>
+    </nav>
+
+    <main>
+      <section id="view-live" class="view active">
+        <h2>⚡ Dernière activité live</h2>
+        <div id="liveFeed" class="feed"></div>
+      </section>
+
+      <section id="view-records" class="view">
+        <h2>🏆 Records détectés</h2>
+        <div id="recordFeed" class="feed"></div>
+      </section>
+
+      <section id="view-speaker" class="view">
+        <h2>🎙️ Speaker mode</h2>
+        <div id="speakerBox" class="speaker-box"></div>
+      </section>
+
+      <section id="view-pilots" class="view">
+        <h2>📱 Pilotes live</h2>
+        <input id="pilotSearch" placeholder="Rechercher un pilote...">
+        <div id="pilotList" class="pilot-list"></div>
+      </section>
+    </main>
+
+    <footer>
+      <span id="lastUpdate">Dernière mise à jour : --</span>
+      <span>MRCP Dashboard V6.0</span>
+    </footer>
+  </div>
+
+  <script src="mrcp_v60_live.js"></script>
+</body>
+</html>
