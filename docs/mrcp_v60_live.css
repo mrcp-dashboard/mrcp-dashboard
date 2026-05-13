@@ -262,3 +262,43 @@ footer{
   background:linear-gradient(135deg,#9b59ff,#5e17eb);
 }
 
+
+
+.hall-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:22px;
+}
+
+.hall-card{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:24px;
+  padding:22px;
+}
+
+.hall-card h3{
+  margin-top:0;
+  margin-bottom:18px;
+  color:#ffe680;
+}
+
+.hall-entry{
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.hall-entry:last-child{
+  border-bottom:none;
+}
+
+.hall-name{
+  font-weight:bold;
+  font-size:18px;
+}
+
+.hall-value{
+  color:#b8c7ff;
+  margin-top:4px;
+}
+

@@ -383,6 +383,112 @@ function renderBadges(){
 }
 
 
+
+
+function renderHallOfFame(){
+
+  const pilots = computeRating();
+
+  if(!pilots.length){
+    return;
+  }
+
+  // --------------------
+  // RECORDS
+  // --------------------
+
+  const bestLapPilot =
+    [...pilots]
+    .filter(p=>p.best)
+    .sort((a,b)=>a.best-b.best)[0];
+
+  document.getElementById("hallRecords").innerHTML = `
+    <div class="hall-entry">
+      <div class="hall-name">
+        ${bestLapPilot?.name || "-"}
+      </div>
+
+      <div class="hall-value">
+        ${fmtLap(bestLapPilot?.best)}
+      </div>
+    </div>
+  `;
+
+  // --------------------
+  // LAPS
+  // --------------------
+
+  document.getElementById("hallLaps").innerHTML =
+    [...pilots]
+    .sort((a,b)=>b.laps-a.laps)
+    .slice(0,5)
+    .map(p=>`
+
+      <div class="hall-entry">
+
+        <div class="hall-name">
+          ${p.name}
+        </div>
+
+        <div class="hall-value">
+          ${p.laps} tours
+        </div>
+
+      </div>
+
+    `).join("");
+
+  // --------------------
+  // RATING
+  // --------------------
+
+  document.getElementById("hallRating").innerHTML =
+    [...pilots]
+    .sort((a,b)=>b.rating-a.rating)
+    .slice(0,5)
+    .map(p=>`
+
+      <div class="hall-entry">
+
+        <div class="hall-name">
+          ${p.name}
+        </div>
+
+        <div class="hall-value">
+          ${p.rating} MRCP pts
+        </div>
+
+      </div>
+
+    `).join("");
+
+  // --------------------
+  // CONSISTENCY
+  // --------------------
+
+  document.getElementById("hallConsistency").innerHTML =
+    [...pilots]
+    .filter(p=>p.sessions >= 5)
+    .sort((a,b)=>a.best-b.best)
+    .slice(0,5)
+    .map(p=>`
+
+      <div class="hall-entry">
+
+        <div class="hall-name">
+          ${p.name}
+        </div>
+
+        <div class="hall-value">
+          ${fmtLap(p.best)}
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
 function detectRecord(){
   const activities = getActivities();
 
@@ -429,7 +535,9 @@ async function loadData(){
     renderPilots(document.getElementById("pilotSearch")?.value || "");
     renderRating();
     renderBadges();
+    renderHallOfFame();
     renderBadges();
+    renderHallOfFame();
 
   }catch(e){
     const dot = document.getElementById("liveDot");
