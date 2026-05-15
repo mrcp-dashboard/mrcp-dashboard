@@ -20,6 +20,7 @@ py -m http.server 8000
 
 Ouvrir ensuite :
 
+- `http://localhost:8000/` pour l'entree par defaut
 - `http://localhost:8000/index_v2.html` pour le dashboard principal
 - `http://localhost:8000/live_center.html` pour le Live Center
 - `http://localhost:8000/pilot_v65.html` pour les profils pilotes
