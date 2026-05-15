@@ -693,7 +693,15 @@ function livePage(){
 
 
 function adminOnly(title, body){if(!state.isAdmin){app.innerHTML='<section class="card"><h2>Accès admin</h2><p>Page réservée à l’administrateur.</p></section>';return false;}app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2>'+body+'</section>';return true;}
-function suspiciousLaps(){return getAllLapsRaw(true).filter(function(l){if(l._excluded)return true;if(l._time<8)return true;if(l._time>=30&&l._time<=45&&l._track==='TT1/8')return true;if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu')return true;return false;}).sort(function(a,b){return a._time-b._time;});}
+function lapSuspicionReasons(l){
+  var reason=[];
+  if(l._excluded) reason.push('exclu');
+  if(l._time<8) reason.push('< 8s');
+  if(l._time>=30&&l._time<=45&&l._track==='TT1/8') reason.push('30-45s TT1/8');
+  if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu'||/^[0-9]+/.test(String(l._pilot))) reason.push('pilote inconnu');
+  return reason;
+}
+function suspiciousLaps(){return getAllLapsRaw(true).filter(function(l){return lapSuspicionReasons(l).length>0;}).sort(function(a,b){return a._time-b._time;});}
 function downloadJson(filename,obj){var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
 function qualityGroupKey(l, type){
   return type==='session' ? (l.session_id||l.session_name||l._date||'session') : (normalizeTransponder(l.transponder)||'sans-puce');
@@ -731,11 +739,7 @@ function adminRecords(){
   var sessionGroups=qualityGroups(laps, 'session');
 
   var rows=laps.slice(0,500).map(function(l){
-    var reason=[];
-    if(l._excluded) reason.push('exclu');
-    if(l._time<8) reason.push('< 8s');
-    if(l._time>=30&&l._time<=45&&l._track==='TT1/8') reason.push('30-45s TT1/8');
-    if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu'||/^[0-9]+/.test(String(l._pilot))) reason.push('pilote inconnu');
+    var reason=lapSuspicionReasons(l);
 
     return '<tr data-lap-id="'+escapeHtml(l.lap_id)+'" data-search="'+escapeHtml((l._pilot+' '+l.transponder+' '+l.session_name+' '+l._track+' '+reason.join(' ')).toLowerCase())+'">' +
       '<td data-label="ID tour"><code>'+escapeHtml(l.lap_id)+'</code></td>' +
@@ -924,7 +928,67 @@ function adminRecords(){
     });
   };
 }
-function quality(){adminOnly('Qualité données','<div class="grid"><div class="card"><h3>Tours suspects</h3><div class="big">'+suspiciousLaps().length+'</div></div><div class="card"><h3>Tours lus</h3><div class="big">'+getAllLaps().length+'</div></div></div><p><a href="#/admin-records" class="btn-primary">Corriger les tours suspects</a></p>');}
+function qualityTrackStats(laps){
+  var map={};
+  laps.forEach(function(l){
+    var track=l._track||'unknown';
+    if(!map[track])map[track]={track:track,laps:0,pilots:{},best:null,sum:0};
+    map[track].laps++;
+    map[track].pilots[l._pilot]=true;
+    map[track].sum+=l._time;
+    if(!map[track].best||l._time<map[track].best._time)map[track].best=l;
+  });
+  return Object.values(map).sort(function(a,b){return a.track.localeCompare(b.track);});
+}
+function qualityReasonStats(laps){
+  var map={};
+  laps.forEach(function(l){
+    lapSuspicionReasons(l).forEach(function(reason){map[reason]=(map[reason]||0)+1;});
+  });
+  return Object.keys(map).sort(function(a,b){return map[b]-map[a];}).map(function(k){return{reason:k,count:map[k]};});
+}
+function qualityGroupRows(groups, type){
+  if(!groups.length)return '<p class="small">Aucun groupe prioritaire.</p>';
+  return '<div class="table-wrap"><table><thead><tr><th>'+escapeHtml(type==='session'?'Session':'Puce')+'</th><th>Tours</th><th>Pistes</th><th>Pilotes vus</th><th>Meilleur</th></tr></thead><tbody>'+
+    groups.slice(0,8).map(function(g){
+      return '<tr><td><strong>'+escapeHtml(g.label)+'</strong></td><td>'+g.laps.length+'</td><td>'+escapeHtml(Object.keys(g.tracks).join(' / ')||'-')+'</td><td>'+escapeHtml(Object.keys(g.pilots).slice(0,4).join(' / ')||'-')+'</td><td>'+fmtTimeS(g.best&&g.best._time)+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function quality(){
+  var all=getAllLapsRaw(true);
+  var active=getAllLaps();
+  var suspect=suspiciousLaps();
+  var o=getOverrides();
+  var reasons=qualityReasonStats(suspect);
+  var tracks=qualityTrackStats(active);
+  var puceGroups=qualityGroups(suspect.filter(function(l){return normalizeTransponder(l.transponder);}), 'transponder');
+  var sessionGroups=qualityGroups(suspect, 'session');
+  var unknownPilots=active.filter(function(l){return l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu'||/^[0-9]+/.test(String(l._pilot));}).length;
+  var fastLaps=active.filter(function(l){return l._time<8;}).length;
+  var corrected=Object.keys(o.excluded).length+Object.keys(o.forced_track).length;
+
+  var reasonHtml=reasons.length?'<div class="quality-reason-grid">'+reasons.map(function(r){
+    return '<div><span class="small">'+escapeHtml(r.reason)+'</span><strong>'+r.count+'</strong></div>';
+  }).join('')+'</div>':'<p class="small">Aucune raison suspecte detectee.</p>';
+
+  var trackRows=tracks.map(function(t){
+    return '<tr><td><span class="badge">'+escapeHtml(t.track)+'</span></td><td>'+t.laps+'</td><td>'+Object.keys(t.pilots).length+'</td><td><strong>'+fmtTimeS(t.best&&t.best._time)+'</strong><div class="small">'+escapeHtml((t.best&&t.best._pilot)||'-')+'</div></td><td>'+fmtTimeS(t.sum/t.laps)+'</td></tr>';
+  }).join('');
+
+  adminOnly('Qualite donnees',
+    '<div class="grid">' +
+      '<div class="card"><h3>Tours suspects</h3><div class="big">'+suspect.length+'</div><p class="small">A traiter dans Records admin</p></div>' +
+      '<div class="card"><h3>Tours actifs</h3><div class="big">'+active.length+'</div><p class="small">'+all.length+' tours lus au total</p></div>' +
+      '<div class="card"><h3>Corrections locales</h3><div class="big">'+corrected+'</div><p class="small">'+Object.keys(o.excluded).length+' exclusions, '+Object.keys(o.forced_track).length+' pistes forcees</p></div>' +
+      '<div class="card"><h3>Pilotes inconnus</h3><div class="big">'+unknownPilots+'</div><p class="small">'+fastLaps+' tours sous 8s</p></div>' +
+    '</div>' +
+    '<p><a href="#/admin-records" class="btn-primary">Corriger les tours suspects</a> <a href="#/admin-pilotes" class="btn-secondary">Associer les pilotes</a></p>' +
+    '<section class="admin-history"><div class="panel-title"><h2>Raisons detectees</h2></div>'+reasonHtml+'</section>' +
+    '<section class="admin-history"><div class="panel-title"><h2>Etat par piste</h2></div><div class="table-wrap"><table><thead><tr><th>Piste</th><th>Tours</th><th>Pilotes</th><th>Meilleur</th><th>Moyenne</th></tr></thead><tbody>'+trackRows+'</tbody></table></div></section>' +
+    '<section class="admin-history"><div class="panel-title"><h2>Puces a verifier</h2></div>'+qualityGroupRows(puceGroups,'transponder')+'</section>' +
+    '<section class="admin-history"><div class="panel-title"><h2>Sessions a verifier</h2></div>'+qualityGroupRows(sessionGroups,'session')+'</section>'
+  );
+}
 function getPilotCorrections(){
   try{
     var raw=JSON.parse(localStorage.getItem('mrcp_pilot_corrections')||'{}');

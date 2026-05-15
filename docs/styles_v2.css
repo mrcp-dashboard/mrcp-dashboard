@@ -514,6 +514,23 @@ textarea.admin-json{width:100%;min-height:220px}
   flex-shrink:0;
   justify-content:flex-end;
 }
+.quality-reason-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.quality-reason-grid>div{
+  min-width:0;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  background:rgba(0,0,0,.14);
+  padding:12px;
+}
+.quality-reason-grid strong{
+  display:block;
+  margin-top:4px;
+  font-size:28px;
+}
 .status-ok{
   color:var(--green);
 }
@@ -552,6 +569,9 @@ textarea.admin-json{width:100%;min-height:220px}
   }
   .quality-group .admin-actions{
     display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .quality-reason-grid{
     grid-template-columns:1fr 1fr;
   }
   .admin-preview{
