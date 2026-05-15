@@ -364,6 +364,40 @@ function pilotConsistency(stats){
   return Math.sqrt(variance);
 }
 
+function pilotTrackTarget(stats, track){
+  var best = pilotBestByTrack(stats, track);
+  var club = clubBest(track);
+  var laps = stats.laps.filter(function(l){return l._track===track;});
+  if(!best || !club || !laps.length) return null;
+
+  var gap = best._time - club._time;
+  var gain = gap > 1 ? 0.5 : (gap > 0.35 ? 0.2 : 0.1);
+  var target = gap <= 0 ? best._time : Math.max(club._time, best._time - gain);
+  var avg = laps.reduce(function(sum,l){return sum+l._time;},0)/laps.length;
+  var consistency = Math.sqrt(laps.reduce(function(sum,l){return sum+Math.pow(l._time-avg,2);},0)/laps.length);
+  var message = gap <= 0 ? 'Record club actuel' : (gap <= 0.35 ? 'Objectif record a portee' : 'Prochain palier realiste');
+
+  return {track:track,best:best,club:club,gap:gap,target:target,avg:avg,consistency:consistency,laps:laps.length,message:message};
+}
+
+function pilotTargetsHtml(stats){
+  var targets=['TT1/8','TT1/10'].map(function(track){return pilotTrackTarget(stats,track);}).filter(Boolean);
+  if(!targets.length)return '<p class="small">Pas encore assez de chronos par piste pour proposer des objectifs.</p>';
+  return '<div class="target-grid">'+targets.map(function(t){
+    var gapText=t.gap<=0?'+'+fmtTimeS(Math.abs(t.gap))+' sur le record':'-'+fmtTimeS(t.gap)+' du record';
+    return '<div class="target-card">' +
+      '<div class="target-head"><span class="badge">'+escapeHtml(t.track)+'</span><strong>'+escapeHtml(t.message)+'</strong></div>' +
+      '<div class="target-time">'+fmtTimeS(t.target)+'</div>' +
+      '<div class="target-meta">' +
+        '<span>Best '+fmtTimeS(t.best._time)+'</span>' +
+        '<span>Record '+fmtTimeS(t.club._time)+'</span>' +
+        '<span>'+escapeHtml(gapText)+'</span>' +
+        '<span>'+t.laps+' tours, regul. '+fmtTimeS(t.consistency)+'</span>' +
+      '</div>' +
+    '</div>';
+  }).join('')+'</div>';
+}
+
 function pilotAiInsights(stats){
   var sessions = pilotSessions(stats).slice().reverse();
   var insights = [];
@@ -477,6 +511,11 @@ function pilotFullProfileHtml(name){
     '<div class="card"><h3>Sessions</h3><div class="big">'+s.sessions+'</div></div>' +
     '<div class="card"><h3>Écart record TT1/8</h3><div class="big">'+(gap18!=null?fmtTimeS(gap18):'-')+'</div></div>' +
     '<div class="card"><h3>Écart record TT1/10</h3><div class="big">'+(gap10!=null?fmtTimeS(gap10):'-')+'</div></div>' +
+  '</section>' +
+
+  '<section class="card">' +
+    '<div class="panel-title"><h3>Objectifs pilote</h3></div>' +
+    pilotTargetsHtml(s) +
   '</section>' +
 
   '<section class="card ai-card">' +

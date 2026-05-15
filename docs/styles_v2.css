@@ -155,6 +155,43 @@ textarea.admin-json{width:100%;min-height:220px}
 .goal-box{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
 .goal-pill{background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
 .goal-pill strong{display:block;font-size:22px}
+.target-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.target-card{
+  min-width:0;
+  border:1px solid rgba(78,166,255,.22);
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(15,133,255,.12), rgba(0,0,0,.16));
+  padding:14px;
+}
+.target-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.target-head strong{
+  color:var(--muted);
+  font-size:13px;
+  text-align:right;
+}
+.target-time{
+  font-size:30px;
+  font-weight:1000;
+  line-height:1.05;
+  margin:6px 0 10px;
+}
+.target-meta{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px 10px;
+  color:var(--muted);
+  font-size:12px;
+}
 .progress-wrap{width:100%;height:220px;margin-top:8px}
 .progress-svg{width:100%;height:100%;overflow:visible}
 .progress-line{fill:none;stroke:var(--cyan);stroke-width:3}
@@ -186,6 +223,8 @@ textarea.admin-json{width:100%;min-height:220px}
   .hero-card{padding:18px;min-height:0}
   .hero-card h1{font-size:26px}.hero-card p{font-size:14px}
   .kpi-grid,.grid{grid-template-columns:1fr 1fr;gap:10px}
+  .target-grid{grid-template-columns:1fr}
+  .target-meta{grid-template-columns:1fr}
   .kpi,.card{border-radius:16px;padding:14px}
   .kpi-card{padding:14px}
   .kpi{min-height:70px}
