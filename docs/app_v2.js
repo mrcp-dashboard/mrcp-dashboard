@@ -627,6 +627,49 @@ function podiums(){
   bindFilters(podiums);
 }
 
+function reportTopRows(rows, limit){
+  return rows.slice(0,limit||5).map(function(r,i){
+    return '<tr><td>'+(i+1)+'</td><td><a href="#/pilote/'+encodeURIComponent(r._pilot)+'">'+escapeHtml(r._pilot)+'</a></td><td><strong>'+fmtTimeS(r._time)+'</strong></td><td><span class="badge">'+escapeHtml(r._track)+'</span></td><td>'+escapeHtml(r._date||r.session_name||'-')+'</td></tr>';
+  }).join('');
+}
+function reportActivityRows(activities){
+  if(!activities.length)return '<p class="small">Aucune activite disponible.</p>';
+  return '<div class="report-activity-list">'+activities.map(function(a){
+    return '<div class="report-activity-item"><strong>'+escapeHtml(a.date||a.name)+'</strong><span>'+a.laps+' tours</span><span>'+Object.keys(a.pilots).length+' pilotes</span><span>'+escapeHtml(Object.keys(a.tracks).join(' / ')||'-')+'</span></div>';
+  }).join('')+'</div>';
+}
+function reportPage(){
+  var laps=getAllLaps();
+  var all=getAllLapsRaw(true);
+  var activities=latestActivities();
+  var bestAll=bestByPilot(laps);
+  var best10=bestByPilot(laps.filter(function(l){return l._track==='TT1/10';}));
+  var best18=bestByPilot(laps.filter(function(l){return l._track==='TT1/8';}));
+  var latest=activities[0];
+  var generated=new Date().toLocaleString('fr-FR');
+
+  app.innerHTML=
+    '<section class="report-hero card">' +
+      '<div><h1>Rapport club MRCP</h1><p class="small">Genere le '+escapeHtml(generated)+' depuis les donnees du dashboard.</p></div>' +
+      '<button id="printReport" class="btn-primary">Imprimer</button>' +
+    '</section>' +
+    '<section class="report-grid">' +
+      '<div class="card"><h3>Tours actifs</h3><div class="big">'+laps.length.toLocaleString('fr-FR')+'</div><p class="small">'+all.length.toLocaleString('fr-FR')+' tours lus au total</p></div>' +
+      '<div class="card"><h3>Pilotes classes</h3><div class="big">'+bestAll.length+'</div><p class="small">avec au moins un chrono actif</p></div>' +
+      '<div class="card"><h3>Derniere activite</h3><div class="big">'+escapeHtml(latest?String(latest.laps):'-')+'</div><p class="small">'+escapeHtml(latest?(latest.date||latest.name):'Aucune')+'</p></div>' +
+      '<div class="card"><h3>Qualite</h3><div class="big">'+suspiciousLaps().length+'</div><p class="small">tours suspects restants</p></div>' +
+    '</section>' +
+    '<section class="card"><div class="panel-title"><h2>Records par piste</h2></div>'+podiumTrackSummaryHtml(laps)+'</section>' +
+    '<section class="report-columns">' +
+      '<div class="card"><h2>Top TT1/10</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Date</th></tr></thead><tbody>'+reportTopRows(best10,8)+'</tbody></table></div></div>' +
+      '<div class="card"><h2>Top TT1/8</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Date</th></tr></thead><tbody>'+reportTopRows(best18,8)+'</tbody></table></div></div>' +
+    '</section>' +
+    '<section class="card"><div class="panel-title"><h2>Dernieres activites</h2></div>'+reportActivityRows(activities)+'</section>';
+
+  var print=document.getElementById('printReport');
+  if(print)print.onclick=function(){window.print();};
+}
+
 
 var liveTimer = null;
 
@@ -1235,7 +1278,7 @@ function adminPage(){
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live')===0)return livePage();
-    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
+    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/rapport')===0)return reportPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
     var current=getAdminConfig();
