@@ -569,7 +569,7 @@ function latestSessionLaps(){
   });
 
   var sessions = Object.values(groups).sort(function(a,b){
-    return String(b.date || b.sessionName).localeCompare(String(a.date || a.sessionName));
+    return (parseDateValue(b.date || b.sessionName)-parseDateValue(a.date || a.sessionName))||String(b.sessionName).localeCompare(String(a.sessionName));
   });
 
   return sessions[0] || {sessionName:'Aucune activité', date:'', laps:[]};
@@ -600,6 +600,12 @@ function liveRanking(sessionLaps){
   return Array.from(map.values()).sort(function(a,b){return a.best-b.best;});
 }
 
+function liveTrackCounts(laps){
+  var counts={};
+  laps.forEach(function(l){var track=l._track||'Non classe';counts[track]=(counts[track]||0)+1;});
+  return counts;
+}
+
 function renderLiveRows(rows){
   if(!rows.length){
     return '<p class="small">Aucun tour live disponible pour le moment.</p>';
@@ -625,6 +631,7 @@ function livePage(){
   var filtered = applyFilters(session.laps);
   var rows = liveRanking(filtered);
   var best = rows[0] || null;
+  var trackCounts = liveTrackCounts(session.laps);
   var lastUpdate = new Date().toLocaleTimeString('fr-FR');
 
   app.innerHTML =
@@ -636,7 +643,9 @@ function livePage(){
         '<div class="goal-box">' +
           '<div class="goal-pill"><span class="small">Activité</span><strong>'+escapeHtml(session.sessionName)+'</strong></div>' +
           '<div class="goal-pill"><span class="small">Pilotes</span><strong>'+rows.length+'</strong></div>' +
-          '<div class="goal-pill"><span class="small">Tours</span><strong>'+filtered.length+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">Tours total</span><strong>'+session.laps.length+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">TT1/8</span><strong>'+(trackCounts['TT1/8']||0)+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">TT1/10</span><strong>'+(trackCounts['TT1/10']||0)+'</strong></div>' +
         '</div>' +
         '<div class="live-refresh">' +
           '<button id="manualRefreshLive" class="btn-primary">Rafraîchir</button>' +
