@@ -112,6 +112,7 @@ main{max-width:1500px;margin:auto}
 .badge{display:inline-flex;padding:4px 10px;border-radius:8px;background:rgba(136,92,255,.25);color:#d9d0ff;font-size:12px;font-weight:800}
 .filters{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
 select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:12px}
+.searchBox{width:100%;max-width:560px;margin:8px 0 14px}
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;white-space:nowrap}th{color:#89a4d1}a{color:#9fd0ff}
 .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:end;min-height:250px;margin-top:10px}
 .step{min-height:180px;padding:18px 12px;border-radius:18px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:center}
@@ -406,6 +407,10 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
   font-size:13px;
   white-space:nowrap;
 }
+.admin-table-wrap code{
+  white-space:normal;
+  word-break:break-word;
+}
 .badge-warn{
   background:rgba(255,138,40,.22);
   color:#ffd8b2;
@@ -424,6 +429,63 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
   }
   .admin-preview{
     grid-template-columns:1fr;
+  }
+  .searchBox{
+    max-width:none;
+  }
+  .admin-table-wrap{
+    overflow:visible;
+  }
+  .admin-table-wrap table,
+  .admin-table-wrap thead,
+  .admin-table-wrap tbody,
+  .admin-table-wrap tr,
+  .admin-table-wrap th,
+  .admin-table-wrap td{
+    display:block;
+    width:100%;
+  }
+  .admin-table-wrap thead{
+    display:none;
+  }
+  .admin-table-wrap tr{
+    margin:0 0 14px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    background:rgba(255,255,255,.035);
+  }
+  .admin-table-wrap td{
+    display:grid;
+    grid-template-columns:minmax(92px,34%) 1fr;
+    gap:10px;
+    align-items:start;
+    padding:9px 0;
+    white-space:normal;
+  }
+  .admin-table-wrap td::before{
+    content:attr(data-label);
+    color:var(--muted);
+    font-size:12px;
+    font-weight:800;
+    text-transform:uppercase;
+  }
+  .admin-table-wrap td[data-label="Actions"],
+  .admin-table-wrap td[data-label="Action"]{
+    display:block;
+  }
+  .admin-table-wrap td[data-label="Actions"]::before,
+  .admin-table-wrap td[data-label="Action"]::before{
+    display:block;
+    margin-bottom:8px;
+  }
+  .admin-table-wrap .admin-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .admin-table-wrap .admin-actions button,
+  .admin-table-wrap .save-pilot-name{
+    width:100%;
   }
 }
 

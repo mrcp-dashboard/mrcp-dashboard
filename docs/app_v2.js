@@ -573,13 +573,13 @@ function adminRecords(){
     if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu'||/^[0-9]+/.test(String(l._pilot))) reason.push('pilote inconnu');
 
     return '<tr data-lap-id="'+escapeHtml(l.lap_id)+'" data-search="'+escapeHtml((l._pilot+' '+l.transponder+' '+l.session_name+' '+l._track+' '+reason.join(' ')).toLowerCase())+'">' +
-      '<td><code>'+escapeHtml(l.lap_id)+'</code></td>' +
-      '<td>'+escapeHtml(l._pilot)+'<div class="small">'+escapeHtml(l.transponder||'')+'</div></td>' +
-      '<td><strong>'+fmtTimeS(l._time)+'</strong></td>' +
-      '<td><span class="badge">'+escapeHtml(l._track)+'</span></td>' +
-      '<td>'+escapeHtml(l.session_name||l._date||'-')+'</td>' +
-      '<td>'+escapeHtml(reason.join(', ')||'-')+'</td>' +
-      '<td>' +
+      '<td data-label="ID tour"><code>'+escapeHtml(l.lap_id)+'</code></td>' +
+      '<td data-label="Pilote/Puce">'+escapeHtml(l._pilot)+'<div class="small">'+escapeHtml(l.transponder||'')+'</div></td>' +
+      '<td data-label="Temps"><strong>'+fmtTimeS(l._time)+'</strong></td>' +
+      '<td data-label="Piste"><span class="badge">'+escapeHtml(l._track)+'</span></td>' +
+      '<td data-label="Session">'+escapeHtml(l.session_name||l._date||'-')+'</td>' +
+      '<td data-label="Raison">'+escapeHtml(reason.join(', ')||'-')+'</td>' +
+      '<td data-label="Actions">' +
         '<div class="admin-actions">' +
           '<button class="record-action btn-danger" data-action="exclude" data-id="'+escapeHtml(l.lap_id)+'">Supprimer tour</button>' +
           '<button class="record-action btn-good" data-action="tt10" data-id="'+escapeHtml(l.lap_id)+'">Mettre TT1/10</button>' +
@@ -603,7 +603,7 @@ function adminRecords(){
     '<textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea>' +
     '<p><button id="importLapOverrides" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
     '<input class="searchBox" id="adminRecordSearch" placeholder="Rechercher pilote, puce, session, raison...">' +
-    '<div class="table-wrap"><table><thead><tr><th>ID tour</th><th>Pilote/Puce</th><th>Temps</th><th>Piste</th><th>Session</th><th>Raison</th><th>Actions</th></tr></thead><tbody id="adminRecordRows">'+rows+'</tbody></table></div>'
+    '<div class="table-wrap admin-table-wrap"><table><thead><tr><th>ID tour</th><th>Pilote/Puce</th><th>Temps</th><th>Piste</th><th>Session</th><th>Raison</th><th>Actions</th></tr></thead><tbody id="adminRecordRows">'+rows+'</tbody></table></div>'
   )) return;
 
   function refreshOverrideText(){
@@ -779,13 +779,13 @@ function adminPilots(){
     var names = Object.keys(r.names).join(' / ');
     var tracks = Object.keys(r.tracks).join(' / ');
     return '<tr data-search="'+escapeHtml((r.transponder+' '+names+' '+currentName).toLowerCase())+'">' +
-      '<td><strong>'+escapeHtml(r.transponder)+'</strong></td>' +
-      '<td>'+escapeHtml(names)+'</td>' +
-      '<td>'+r.laps+'</td>' +
-      '<td>'+fmtTimeS(r.best)+'</td>' +
-      '<td><span class="badge">'+escapeHtml(tracks)+'</span></td>' +
-      '<td><input class="pilot-name-input" data-tp="'+escapeHtml(r.transponder)+'" value="'+escapeHtml(currentName)+'" placeholder="Nom pilote officiel"></td>' +
-      '<td><button class="save-pilot-name btn-primary" data-tp="'+escapeHtml(r.transponder)+'">Sauver</button></td>' +
+      '<td data-label="Puce"><strong>'+escapeHtml(r.transponder)+'</strong></td>' +
+      '<td data-label="Noms vus">'+escapeHtml(names)+'</td>' +
+      '<td data-label="Tours">'+r.laps+'</td>' +
+      '<td data-label="Best">'+fmtTimeS(r.best)+'</td>' +
+      '<td data-label="Piste"><span class="badge">'+escapeHtml(tracks)+'</span></td>' +
+      '<td data-label="Nom officiel"><input class="pilot-name-input" data-tp="'+escapeHtml(r.transponder)+'" value="'+escapeHtml(currentName)+'" placeholder="Nom pilote officiel"></td>' +
+      '<td data-label="Action"><button class="save-pilot-name btn-primary" data-tp="'+escapeHtml(r.transponder)+'">Sauver</button></td>' +
     '</tr>';
   }).join('');
 
@@ -801,7 +801,7 @@ function adminPilots(){
     '<textarea class="admin-json" id="pilotCorrectionsText">'+escapeHtml(JSON.stringify(corrections,null,2))+'</textarea>' +
     '<p><button id="importPilotCorrections" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
     '<input class="searchBox" id="adminPilotSearch" placeholder="Rechercher transpondeur ou pilote...">' +
-    '<div class="table-wrap"><table><thead><tr><th>Puce</th><th>Noms vus</th><th>Tours</th><th>Best</th><th>Piste</th><th>Nom officiel</th><th>Action</th></tr></thead><tbody id="adminPilotRows">'+htmlRows+'</tbody></table></div>'
+    '<div class="table-wrap admin-table-wrap"><table><thead><tr><th>Puce</th><th>Noms vus</th><th>Tours</th><th>Best</th><th>Piste</th><th>Nom officiel</th><th>Action</th></tr></thead><tbody id="adminPilotRows">'+htmlRows+'</tbody></table></div>'
   )) return;
 
   document.querySelectorAll('.save-pilot-name').forEach(function(btn){
