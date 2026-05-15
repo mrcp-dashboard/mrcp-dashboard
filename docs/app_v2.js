@@ -76,6 +76,13 @@ function setAdminStatus(targetId, stateName, title, body){
   el.className='admin-status '+(stateName||'');
   el.innerHTML='<strong>'+escapeHtml(title)+'</strong>'+(body?'<div>'+body+'</div>':'');
 }
+function bytesText(value){
+  var n=Number(value);
+  if(!Number.isFinite(n)) return '-';
+  if(n<1024) return n+' o';
+  if(n<1024*1024) return (n/1024).toFixed(1)+' Ko';
+  return (n/1024/1024).toFixed(1)+' Mo';
+}
 function commandListHtml(commands){
   if(!Array.isArray(commands)||!commands.length) return '';
   return '<details><summary>Details techniques</summary><ol>'+commands.map(function(c){
@@ -135,6 +142,32 @@ async function loadAdminBackups(){
     box.innerHTML='<div class="admin-status warn"><strong>Sauvegardes indisponibles</strong><div>'+escapeHtml(e.message)+'</div></div>';
   }
 }
+function adminStatusHtml(status){
+  var git=status.git||{}, files=status.files||{}, data=files.data_v2||{};
+  var gitState=git.dirty?'Modifs locales':'Propre';
+  var dataText=data.exists ? bytesText(data.size)+' - '+(data.modified||'date inconnue') : 'Manquant';
+  var latest=status.latest_history?status.latest_history.message||status.latest_history.status:'Aucune action';
+  return '<div class="admin-diagnostic-grid">' +
+    '<div><span class="small">API</span><strong>'+escapeHtml(status.service||'admin')+'</strong><small>'+escapeHtml(status.time||'')+'</small></div>' +
+    '<div><span class="small">Git</span><strong>'+escapeHtml((git.branch||'-')+' @ '+(git.head||'-'))+'</strong><small>'+escapeHtml(gitState)+'</small></div>' +
+    '<div><span class="small">data_v2.json</span><strong>'+escapeHtml(data.exists?'OK':'Manquant')+'</strong><small>'+escapeHtml(dataText)+'</small></div>' +
+    '<div><span class="small">Historique</span><strong>'+escapeHtml(String(status.history_count||0))+'</strong><small>'+escapeHtml(latest)+'</small></div>' +
+    '<div><span class="small">Sauvegardes</span><strong>'+escapeHtml(String(status.backup_count||0))+'</strong><small>'+escapeHtml(status.latest_backup?status.latest_backup.id:'Aucune')+'</small></div>' +
+    '<div><span class="small">Dossier</span><strong>'+escapeHtml(status.docs_dir||'-')+'</strong><small>'+escapeHtml(status.project_root||'-')+'</small></div>' +
+  '</div>' +
+  (git.status&&git.status.length?'<details><summary>Modifs Git locales</summary><pre>'+escapeHtml(git.status.join('\n'))+'</pre></details>':'');
+}
+async function loadAdminStatus(){
+  var box=document.getElementById('adminDiagnostics');
+  if(!box) return;
+  box.innerHTML='<div class="small">Chargement...</div>';
+  try{
+    var result=await adminFetch('/admin-status');
+    box.innerHTML=adminStatusHtml(result);
+  }catch(e){
+    box.innerHTML='<div class="admin-status warn"><strong>Diagnostic indisponible</strong><div>'+escapeHtml(e.message)+'</div></div>';
+  }
+}
 async function restoreAdminBackup(backupId, trigger){
   if(!backupId) return;
   if(!confirm('Restaurer la sauvegarde '+backupId+' et pousser sur GitHub ?')) return;
@@ -148,6 +181,7 @@ async function restoreAdminBackup(backupId, trigger){
       body:JSON.stringify({backup_id:backupId,message:message||('Restaure sauvegarde admin '+backupId)})
     });
     setAdminStatus('adminHubStatus','ok','Sauvegarde restauree',escapeHtml(result.message||'Termine')+commandListHtml(result.commands));
+    loadAdminStatus();
     loadAdminHistory();
     loadAdminBackups();
     alert(result.message||'Sauvegarde restauree');
@@ -180,6 +214,7 @@ async function applyAdminCorrections(statusId, trigger){
       })
     });
     setAdminStatus(statusId,'ok','Corrections appliquees',escapeHtml(result.message||'Termine')+commandListHtml(result.commands));
+    loadAdminStatus();
     loadAdminHistory();
     loadAdminBackups();
     alert(result.message||'Corrections appliquees');
@@ -946,6 +981,7 @@ function adminPage(){
     '</div>' +
     '<div id="adminHubStatus" class="admin-status hidden"></div>' +
     '<ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Clique sur Appliquer corrections + push si l API locale est configuree.</li><li>Sinon exporte les JSON et lance la generation manuellement.</li></ol>' +
+    '<div class="admin-history"><div class="panel-title"><h2>Diagnostic admin</h2><button id="refreshAdminDiagnostics" class="btn-secondary">Rafraichir</button></div><div id="adminDiagnostics"><div class="small">Chargement...</div></div></div>' +
     '<div class="admin-history"><div class="panel-title"><h2>Sauvegardes admin</h2><button id="refreshAdminBackups" class="btn-secondary">Rafraichir</button></div><div id="adminBackups"><div class="small">Chargement...</div></div></div>' +
     '<div class="admin-history"><div class="panel-title"><h2>Historique admin</h2><button id="refreshAdminHistory" class="btn-secondary">Rafraichir</button></div><div id="adminHistory"><div class="small">Chargement...</div></div></div>'
   );
@@ -957,6 +993,9 @@ function adminPage(){
   if(refresh)refresh.onclick=function(){loadAdminHistory();};
   var refreshBackups=document.getElementById('refreshAdminBackups');
   if(refreshBackups)refreshBackups.onclick=function(){loadAdminBackups();};
+  var refreshDiagnostics=document.getElementById('refreshAdminDiagnostics');
+  if(refreshDiagnostics)refreshDiagnostics.onclick=function(){loadAdminStatus();};
+  loadAdminStatus();
   loadAdminBackups();
   loadAdminHistory();
   var reset=document.getElementById('resetAdminApi');

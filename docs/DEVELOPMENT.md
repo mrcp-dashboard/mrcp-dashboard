@@ -78,6 +78,7 @@ commit puis push.
 
 L'API conserve aussi un filet de securite local :
 
+- `GET /admin-status` retourne le diagnostic API, Git et fichiers critiques.
 - `GET /admin-history` retourne les dernieres actions admin.
 - `GET /admin-backups` liste les sauvegardes locales.
 - `POST /restore-backup` restaure une sauvegarde, regenere `data_v2.json`,

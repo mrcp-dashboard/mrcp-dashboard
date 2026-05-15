@@ -110,6 +110,8 @@ Quand l'API est disponible, le dashboard peut appeler directement :
 - `POST /check-auth` pour verifier le token.
 - `POST /apply-corrections` pour ecrire les corrections, regenerer `data_v2.json`,
   commit et push Git.
+- `GET /admin-status` pour verifier le dossier pilote, l'etat Git, les fichiers
+  critiques et les dernieres actions.
 - `GET /admin-history` pour afficher les dernieres actions admin.
 - `GET /admin-backups` pour lister les sauvegardes locales.
 - `POST /restore-backup` pour restaurer une sauvegarde, regenerer les donnees,

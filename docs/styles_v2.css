@@ -436,6 +436,35 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
   padding:3px 8px;
   white-space:nowrap;
 }
+.admin-diagnostic-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.admin-diagnostic-grid>div{
+  min-width:0;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  background:rgba(0,0,0,.12);
+  padding:12px;
+}
+.admin-diagnostic-grid strong,
+.admin-diagnostic-grid small{
+  display:block;
+  overflow-wrap:anywhere;
+}
+.admin-diagnostic-grid strong{
+  margin-top:4px;
+}
+.admin-diagnostic-grid small{
+  color:var(--muted);
+  margin-top:6px;
+  line-height:1.35;
+}
+.admin-history pre{
+  white-space:pre-wrap;
+  word-break:break-word;
+}
 .status-ok{
   color:var(--green);
 }
@@ -468,6 +497,9 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
     flex-direction:column;
   }
   .admin-preview{
+    grid-template-columns:1fr;
+  }
+  .admin-diagnostic-grid{
     grid-template-columns:1fr;
   }
   .searchBox{

@@ -152,6 +152,35 @@ def list_admin_backups(limit=20):
     return backups
 
 
+def file_status(path):
+    if not path.exists():
+        return {"exists": False}
+    stat = path.stat()
+    return {
+        "exists": True,
+        "path": str(path),
+        "size": stat.st_size,
+        "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(timespec="seconds"),
+    }
+
+
+def git_info():
+    branch = run_cmd(["git", "branch", "--show-current"], cwd=PROJECT_ROOT)
+    head = run_cmd(["git", "rev-parse", "--short", "HEAD"], cwd=PROJECT_ROOT)
+    status = run_cmd(["git", "status", "--short"], cwd=PROJECT_ROOT)
+    return {
+        "branch": branch["stdout"].strip() if branch["returncode"] == 0 else "",
+        "head": head["stdout"].strip() if head["returncode"] == 0 else "",
+        "dirty": bool(status["stdout"].strip()) if status["returncode"] == 0 else True,
+        "status": status["stdout"].splitlines() if status["returncode"] == 0 else [],
+        "errors": [
+            item["stderr"].strip()
+            for item in (branch, head, status)
+            if item["returncode"] != 0 and item["stderr"].strip()
+        ],
+    }
+
+
 def restore_admin_backup_files(backup_id):
     if not backup_id or any(part in backup_id for part in ("/", "\\", "..")):
         raise ValueError("backup_id invalide")
@@ -240,6 +269,33 @@ def admin_backups():
     if not check_auth():
         return jsonify({"ok": False, "error": "unauthorized"}), 401
     return jsonify({"ok": True, "backups": list_admin_backups()})
+
+
+@app.route("/admin-status", methods=["GET"])
+def admin_status():
+    if not check_auth():
+        return jsonify({"ok": False, "error": "unauthorized"}), 401
+    history = load_admin_history()
+    backups = list_admin_backups()
+    return jsonify({
+        "ok": True,
+        "service": "mrcp-admin-api",
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "project_root": str(PROJECT_ROOT),
+        "docs_dir": str(DOCS_DIR),
+        "token_configured": bool(TOKEN),
+        "git": git_info(),
+        "files": {
+            "data_v2": file_status(DOCS_DIR / "data_v2.json"),
+            "lap_overrides": file_status(DOCS_DIR / "lap_overrides.json"),
+            "corrections": file_status(DOCS_DIR / "corrections.json"),
+            "admin_history": file_status(HISTORY_FILE),
+        },
+        "history_count": len(history),
+        "backup_count": len(backups),
+        "latest_history": history[0] if history else None,
+        "latest_backup": backups[0] if backups else None,
+    })
 
 
 @app.route("/apply-corrections", methods=["POST"])
