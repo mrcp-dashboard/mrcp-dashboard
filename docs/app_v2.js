@@ -46,19 +46,72 @@ async function checkAdminToken(apiUrl, token){
     throw e;
   }
 }
-async function applyAdminCorrections(){
+function adminCorrectionSummary(){
+  var o=getOverrides(), p=getPilotCorrections();
+  return {
+    excluded:Object.keys(o.excluded).length,
+    forced:Object.keys(o.forced_track).length,
+    pilots:Object.keys(p.transponders).length
+  };
+}
+function hasAdminCorrections(){
+  var s=adminCorrectionSummary();
+  return s.excluded+s.forced+s.pilots>0;
+}
+function adminSummaryText(){
+  var s=adminCorrectionSummary();
+  return s.excluded+' exclusions, '+s.forced+' pistes forcees, '+s.pilots+' associations pilotes';
+}
+function adminPreviewHtml(){
+  var s=adminCorrectionSummary();
+  return '<div class="admin-preview">' +
+    '<div><span class="small">Tours exclus</span><strong>'+s.excluded+'</strong></div>' +
+    '<div><span class="small">Pistes forcees</span><strong>'+s.forced+'</strong></div>' +
+    '<div><span class="small">Pilotes associes</span><strong>'+s.pilots+'</strong></div>' +
+  '</div>';
+}
+function setAdminStatus(targetId, stateName, title, body){
+  var el=targetId ? document.getElementById(targetId) : null;
+  if(!el) return;
+  el.className='admin-status '+(stateName||'');
+  el.innerHTML='<strong>'+escapeHtml(title)+'</strong>'+(body?'<div>'+body+'</div>':'');
+}
+function commandListHtml(commands){
+  if(!Array.isArray(commands)||!commands.length) return '';
+  return '<details><summary>Details techniques</summary><ol>'+commands.map(function(c){
+    var ok=c.returncode===0;
+    return '<li><code>'+escapeHtml(c.cmd||'commande')+'</code> <span class="'+(ok?'status-ok':'status-ko')+'">'+(ok?'OK':'Erreur '+c.returncode)+'</span></li>';
+  }).join('')+'</ol></details>';
+}
+async function applyAdminCorrections(statusId, trigger){
+  if(!hasAdminCorrections()){
+    setAdminStatus(statusId,'warn','Aucune correction a appliquer','Corrige un tour ou une association pilote avant de pousser.');
+    alert('Aucune correction locale a appliquer.');
+    return;
+  }
+  var confirmed=confirm('Appliquer ces corrections et pousser sur GitHub ?\n\n'+adminSummaryText());
+  if(!confirmed) return;
   var message=prompt('Message de commit', 'Maj corrections admin dashboard');
   if(message===null) return;
-  var result=await adminFetch('/apply-corrections',{
-    method:'POST',
-    body:JSON.stringify({
-      lap_overrides:getOverrides(),
-      corrections:getPilotCorrections(),
-      message:message||'Maj corrections admin dashboard'
-    })
-  });
-  alert(result.message||'Corrections appliquées');
-  location.reload();
+  if(trigger) trigger.disabled=true;
+  setAdminStatus(statusId,'pending','Application en cours','Ecriture des JSON, generation des donnees, commit et push...');
+  try{
+    var result=await adminFetch('/apply-corrections',{
+      method:'POST',
+      body:JSON.stringify({
+        lap_overrides:getOverrides(),
+        corrections:getPilotCorrections(),
+        message:message||'Maj corrections admin dashboard'
+      })
+    });
+    setAdminStatus(statusId,'ok','Corrections appliquees',escapeHtml(result.message||'Termine')+commandListHtml(result.commands));
+    alert(result.message||'Corrections appliquees');
+  }catch(e){
+    setAdminStatus(statusId,'error','Echec API admin',escapeHtml(e.message));
+    throw e;
+  }finally{
+    if(trigger) trigger.disabled=false;
+  }
 }
 
 function getAllLapsRaw(includeExcluded){
@@ -544,7 +597,9 @@ function adminRecords(){
       '<div class="card"><h3>Forçages piste</h3><div class="big" id="forcedTrackCount">'+Object.keys(o.forced_track).length+'</div></div>' +
       '<div class="card"><h3>Tours suspects restants</h3><div class="big" id="suspectCount">'+laps.length+'</div></div>' +
     '</div>' +
+    adminPreviewHtml() +
     '<p><button id="exportLapOverrides" class="btn-primary">Exporter lap_overrides.json</button> <button id="applyLapOverridesApi" class="btn-good">Appliquer via API</button> <button id="copyLapOverrides" class="btn-secondary">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections records</button></p>' +
+    '<div id="adminRecordsStatus" class="admin-status hidden"></div>' +
     '<textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea>' +
     '<p><button id="importLapOverrides" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
     '<input class="searchBox" id="adminRecordSearch" placeholder="Rechercher pilote, puce, session, raison...">' +
@@ -626,7 +681,7 @@ function adminRecords(){
   };
 
   document.getElementById('applyLapOverridesApi').onclick=function(){
-    applyAdminCorrections().catch(function(e){alert('API admin : '+e.message);});
+    applyAdminCorrections('adminRecordsStatus',this).catch(function(e){alert('API admin : '+e.message);});
   };
 
   document.getElementById('copyLapOverrides').onclick=function(){
@@ -740,7 +795,9 @@ function adminPilots(){
       '<div class="card"><h3>Transpondeurs détectés</h3><div class="big">'+rows.length+'</div></div>' +
       '<div class="card"><h3>Associations locales</h3><div class="big">'+Object.keys(corrections.transponders).length+'</div></div>' +
     '</div>' +
+    adminPreviewHtml() +
     '<p><button id="exportPilotCorrections" class="btn-primary">Exporter corrections.json</button> <button id="applyPilotCorrectionsApi" class="btn-good">Appliquer via API</button> <button id="copyPilotCorrections" class="btn-secondary">Copier JSON</button> <button id="clearPilotCorrections" class="btn-danger">Vider corrections pilotes</button></p>' +
+    '<div id="adminPilotsStatus" class="admin-status hidden"></div>' +
     '<textarea class="admin-json" id="pilotCorrectionsText">'+escapeHtml(JSON.stringify(corrections,null,2))+'</textarea>' +
     '<p><button id="importPilotCorrections" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
     '<input class="searchBox" id="adminPilotSearch" placeholder="Rechercher transpondeur ou pilote...">' +
@@ -769,7 +826,7 @@ function adminPilots(){
   };
 
   document.getElementById('applyPilotCorrectionsApi').onclick=function(){
-    applyAdminCorrections().catch(function(e){alert('API admin : '+e.message);});
+    applyAdminCorrections('adminPilotsStatus',this).catch(function(e){alert('API admin : '+e.message);});
   };
 
   document.getElementById('copyPilotCorrections').onclick=function(){
@@ -808,14 +865,15 @@ function adminPage(){
     '<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/quality" class="btn-secondary">Qualite</a></p>' +
     '<div class="grid">' +
       '<div class="card"><h3>API admin</h3><p class="small">Les corrections peuvent etre exportees en JSON ou appliquees directement via l API locale.</p><div class="goal-box"><div class="goal-pill"><span class="small">URL</span><strong>'+escapeHtml(cfg.apiUrl||'Non configuree')+'</strong></div><div class="goal-pill"><span class="small">Token</span><strong>'+(cfg.token?'Configure':'Manquant')+'</strong></div></div><p><button id="testAdminApi" class="btn-secondary">Tester API</button> <button id="applyAllCorrections" class="btn-good">Appliquer corrections + push</button> <button id="resetAdminApi" class="btn-danger">Oublier acces admin</button></p></div>' +
-      '<div class="card"><h3>Corrections locales</h3><div class="goal-box"><div class="goal-pill"><span class="small">Records</span><strong>'+Object.keys(getOverrides().excluded).length+' exclusions / '+Object.keys(getOverrides().forced_track).length+' pistes</strong></div><div class="goal-pill"><span class="small">Pilotes</span><strong>'+Object.keys(getPilotCorrections().transponders).length+' associations</strong></div></div></div>' +
+      '<div class="card"><h3>Corrections locales</h3>'+adminPreviewHtml()+'</div>' +
     '</div>' +
+    '<div id="adminHubStatus" class="admin-status hidden"></div>' +
     '<ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Clique sur Appliquer corrections + push si l API locale est configuree.</li><li>Sinon exporte les JSON et lance la generation manuellement.</li></ol>'
   );
   var test=document.getElementById('testAdminApi');
   if(test)test.onclick=function(){adminFetch('/check-auth',{method:'POST'}).then(function(){alert('API admin OK');}).catch(function(e){alert('API admin : '+e.message);});};
   var apply=document.getElementById('applyAllCorrections');
-  if(apply)apply.onclick=function(){applyAdminCorrections().catch(function(e){alert('API admin : '+e.message);});};
+  if(apply)apply.onclick=function(){applyAdminCorrections('adminHubStatus',this).catch(function(e){alert('API admin : '+e.message);});};
   var reset=document.getElementById('resetAdminApi');
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
 }

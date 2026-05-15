@@ -355,6 +355,52 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
   gap:8px;
   flex-wrap:wrap;
 }
+.admin-preview{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(120px,1fr));
+  gap:10px;
+  margin:16px 0;
+}
+.admin-preview>div,
+.admin-status{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:12px;
+  background:rgba(255,255,255,.04);
+  padding:12px 14px;
+}
+.admin-preview strong{
+  display:block;
+  margin-top:4px;
+  font-size:22px;
+}
+.admin-status{
+  margin:12px 0;
+  line-height:1.45;
+}
+.admin-status.hidden{
+  display:none;
+}
+.admin-status.pending{
+  border-color:rgba(15,133,255,.45);
+}
+.admin-status.ok{
+  border-color:rgba(46,213,115,.55);
+}
+.admin-status.warn{
+  border-color:rgba(255,193,7,.55);
+}
+.admin-status.error{
+  border-color:rgba(255,80,80,.65);
+}
+.admin-status details{
+  margin-top:10px;
+}
+.status-ok{
+  color:var(--green);
+}
+.status-ko{
+  color:var(--danger);
+}
 .admin-actions button{
   padding:9px 11px;
   font-size:13px;
@@ -375,6 +421,9 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
   }
   .admin-actions{
     flex-direction:column;
+  }
+  .admin-preview{
+    grid-template-columns:1fr;
   }
 }
 
