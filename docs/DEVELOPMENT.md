@@ -79,9 +79,10 @@ commit puis push.
 ## Checklist avant commit
 
 ```bash
-py -m py_compile live_server.py docs/build_data_v2.py docs/admin_api.py docs/auto_check.py docs/speedhive_sync_linux.py docs/validate_dashboard_data.py
+py -m py_compile live_server.py docs/build_data_v2.py docs/admin_api.py docs/auto_check.py docs/speedhive_sync_linux.py docs/validate_dashboard_data.py docs/check_text_encoding.py
 py docs/build_data_v2.py
 py docs/validate_dashboard_data.py
+py docs/check_text_encoding.py
 git status --short
 ```
 

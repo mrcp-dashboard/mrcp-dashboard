@@ -14,3 +14,4 @@ fi
 "$PYTHON" fix_lap_overrides.py
 "$PYTHON" build_data_v2.py
 "$PYTHON" validate_dashboard_data.py
+"$PYTHON" check_text_encoding.py
