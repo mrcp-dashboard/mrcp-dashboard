@@ -16,54 +16,101 @@ function getActivities(){
   return data?.activities || [];
 }
 
-function getPilotsFromActivities(){
-  const pilots = {};
-  getActivities().forEach(a=>{
-    (a.participants || []).forEach(p=>{
-      const name = p.name || p.pilot || p.driver || p.transponder || "Pilote inconnu";
-      if(!pilots[name]) pilots[name] = {name,laps:0,best:null,sessions:0};
-      const laps = p.laps_count || p.lap_count || (p.laps ? p.laps.length : 0) || 0;
-      pilots[name].laps += laps;
-      pilots[name].sessions += 1;
+function getParticipantName(p){
+  return p.pilot_name || p.name || p.pilot || p.driver || (p.transponder ? "Inconnu #" + p.transponder : "Pilote inconnu");
+}
 
-      const best = p.best_lap || p.best || p.bestLap;
-      if(best && (!pilots[name].best || best < pilots[name].best)){
-        pilots[name].best = best;
-      }
+function getAllLiveLaps(){
+  const rows = [];
+  getActivities().forEach(a=>{
+    const session = a.name || a.title || a.date_fr || a.date || a.id || "Session";
+    const date = a.date_fr || a.date || "";
+    (a.participants || []).forEach(p=>{
+      const name = getParticipantName(p);
+      const transponder = p.transponder || p.transponder_id || "";
+      (p.laps || []).forEach(l=>{
+        const time = Number(l.lap_time ?? l.time ?? l.seconds ?? l.best_lap);
+        if(!Number.isFinite(time)) return;
+        rows.push({
+          pilot:name,
+          transponder,
+          time,
+          track:l.track || p.track || "Non classe",
+          session,
+          date
+        });
+      });
     });
   });
-  return Object.values(pilots);
+  return rows;
+}
+
+function getPilotsFromActivities(){
+  const pilots = {};
+  getAllLiveLaps().forEach(l=>{
+    if(!pilots[l.pilot]) pilots[l.pilot] = {name:l.pilot,laps:0,best:null,sessions:new Set()};
+    pilots[l.pilot].laps += 1;
+    pilots[l.pilot].sessions.add(l.session);
+    if(!pilots[l.pilot].best || l.time < pilots[l.pilot].best){
+      pilots[l.pilot].best = l.time;
+    }
+  });
+  return Object.values(pilots).map(p=>({
+    name:p.name,
+    laps:p.laps,
+    best:p.best,
+    sessions:p.sessions.size
+  }));
+}
+
+function liveTrackStats(){
+  const stats = {};
+  getAllLiveLaps().forEach(l=>{
+    if(!stats[l.track]) stats[l.track] = {laps_count:0,best:null,bestPilot:"-"};
+    stats[l.track].laps_count += 1;
+    if(!stats[l.track].best || l.time < stats[l.track].best){
+      stats[l.track].best = l.time;
+      stats[l.track].bestPilot = l.pilot;
+    }
+  });
+  return stats;
 }
 
 function renderRecords(){
-  const tracks = data?.tracks || {};
-  const activities = getActivities();
-
+  const laps = getAllLiveLaps();
+  const summaryTracks = data?.summary?.tracks || {};
+  const computedTracks = liveTrackStats();
   let globalBest = null;
-  let bestPilot = "-";
 
-  activities.forEach(a=>{
-    if(a.best_lap && (!globalBest || a.best_lap < globalBest)){
-      globalBest = a.best_lap;
-      bestPilot = a.best_pilot || "-";
+  laps.forEach(l=>{
+    if(!globalBest || l.time < globalBest.time){
+      globalBest = l;
     }
   });
+
+  function trackCount(track){
+    return summaryTracks[track]?.laps_count || computedTracks[track]?.laps_count || 0;
+  }
+
+  function trackSub(track){
+    return computedTracks[track]?.best ? "Best " + fmtLap(computedTracks[track].best) + " - " + computedTracks[track].bestPilot : "tours enregistres";
+  }
 
   document.getElementById("recordsLive").innerHTML = `
     <div class="card">
       <div class="card-title">Meilleur tour global</div>
-      <div class="card-value">${fmtLap(globalBest)}</div>
-      <div class="card-sub">${bestPilot}</div>
+      <div class="card-value">${fmtLap(globalBest && globalBest.time)}</div>
+      <div class="card-sub">${globalBest ? globalBest.pilot : "-"}</div>
     </div>
     <div class="card">
       <div class="card-title">TT1/8</div>
-      <div class="card-value">${tracks["TT1/8"]?.laps_count || 0}</div>
-      <div class="card-sub">tours enregistrés</div>
+      <div class="card-value">${trackCount("TT1/8")}</div>
+      <div class="card-sub">${trackSub("TT1/8")}</div>
     </div>
     <div class="card">
       <div class="card-title">TT1/10</div>
-      <div class="card-value">${tracks["TT1/10"]?.laps_count || 0}</div>
-      <div class="card-sub">tours enregistrés</div>
+      <div class="card-value">${trackCount("TT1/10")}</div>
+      <div class="card-sub">${trackSub("TT1/10")}</div>
     </div>
   `;
 }
@@ -80,31 +127,29 @@ function renderTopPilots(){
       <div>${p.laps} tours</div>
       <div>${fmtLap(p.best)}</div>
     </div>
-  `).join("") || "<div class='card'>Aucun pilote trouvé</div>";
+  `).join("") || "<div class='card'>Aucun pilote trouve</div>";
 }
 
 function renderClubStats(){
   const activities = getActivities();
   const pilots = getPilotsFromActivities();
-
-  const totalLaps = data?.laps_count ||
-    activities.reduce((s,a)=>s+(a.laps_count||0),0);
+  const totalLaps = data?.summary?.laps_count || getAllLiveLaps().length;
 
   document.getElementById("clubStats").innerHTML = `
     <div class="stat-box"><strong>${activities.length}</strong><span>sessions</span></div>
     <div class="stat-box"><strong>${pilots.length}</strong><span>pilotes</span></div>
     <div class="stat-box"><strong>${totalLaps}</strong><span>tours</span></div>
-    <div class="stat-box"><strong>${data?.quality_score ?? "-"}</strong><span>qualité</span></div>
+    <div class="stat-box"><strong>${data?.data_quality?.global_score ?? "-"}</strong><span>qualite</span></div>
   `;
 }
 
 function renderHeatmap(){
   const days = {};
   getActivities().forEach(a=>{
-    const d = a.date || "inconnu";
+    const d = a.date_fr || a.date || "inconnu";
     if(!days[d]) days[d] = {sessions:0,laps:0};
     days[d].sessions += 1;
-    days[d].laps += a.laps_count || 0;
+    days[d].laps += (a.participants || []).reduce((sum,p)=>sum+((p.laps || []).length),0);
   });
 
   const entries = Object.entries(days).slice(-14);
@@ -115,7 +160,7 @@ function renderHeatmap(){
       <span>${day}</span>
       <span>${v.sessions} sessions</span>
     </div>
-  `).join("") || "<div class='card'>Aucune activité</div>";
+  `).join("") || "<div class='card'>Aucune activite</div>";
 }
 
 function rotateScreens(){
