@@ -396,6 +396,46 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
 .admin-status details{
   margin-top:10px;
 }
+.admin-history{
+  margin-top:18px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:12px;
+  background:rgba(255,255,255,.035);
+  padding:14px;
+}
+.admin-history-list{
+  display:grid;
+  gap:10px;
+}
+.admin-history-item{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  background:rgba(0,0,0,.12);
+  padding:12px;
+}
+.admin-history-top,
+.admin-history-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.admin-history-top{
+  margin-bottom:6px;
+}
+.admin-history-meta{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:6px;
+}
+.admin-history-status{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  color:var(--muted);
+  font-size:12px;
+  padding:3px 8px;
+  white-space:nowrap;
+}
 .status-ok{
   color:var(--green);
 }

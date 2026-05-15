@@ -83,6 +83,33 @@ function commandListHtml(commands){
     return '<li><code>'+escapeHtml(c.cmd||'commande')+'</code> <span class="'+(ok?'status-ok':'status-ko')+'">'+(ok?'OK':'Erreur '+c.returncode)+'</span></li>';
   }).join('')+'</ol></details>';
 }
+function historyCountsText(item){
+  var c=item&&item.counts?item.counts:{};
+  return (c.excluded_laps||0)+' exclusions, '+(c.forced_tracks||0)+' pistes forcees, '+(c.pilot_transponders||0)+' puces, '+(c.pilot_names||0)+' noms';
+}
+function adminHistoryHtml(history){
+  if(!Array.isArray(history)||!history.length) return '<div class="small">Aucune action admin enregistree pour le moment.</div>';
+  return '<div class="admin-history-list">'+history.map(function(item){
+    var status=item.status||'unknown';
+    var commit=item.commit?'<span>Commit '+escapeHtml(item.commit)+'</span>':'';
+    return '<div class="admin-history-item">' +
+      '<div class="admin-history-top"><strong>'+escapeHtml(item.message||'Correction admin')+'</strong><span class="admin-history-status">'+escapeHtml(status)+'</span></div>' +
+      '<div class="admin-history-meta"><span>'+escapeHtml(item.time||'date inconnue')+'</span>'+commit+'</div>' +
+      '<div class="small">'+escapeHtml(historyCountsText(item))+'</div>' +
+    '</div>';
+  }).join('')+'</div>';
+}
+async function loadAdminHistory(){
+  var box=document.getElementById('adminHistory');
+  if(!box) return;
+  box.innerHTML='<div class="small">Chargement...</div>';
+  try{
+    var result=await adminFetch('/admin-history');
+    box.innerHTML=adminHistoryHtml(result.history||[]);
+  }catch(e){
+    box.innerHTML='<div class="admin-status warn"><strong>Historique indisponible</strong><div>'+escapeHtml(e.message)+'</div></div>';
+  }
+}
 async function applyAdminCorrections(statusId, trigger){
   if(!hasAdminCorrections()){
     setAdminStatus(statusId,'warn','Aucune correction a appliquer','Corrige un tour ou une association pilote avant de pousser.');
@@ -105,6 +132,7 @@ async function applyAdminCorrections(statusId, trigger){
       })
     });
     setAdminStatus(statusId,'ok','Corrections appliquees',escapeHtml(result.message||'Termine')+commandListHtml(result.commands));
+    loadAdminHistory();
     alert(result.message||'Corrections appliquees');
   }catch(e){
     setAdminStatus(statusId,'error','Echec API admin',escapeHtml(e.message));
@@ -868,12 +896,16 @@ function adminPage(){
       '<div class="card"><h3>Corrections locales</h3>'+adminPreviewHtml()+'</div>' +
     '</div>' +
     '<div id="adminHubStatus" class="admin-status hidden"></div>' +
-    '<ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Clique sur Appliquer corrections + push si l API locale est configuree.</li><li>Sinon exporte les JSON et lance la generation manuellement.</li></ol>'
+    '<ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Clique sur Appliquer corrections + push si l API locale est configuree.</li><li>Sinon exporte les JSON et lance la generation manuellement.</li></ol>' +
+    '<div class="admin-history"><div class="panel-title"><h2>Historique admin</h2><button id="refreshAdminHistory" class="btn-secondary">Rafraichir</button></div><div id="adminHistory"><div class="small">Chargement...</div></div></div>'
   );
   var test=document.getElementById('testAdminApi');
   if(test)test.onclick=function(){adminFetch('/check-auth',{method:'POST'}).then(function(){alert('API admin OK');}).catch(function(e){alert('API admin : '+e.message);});};
   var apply=document.getElementById('applyAllCorrections');
   if(apply)apply.onclick=function(){applyAdminCorrections('adminHubStatus',this).catch(function(e){alert('API admin : '+e.message);});};
+  var refresh=document.getElementById('refreshAdminHistory');
+  if(refresh)refresh.onclick=function(){loadAdminHistory();};
+  loadAdminHistory();
   var reset=document.getElementById('resetAdminApi');
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
 }
