@@ -132,6 +132,37 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
 .podium-compact .medal{font-size:26px}
 .podium-compact .time{font-size:22px;margin-top:6px}
 .podium-compact strong{font-size:13px;line-height:1.2}
+.podium-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.podium-summary-card{
+  min-width:0;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(0,0,0,.16);
+  padding:14px;
+}
+.podium-summary-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:10px;
+}
+.podium-summary-card>strong{
+  display:block;
+  overflow-wrap:anywhere;
+}
+.podium-summary-time{
+  font-size:30px;
+  font-weight:1000;
+  line-height:1.05;
+  margin:8px 0 6px;
+}
 .footer{max-width:1500px;margin:24px auto 0;display:flex;justify-content:space-between;gap:12px;color:var(--muted);padding:10px 4px}
 .admin-actions{display:flex;gap:8px;flex-wrap:wrap}
 .btn-danger{background:rgba(180,27,43,.92)!important;border-color:rgba(255,118,130,.65)!important;color:#fff!important}
@@ -225,6 +256,7 @@ textarea.admin-json{width:100%;min-height:220px}
   .kpi-grid,.grid{grid-template-columns:1fr 1fr;gap:10px}
   .target-grid{grid-template-columns:1fr}
   .target-meta{grid-template-columns:1fr}
+  .podium-summary-grid{grid-template-columns:1fr}
   .kpi,.card{border-radius:16px;padding:14px}
   .kpi-card{padding:14px}
   .kpi{min-height:70px}
