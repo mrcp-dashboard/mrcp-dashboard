@@ -695,9 +695,40 @@ function livePage(){
 function adminOnly(title, body){if(!state.isAdmin){app.innerHTML='<section class="card"><h2>Accès admin</h2><p>Page réservée à l’administrateur.</p></section>';return false;}app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2>'+body+'</section>';return true;}
 function suspiciousLaps(){return getAllLapsRaw(true).filter(function(l){if(l._excluded)return true;if(l._time<8)return true;if(l._time>=30&&l._time<=45&&l._track==='TT1/8')return true;if(l._pilot.indexOf('Inconnu')>=0||l._pilot==='Pilote inconnu')return true;return false;}).sort(function(a,b){return a._time-b._time;});}
 function downloadJson(filename,obj){var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function qualityGroupKey(l, type){
+  return type==='session' ? (l.session_id||l.session_name||l._date||'session') : (normalizeTransponder(l.transponder)||'sans-puce');
+}
+function qualityGroups(laps, type){
+  var map={};
+  laps.forEach(function(l){
+    var key=qualityGroupKey(l,type);
+    if(!map[key])map[key]={key:key,label:type==='session'?(l.session_name||l._date||key):(normalizeTransponder(l.transponder)||'Sans puce'),laps:[],pilots:{},tracks:{},best:null};
+    map[key].laps.push(l);
+    map[key].pilots[l._pilot]=true;
+    map[key].tracks[l._track]=true;
+    if(!map[key].best||l._time<map[key].best._time)map[key].best=l;
+  });
+  return Object.values(map).sort(function(a,b){return b.laps.length-a.laps.length||((a.best?a.best._time:999)-(b.best?b.best._time:999));});
+}
+function qualityGroupHtml(groups, type){
+  if(!groups.length)return '<p class="small">Aucun groupe à traiter.</p>';
+  return '<div class="quality-groups">'+groups.slice(0,10).map(function(g){
+    var pilots=Object.keys(g.pilots).slice(0,3).join(', ');
+    var tracks=Object.keys(g.tracks).join(' / ');
+    return '<div class="quality-group">' +
+      '<div><strong>'+escapeHtml(g.label)+'</strong><div class="small">'+g.laps.length+' tours · '+escapeHtml(tracks||'-')+' · '+escapeHtml(pilots||'-')+'</div><div class="small">Meilleur : '+fmtTimeS(g.best&&g.best._time)+'</div></div>' +
+      '<div class="admin-actions">' +
+        '<button class="bulk-quality btn-danger" data-type="'+type+'" data-key="'+escapeHtml(g.key)+'" data-action="exclude">Exclure groupe</button>' +
+        '<button class="bulk-quality btn-good" data-type="'+type+'" data-key="'+escapeHtml(g.key)+'" data-action="tt10">Tout TT1/10</button>' +
+      '</div>' +
+    '</div>';
+  }).join('')+'</div>';
+}
 function adminRecords(){
   var laps=suspiciousLaps();
   var o=getOverrides();
+  var puceGroups=qualityGroups(laps.filter(function(l){return normalizeTransponder(l.transponder);}), 'transponder');
+  var sessionGroups=qualityGroups(laps, 'session');
 
   var rows=laps.slice(0,500).map(function(l){
     var reason=[];
@@ -734,6 +765,8 @@ function adminRecords(){
     adminPreviewHtml() +
     '<p><button id="exportLapOverrides" class="btn-primary">Exporter lap_overrides.json</button> <button id="applyLapOverridesApi" class="btn-good">Appliquer via API</button> <button id="copyLapOverrides" class="btn-secondary">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections records</button></p>' +
     '<div id="adminRecordsStatus" class="admin-status hidden"></div>' +
+    '<section class="admin-history"><div class="panel-title"><h2>Nettoyage par puce</h2></div>'+qualityGroupHtml(puceGroups,'transponder')+'</section>' +
+    '<section class="admin-history"><div class="panel-title"><h2>Nettoyage par session</h2></div>'+qualityGroupHtml(sessionGroups,'session')+'</section>' +
     '<textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea>' +
     '<p><button id="importLapOverrides" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
     '<input class="searchBox" id="adminRecordSearch" placeholder="Rechercher pilote, puce, session, raison...">' +
@@ -807,6 +840,39 @@ function adminRecords(){
         removeCorrectedRow(btn);
         return;
       }
+    };
+  });
+
+  document.querySelectorAll('.bulk-quality').forEach(function(btn){
+    btn.onclick=function(){
+      var type=btn.getAttribute('data-type');
+      var key=btn.getAttribute('data-key');
+      var action=btn.getAttribute('data-action');
+      var groupLaps=laps.filter(function(l){return qualityGroupKey(l,type)===key;});
+      var label=type==='session'?'cette session':'cette puce';
+
+      if(!groupLaps.length){
+        alert('Aucun tour trouve pour ce groupe.');
+        return;
+      }
+
+      if(action==='exclude' && !confirm('Exclure '+groupLaps.length+' tours de '+label+' ?')) return;
+      if(action==='tt10' && !confirm('Forcer '+groupLaps.length+' tours de '+label+' en TT1/10 ?')) return;
+
+      var x=getOverrides();
+      groupLaps.forEach(function(l){
+        if(action==='exclude'){
+          x.excluded[l.lap_id]={reason:'Exclu admin groupe '+(type==='session'?'session':'puce')};
+          delete x.forced_track[l.lap_id];
+        }
+        if(action==='tt10'){
+          x.forced_track[l.lap_id]='TT1/10';
+          delete x.excluded[l.lap_id];
+        }
+      });
+      setOverrides(x);
+      adminRecords();
+      alert(groupLaps.length+' tours corriges. Pense a appliquer via API ou exporter le JSON.');
     };
   });
 
