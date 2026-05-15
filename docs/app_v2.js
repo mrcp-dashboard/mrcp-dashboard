@@ -278,13 +278,25 @@ function pilotStats(name){
 }
 function clubBest(track){var rows=bestByPilot(getAllLaps().filter(function(l){return track==='all'||l._track===track;}));return rows[0]||null;}
 function pilotBestByTrack(stats,track){return bestByPilot(stats.laps.filter(function(l){return l._track===track;}))[0]||null;}
+function parseDateValue(value){
+  var s=String(value||'').trim();
+  var m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m)return new Date(Number(m[3]),Number(m[2])-1,Number(m[1])).getTime();
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return new Date(Number(m[1]),Number(m[2])-1,Number(m[3])).getTime();
+  var t=Date.parse(s);
+  return Number.isFinite(t)?t:Number.MAX_SAFE_INTEGER;
+}
 function pilotProgressData(stats,track){
   var groups={};
   stats.laps.filter(function(l){return track==='all'||l._track===track;}).forEach(function(l){
     var key=l.session_name||l._date||l.session_id||'session';
-    if(!groups[key]||l._time<groups[key].time)groups[key]={label:key,time:l._time,date:l._date};
+    var sortDate=parseDateValue(l._date||l.session_date||l.date||key);
+    if(!groups[key]||l._time<groups[key].time)groups[key]={label:key,time:l._time,date:l._date,sortDate:sortDate};
   });
-  return Object.values(groups).sort(function(a,b){return String(a.date||a.label).localeCompare(String(b.date||b.label));}).slice(-18);
+  return Object.values(groups).sort(function(a,b){
+    return (a.sortDate-b.sortDate)||String(a.label).localeCompare(String(b.label));
+  }).slice(-18);
 }
 function renderProgressSvg(points){
   if(points.length<2)return '<p class="small">Pas encore assez de sessions pour afficher une progression.</p>';
