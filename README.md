@@ -110,6 +110,13 @@ Quand l'API est disponible, le dashboard peut appeler directement :
 - `POST /check-auth` pour verifier le token.
 - `POST /apply-corrections` pour ecrire les corrections, regenerer `data_v2.json`,
   commit et push Git.
+- `GET /admin-history` pour afficher les dernieres actions admin.
+- `GET /admin-backups` pour lister les sauvegardes locales.
+- `POST /restore-backup` pour restaurer une sauvegarde, regenerer les donnees,
+  commit et push Git.
+
+Avant chaque application ou restauration, l'API cree une sauvegarde locale dans
+`docs/backups/admin/`. Ce dossier est ignore par Git.
 
 Consulter `docs/README_V4_2_ADMIN_API.txt` pour l'installation systemd sur le LXC.
 

@@ -20,6 +20,7 @@ Par défaut écoute sur :
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -34,6 +35,8 @@ TOKEN = os.environ.get("MRCP_ADMIN_TOKEN", "")
 HOST = os.environ.get("MRCP_ADMIN_API_HOST", "0.0.0.0")
 PORT = int(os.environ.get("MRCP_ADMIN_API_PORT", "5055"))
 HISTORY_FILE = DOCS_DIR / "admin_history.json"
+BACKUP_DIR = DOCS_DIR / "backups" / "admin"
+MANAGED_JSON_FILES = ("lap_overrides.json", "corrections.json", "data_v2.json")
 
 if not TOKEN:
     print("ATTENTION: MRCP_ADMIN_TOKEN non défini. Définis un token avant usage en production.")
@@ -99,6 +102,114 @@ def append_admin_history(entry):
     )
 
 
+def make_admin_backup(reason, message=""):
+    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    backup_id = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    target = BACKUP_DIR / backup_id
+    target.mkdir(parents=True, exist_ok=False)
+    files = []
+
+    for filename in MANAGED_JSON_FILES:
+        source = DOCS_DIR / filename
+        if source.exists():
+            shutil.copy2(source, target / filename)
+            files.append(filename)
+
+    meta = {
+        "id": backup_id,
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "reason": reason,
+        "message": message,
+        "files": files,
+    }
+    (target / "meta.json").write_text(
+        json.dumps(meta, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return meta
+
+
+def list_admin_backups(limit=20):
+    if not BACKUP_DIR.exists():
+        return []
+    backups = []
+    for path in sorted(BACKUP_DIR.iterdir(), reverse=True):
+        if not path.is_dir():
+            continue
+        meta_file = path / "meta.json"
+        if meta_file.exists():
+            try:
+                meta = json.loads(meta_file.read_text(encoding="utf-8"))
+            except Exception:
+                meta = {}
+        else:
+            meta = {}
+        meta["id"] = meta.get("id") or path.name
+        meta["files"] = meta.get("files") if isinstance(meta.get("files"), list) else []
+        backups.append(meta)
+        if len(backups) >= limit:
+            break
+    return backups
+
+
+def restore_admin_backup_files(backup_id):
+    if not backup_id or any(part in backup_id for part in ("/", "\\", "..")):
+        raise ValueError("backup_id invalide")
+    source_dir = BACKUP_DIR / backup_id
+    if not source_dir.is_dir():
+        raise FileNotFoundError("sauvegarde introuvable")
+
+    restored = []
+    for filename in MANAGED_JSON_FILES:
+        source = source_dir / filename
+        if source.exists():
+            shutil.copy2(source, DOCS_DIR / filename)
+            restored.append(filename)
+    return restored
+
+
+def publish_docs_changes(message, history_entry):
+    commands = []
+    build = run_cmd([sys.executable, "build_data_v2.py"], cwd=DOCS_DIR)
+    commands.append(build)
+    if build["returncode"] != 0:
+        history_entry["status"] = "generation_failed"
+        return commands, "generation data_v2.json echouee."
+
+    commands.append(run_cmd(["git", "add", "docs"], cwd=PROJECT_ROOT))
+    diff_check = run_cmd(["git", "diff", "--cached", "--quiet"], cwd=PROJECT_ROOT)
+    if diff_check["returncode"] == 0:
+        history_entry["status"] = "no_git_changes"
+        return commands, ""
+
+    commit_msg = f"{message} {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+    commit = run_cmd(["git", "commit", "-m", commit_msg], cwd=PROJECT_ROOT)
+    commands.append(commit)
+    if commit["returncode"] != 0:
+        history_entry["status"] = "commit_failed"
+        return commands, "git commit a echoue."
+
+    commit_hash = run_cmd(["git", "rev-parse", "--short", "HEAD"], cwd=PROJECT_ROOT)
+    commands.append(commit_hash)
+    if commit_hash["returncode"] == 0:
+        history_entry["commit"] = commit_hash["stdout"].strip()
+
+    pull = run_cmd(["git", "pull", "--rebase"], cwd=PROJECT_ROOT)
+    commands.append(pull)
+    if pull["returncode"] != 0:
+        history_entry["status"] = "pull_failed"
+        return commands, "git pull --rebase a echoue. Resous le conflit manuellement."
+
+    push = run_cmd(["git", "push"], cwd=PROJECT_ROOT)
+    commands.append(push)
+    if push["returncode"] != 0:
+        history_entry["status"] = "push_failed"
+        return commands, "git push a echoue."
+
+    history_entry["status"] = "pushed"
+    return commands, ""
+
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({
@@ -124,6 +235,13 @@ def admin_history():
     return jsonify({"ok": True, "history": load_admin_history()[:25]})
 
 
+@app.route("/admin-backups", methods=["GET"])
+def admin_backups():
+    if not check_auth():
+        return jsonify({"ok": False, "error": "unauthorized"}), 401
+    return jsonify({"ok": True, "backups": list_admin_backups()})
+
+
 @app.route("/apply-corrections", methods=["POST"])
 def apply_corrections():
     if not check_auth():
@@ -141,6 +259,7 @@ def apply_corrections():
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
     written = []
+    backup = make_admin_backup("before_apply", message)
     history_entry = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "message": message,
@@ -148,6 +267,7 @@ def apply_corrections():
         "written": [],
         "status": "pending",
         "commit": "",
+        "backup": backup,
     }
 
     if lap_overrides is not None:
@@ -248,6 +368,55 @@ def apply_corrections():
         "history": history_entry,
         "commit": history_entry["commit"],
         "message": "Corrections appliquées, data_v2.json régénéré et GitHub mis à jour.",
+        "commands": commands,
+    })
+
+@app.route("/restore-backup", methods=["POST"])
+def restore_backup():
+    if not check_auth():
+        return jsonify({"ok": False, "error": "unauthorized"}), 401
+
+    payload = request.get_json(force=True, silent=True) or {}
+    backup_id = str(payload.get("backup_id") or "")
+    message = payload.get("message") or f"Restaure sauvegarde admin {backup_id}"
+
+    try:
+        safety_backup = make_admin_backup("before_restore", message)
+        restored = restore_admin_backup_files(backup_id)
+    except (FileNotFoundError, ValueError) as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+    if not restored:
+        return jsonify({"ok": False, "error": "Aucun fichier restaurable dans cette sauvegarde."}), 400
+
+    history_entry = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "message": message,
+        "counts": {},
+        "written": restored,
+        "status": "pending",
+        "commit": "",
+        "backup": safety_backup,
+        "restored_backup": backup_id,
+    }
+    commands, error = publish_docs_changes(message, history_entry)
+    append_admin_history(history_entry)
+
+    if error:
+        return jsonify({
+            "ok": False,
+            "restored": restored,
+            "history": history_entry,
+            "error": error,
+            "commands": commands,
+        }), 500
+
+    return jsonify({
+        "ok": True,
+        "restored": restored,
+        "history": history_entry,
+        "commit": history_entry["commit"],
+        "message": "Sauvegarde restauree, data_v2.json regenere et GitHub mis a jour.",
         "commands": commands,
     })
 

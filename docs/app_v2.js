@@ -110,6 +110,54 @@ async function loadAdminHistory(){
     box.innerHTML='<div class="admin-status warn"><strong>Historique indisponible</strong><div>'+escapeHtml(e.message)+'</div></div>';
   }
 }
+function adminBackupHtml(backups){
+  if(!Array.isArray(backups)||!backups.length) return '<div class="small">Aucune sauvegarde disponible pour le moment.</div>';
+  return '<div class="admin-history-list">'+backups.map(function(item){
+    var files=Array.isArray(item.files)?item.files.join(', '):'';
+    return '<div class="admin-history-item">' +
+      '<div class="admin-history-top"><strong>'+escapeHtml(item.id||'sauvegarde')+'</strong><button class="btn-secondary restore-admin-backup" data-backup-id="'+escapeHtml(item.id||'')+'">Restaurer</button></div>' +
+      '<div class="admin-history-meta"><span>'+escapeHtml(item.time||'date inconnue')+'</span><span>'+escapeHtml(item.reason||'backup')+'</span></div>' +
+      '<div class="small">'+escapeHtml(files||'Aucun fichier liste')+'</div>' +
+    '</div>';
+  }).join('')+'</div>';
+}
+async function loadAdminBackups(){
+  var box=document.getElementById('adminBackups');
+  if(!box) return;
+  box.innerHTML='<div class="small">Chargement...</div>';
+  try{
+    var result=await adminFetch('/admin-backups');
+    box.innerHTML=adminBackupHtml(result.backups||[]);
+    document.querySelectorAll('.restore-admin-backup').forEach(function(btn){
+      btn.onclick=function(){restoreAdminBackup(btn.getAttribute('data-backup-id'),btn);};
+    });
+  }catch(e){
+    box.innerHTML='<div class="admin-status warn"><strong>Sauvegardes indisponibles</strong><div>'+escapeHtml(e.message)+'</div></div>';
+  }
+}
+async function restoreAdminBackup(backupId, trigger){
+  if(!backupId) return;
+  if(!confirm('Restaurer la sauvegarde '+backupId+' et pousser sur GitHub ?')) return;
+  var message=prompt('Message de commit', 'Restaure sauvegarde admin '+backupId);
+  if(message===null) return;
+  if(trigger) trigger.disabled=true;
+  setAdminStatus('adminHubStatus','pending','Restauration en cours','Restauration des JSON, regeneration des donnees, commit et push...');
+  try{
+    var result=await adminFetch('/restore-backup',{
+      method:'POST',
+      body:JSON.stringify({backup_id:backupId,message:message||('Restaure sauvegarde admin '+backupId)})
+    });
+    setAdminStatus('adminHubStatus','ok','Sauvegarde restauree',escapeHtml(result.message||'Termine')+commandListHtml(result.commands));
+    loadAdminHistory();
+    loadAdminBackups();
+    alert(result.message||'Sauvegarde restauree');
+  }catch(e){
+    setAdminStatus('adminHubStatus','error','Echec restauration',escapeHtml(e.message));
+    alert('API admin : '+e.message);
+  }finally{
+    if(trigger) trigger.disabled=false;
+  }
+}
 async function applyAdminCorrections(statusId, trigger){
   if(!hasAdminCorrections()){
     setAdminStatus(statusId,'warn','Aucune correction a appliquer','Corrige un tour ou une association pilote avant de pousser.');
@@ -133,6 +181,7 @@ async function applyAdminCorrections(statusId, trigger){
     });
     setAdminStatus(statusId,'ok','Corrections appliquees',escapeHtml(result.message||'Termine')+commandListHtml(result.commands));
     loadAdminHistory();
+    loadAdminBackups();
     alert(result.message||'Corrections appliquees');
   }catch(e){
     setAdminStatus(statusId,'error','Echec API admin',escapeHtml(e.message));
@@ -897,6 +946,7 @@ function adminPage(){
     '</div>' +
     '<div id="adminHubStatus" class="admin-status hidden"></div>' +
     '<ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Clique sur Appliquer corrections + push si l API locale est configuree.</li><li>Sinon exporte les JSON et lance la generation manuellement.</li></ol>' +
+    '<div class="admin-history"><div class="panel-title"><h2>Sauvegardes admin</h2><button id="refreshAdminBackups" class="btn-secondary">Rafraichir</button></div><div id="adminBackups"><div class="small">Chargement...</div></div></div>' +
     '<div class="admin-history"><div class="panel-title"><h2>Historique admin</h2><button id="refreshAdminHistory" class="btn-secondary">Rafraichir</button></div><div id="adminHistory"><div class="small">Chargement...</div></div></div>'
   );
   var test=document.getElementById('testAdminApi');
@@ -905,6 +955,9 @@ function adminPage(){
   if(apply)apply.onclick=function(){applyAdminCorrections('adminHubStatus',this).catch(function(e){alert('API admin : '+e.message);});};
   var refresh=document.getElementById('refreshAdminHistory');
   if(refresh)refresh.onclick=function(){loadAdminHistory();};
+  var refreshBackups=document.getElementById('refreshAdminBackups');
+  if(refreshBackups)refreshBackups.onclick=function(){loadAdminBackups();};
+  loadAdminBackups();
   loadAdminHistory();
   var reset=document.getElementById('resetAdminApi');
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};

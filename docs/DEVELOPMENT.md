@@ -76,6 +76,16 @@ appliquees. Depuis le hub admin ou les pages de corrections, le bouton
 vers `POST /apply-corrections`. L'API ecrit les JSON, regenere les donnees,
 commit puis push.
 
+L'API conserve aussi un filet de securite local :
+
+- `GET /admin-history` retourne les dernieres actions admin.
+- `GET /admin-backups` liste les sauvegardes locales.
+- `POST /restore-backup` restaure une sauvegarde, regenere `data_v2.json`,
+  commit puis push.
+
+Les sauvegardes sont creees dans `docs/backups/admin/` avant chaque application
+ou restauration. Elles ne doivent pas etre suivies par Git.
+
 ## Checklist avant commit
 
 ```bash
