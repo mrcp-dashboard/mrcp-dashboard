@@ -8,6 +8,7 @@ Type=simple
 WorkingDirectory=/opt/mrcp-dashboard/docs
 Environment=MRCP_PROJECT_ROOT=/opt/mrcp-dashboard
 Environment=MRCP_DOCS_DIR=/opt/mrcp-dashboard/docs
+Environment=MRCP_ADMIN_API_HOST=0.0.0.0
 Environment=MRCP_ADMIN_API_PORT=5055
 Environment=MRCP_ADMIN_TOKEN=CHANGE_MOI_TOKEN_SECRET
 ExecStart=/opt/mrcp-dashboard/venv/bin/python /opt/mrcp-dashboard/docs/admin_api.py

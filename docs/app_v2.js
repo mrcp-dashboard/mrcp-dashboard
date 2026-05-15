@@ -4,7 +4,8 @@
 var DATA = null;
 var app = document.getElementById('app');
 var deferredPrompt = null;
-var state = { track:'all', isAdmin: localStorage.getItem('mrcp_admin') === '1' };
+var ADMIN_CFG_KEY = 'mrcp_admin_api_config';
+var state = { track:'all', isAdmin: !!getAdminConfig().token };
 
 function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function fmtTime(v){var n=Number(v);return Number.isFinite(n)?n.toFixed(3):'-';}
@@ -17,6 +18,48 @@ function lapKey(activityId, transponder, lapNo, startTime, lapTime){var n=Number
 function getOverrides(){try{var raw=JSON.parse(localStorage.getItem('mrcp_lap_overrides')||'{}');return{excluded:raw.excluded&&typeof raw.excluded==='object'?raw.excluded:{},forced_track:raw.forced_track&&typeof raw.forced_track==='object'?raw.forced_track:{}};}catch(e){return{excluded:{},forced_track:{}};}}
 function setOverrides(o){localStorage.setItem('mrcp_lap_overrides',JSON.stringify({excluded:o.excluded||{},forced_track:o.forced_track||{}},null,2));}
 function forcedTrack(lapId){return getOverrides().forced_track[lapId]||null;}
+function getAdminConfig(){try{var raw=JSON.parse(localStorage.getItem(ADMIN_CFG_KEY)||'{}');return{apiUrl:String(raw.apiUrl||'').replace(/\/+$/,''),token:String(raw.token||'')};}catch(e){return{apiUrl:'',token:''};}}
+function setAdminConfig(cfg){localStorage.setItem(ADMIN_CFG_KEY,JSON.stringify({apiUrl:String(cfg.apiUrl||'').replace(/\/+$/,''),token:String(cfg.token||'')},null,2));}
+function clearAdminConfig(){localStorage.removeItem(ADMIN_CFG_KEY);}
+async function adminFetch(path, options){
+  var cfg=getAdminConfig();
+  if(!cfg.apiUrl||!cfg.token) throw new Error('Configuration API admin manquante');
+  options=options||{};
+  var headers=Object.assign({'X-MRCP-Admin-Token':cfg.token},options.headers||{});
+  if(options.body&&!headers['Content-Type']) headers['Content-Type']='application/json';
+  var res=await fetch(cfg.apiUrl+path,Object.assign({},options,{headers:headers}));
+  var data=await res.json().catch(function(){return{};});
+  if(!res.ok) throw new Error(data.error||('Erreur API HTTP '+res.status));
+  return data;
+}
+async function checkAdminToken(apiUrl, token){
+  setAdminConfig({apiUrl:apiUrl,token:token});
+  try{
+    await adminFetch('/check-auth',{method:'POST'});
+    state.isAdmin=true;
+    updateAdminNav();
+    return true;
+  }catch(e){
+    clearAdminConfig();
+    state.isAdmin=false;
+    updateAdminNav();
+    throw e;
+  }
+}
+async function applyAdminCorrections(){
+  var message=prompt('Message de commit', 'Maj corrections admin dashboard');
+  if(message===null) return;
+  var result=await adminFetch('/apply-corrections',{
+    method:'POST',
+    body:JSON.stringify({
+      lap_overrides:getOverrides(),
+      corrections:getPilotCorrections(),
+      message:message||'Maj corrections admin dashboard'
+    })
+  });
+  alert(result.message||'Corrections appliquées');
+  location.reload();
+}
 
 function getAllLapsRaw(includeExcluded){
   var rows=[], o=getOverrides();
@@ -501,7 +544,7 @@ function adminRecords(){
       '<div class="card"><h3>Forçages piste</h3><div class="big" id="forcedTrackCount">'+Object.keys(o.forced_track).length+'</div></div>' +
       '<div class="card"><h3>Tours suspects restants</h3><div class="big" id="suspectCount">'+laps.length+'</div></div>' +
     '</div>' +
-    '<p><button id="exportLapOverrides" class="btn-primary">Exporter lap_overrides.json</button> <button id="copyLapOverrides" class="btn-secondary">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections records</button></p>' +
+    '<p><button id="exportLapOverrides" class="btn-primary">Exporter lap_overrides.json</button> <button id="applyLapOverridesApi" class="btn-good">Appliquer via API</button> <button id="copyLapOverrides" class="btn-secondary">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections records</button></p>' +
     '<textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea>' +
     '<p><button id="importLapOverrides" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
     '<input class="searchBox" id="adminRecordSearch" placeholder="Rechercher pilote, puce, session, raison...">' +
@@ -580,6 +623,10 @@ function adminRecords(){
 
   document.getElementById('exportLapOverrides').onclick=function(){
     downloadJson('lap_overrides.json',getOverrides());
+  };
+
+  document.getElementById('applyLapOverridesApi').onclick=function(){
+    applyAdminCorrections().catch(function(e){alert('API admin : '+e.message);});
   };
 
   document.getElementById('copyLapOverrides').onclick=function(){
@@ -693,7 +740,7 @@ function adminPilots(){
       '<div class="card"><h3>Transpondeurs détectés</h3><div class="big">'+rows.length+'</div></div>' +
       '<div class="card"><h3>Associations locales</h3><div class="big">'+Object.keys(corrections.transponders).length+'</div></div>' +
     '</div>' +
-    '<p><button id="exportPilotCorrections" class="btn-primary">Exporter corrections.json</button> <button id="copyPilotCorrections" class="btn-secondary">Copier JSON</button> <button id="clearPilotCorrections" class="btn-danger">Vider corrections pilotes</button></p>' +
+    '<p><button id="exportPilotCorrections" class="btn-primary">Exporter corrections.json</button> <button id="applyPilotCorrectionsApi" class="btn-good">Appliquer via API</button> <button id="copyPilotCorrections" class="btn-secondary">Copier JSON</button> <button id="clearPilotCorrections" class="btn-danger">Vider corrections pilotes</button></p>' +
     '<textarea class="admin-json" id="pilotCorrectionsText">'+escapeHtml(JSON.stringify(corrections,null,2))+'</textarea>' +
     '<p><button id="importPilotCorrections" class="btn-secondary">Importer le JSON ci-dessus</button></p>' +
     '<input class="searchBox" id="adminPilotSearch" placeholder="Rechercher transpondeur ou pilote...">' +
@@ -719,6 +766,10 @@ function adminPilots(){
 
   document.getElementById('exportPilotCorrections').onclick=function(){
     exportPilotCorrections();
+  };
+
+  document.getElementById('applyPilotCorrectionsApi').onclick=function(){
+    applyAdminCorrections().catch(function(e){alert('API admin : '+e.message);});
   };
 
   document.getElementById('copyPilotCorrections').onclick=function(){
@@ -751,11 +802,45 @@ function adminPilots(){
     });
   };
 }
-function adminPage(){adminOnly('Admin','<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/quality" class="btn-secondary">Qualité</a></p><ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Exporte lap_overrides.json et corrections.json.</li><li>Copie dans le projet.</li><li>Lance python build_data_v2.py puis commit/push.</li></ol>');}
+function adminPage(){
+  var cfg=getAdminConfig();
+  adminOnly('Admin',
+    '<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/quality" class="btn-secondary">Qualite</a></p>' +
+    '<div class="grid">' +
+      '<div class="card"><h3>API admin</h3><p class="small">Les corrections peuvent etre exportees en JSON ou appliquees directement via l API locale.</p><div class="goal-box"><div class="goal-pill"><span class="small">URL</span><strong>'+escapeHtml(cfg.apiUrl||'Non configuree')+'</strong></div><div class="goal-pill"><span class="small">Token</span><strong>'+(cfg.token?'Configure':'Manquant')+'</strong></div></div><p><button id="testAdminApi" class="btn-secondary">Tester API</button> <button id="applyAllCorrections" class="btn-good">Appliquer corrections + push</button> <button id="resetAdminApi" class="btn-danger">Oublier acces admin</button></p></div>' +
+      '<div class="card"><h3>Corrections locales</h3><div class="goal-box"><div class="goal-pill"><span class="small">Records</span><strong>'+Object.keys(getOverrides().excluded).length+' exclusions / '+Object.keys(getOverrides().forced_track).length+' pistes</strong></div><div class="goal-pill"><span class="small">Pilotes</span><strong>'+Object.keys(getPilotCorrections().transponders).length+' associations</strong></div></div></div>' +
+    '</div>' +
+    '<ol><li>Corrige les tours dans Records admin.</li><li>Associe les puces dans Pilotes admin.</li><li>Clique sur Appliquer corrections + push si l API locale est configuree.</li><li>Sinon exporte les JSON et lance la generation manuellement.</li></ol>'
+  );
+  var test=document.getElementById('testAdminApi');
+  if(test)test.onclick=function(){adminFetch('/check-auth',{method:'POST'}).then(function(){alert('API admin OK');}).catch(function(e){alert('API admin : '+e.message);});};
+  var apply=document.getElementById('applyAllCorrections');
+  if(apply)apply.onclick=function(){applyAdminCorrections().catch(function(e){alert('API admin : '+e.message);});};
+  var reset=document.getElementById('resetAdminApi');
+  if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
+}
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live')===0)return livePage();
     if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
-function bindAdmin(){function unlock(){var c=prompt('Code admin');if(c==='mrcp'){localStorage.setItem('mrcp_admin','1');state.isAdmin=true;updateAdminNav();alert('Mode admin activé');}else if(c)alert('Code incorrect');}var a=document.getElementById('adminBtn');if(a)a.onclick=unlock;var b=document.getElementById('adminBtnTop');if(b)b.onclick=unlock;var e=document.getElementById('adminExit');if(e)e.onclick=function(){localStorage.removeItem('mrcp_admin');state.isAdmin=false;location.hash='#/';router();};}
+function bindAdmin(){
+  async function unlock(){
+    var current=getAdminConfig();
+    var apiUrl=prompt('URL API admin', current.apiUrl||'http://127.0.0.1:5055');
+    if(!apiUrl) return;
+    var token=prompt('Token admin', current.token||'');
+    if(!token) return;
+    try{
+      await checkAdminToken(apiUrl, token);
+      alert('Mode admin active');
+      router();
+    }catch(e){
+      alert('Acces admin refuse : '+e.message);
+    }
+  }
+  var a=document.getElementById('adminBtn');if(a)a.onclick=unlock;
+  var b=document.getElementById('adminBtnTop');if(b)b.onclick=unlock;
+  var e=document.getElementById('adminExit');if(e)e.onclick=function(){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();};
+}
 
 function setupPwa(){
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(e){console.log('SW non enregistré',e);});}

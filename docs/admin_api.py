@@ -21,6 +21,7 @@ Par défaut écoute sur :
 import json
 import os
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -30,6 +31,8 @@ from flask_cors import CORS
 PROJECT_ROOT = Path(os.environ.get("MRCP_PROJECT_ROOT", "/opt/mrcp-dashboard"))
 DOCS_DIR = Path(os.environ.get("MRCP_DOCS_DIR", str(PROJECT_ROOT / "docs")))
 TOKEN = os.environ.get("MRCP_ADMIN_TOKEN", "")
+HOST = os.environ.get("MRCP_ADMIN_API_HOST", "0.0.0.0")
+PORT = int(os.environ.get("MRCP_ADMIN_API_PORT", "5055"))
 
 if not TOKEN:
     print("ATTENTION: MRCP_ADMIN_TOKEN non défini. Définis un token avant usage en production.")
@@ -72,6 +75,13 @@ def health():
     })
 
 
+@app.route("/check-auth", methods=["POST"])
+def check_auth_route():
+    if not check_auth():
+        return jsonify({"ok": False, "error": "unauthorized"}), 401
+    return jsonify({"ok": True, "service": "mrcp-admin-api"})
+
+
 @app.route("/apply-corrections", methods=["POST"])
 def apply_corrections():
     if not check_auth():
@@ -102,7 +112,7 @@ def apply_corrections():
 
     commands = []
 
-    commands.append(run_cmd(["python", "build_data_v2.py"], cwd=DOCS_DIR))
+    commands.append(run_cmd([sys.executable, "build_data_v2.py"], cwd=DOCS_DIR))
 
     commands.append(run_cmd(["git", "add", "docs"], cwd=PROJECT_ROOT))
 
@@ -151,4 +161,4 @@ def apply_corrections():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("MRCP_ADMIN_API_PORT", "5055")))
+    app.run(host=HOST, port=PORT)

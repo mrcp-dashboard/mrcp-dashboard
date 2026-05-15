@@ -1,0 +1,20 @@
+[Unit]
+Description=MRCP Dashboard Live Timing Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/mrcp-dashboard
+Environment=MRCP_PROJECT_ROOT=/opt/mrcp-dashboard
+Environment=MRCP_DOCS_DIR=/opt/mrcp-dashboard/docs
+Environment=MRCP_DATA_FILE=/opt/mrcp-dashboard/docs/data_v2.json
+Environment=MRCP_LIVE_HOST=0.0.0.0
+Environment=MRCP_LIVE_PORT=5056
+Environment=MRCP_LIVE_CORS_ORIGINS=*
+ExecStart=/opt/mrcp-dashboard/venv/bin/python /opt/mrcp-dashboard/live_server.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

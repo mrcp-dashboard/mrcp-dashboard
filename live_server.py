@@ -3,21 +3,27 @@ from flask_socketio import SocketIO
 import json
 import time
 import os
+from pathlib import Path
 from threading import Thread
 
-DATA_FILE = "/opt/mrcp-dashboard/docs/data_v2.json"
+PROJECT_ROOT = Path(os.environ.get("MRCP_PROJECT_ROOT", "/opt/mrcp-dashboard"))
+DOCS_DIR = Path(os.environ.get("MRCP_DOCS_DIR", str(PROJECT_ROOT / "docs")))
+DATA_FILE = Path(os.environ.get("MRCP_DATA_FILE", str(DOCS_DIR / "data_v2.json")))
+LIVE_HOST = os.environ.get("MRCP_LIVE_HOST", "0.0.0.0")
+LIVE_PORT = int(os.environ.get("MRCP_LIVE_PORT", "5056"))
+LIVE_CORS_ORIGINS = os.environ.get("MRCP_LIVE_CORS_ORIGINS", "*")
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins=LIVE_CORS_ORIGINS)
 
 last_signature = None
 
 
 def load_data():
-    if not os.path.exists(DATA_FILE):
+    if not DATA_FILE.exists():
         return {"laps": []}
 
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
+    with DATA_FILE.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -207,7 +213,7 @@ def index():
         "status": "ok",
         "service": "MRCP Live Timing V5.2",
         "mode": "Dernière session MRCP",
-        "data_file": DATA_FILE
+        "data_file": str(DATA_FILE)
     })
 
 
@@ -224,4 +230,4 @@ def handle_connect():
 
 if __name__ == "__main__":
     Thread(target=watcher, daemon=True).start()
-    socketio.run(app, host="0.0.0.0", port=5056)
+    socketio.run(app, host=LIVE_HOST, port=LIVE_PORT)

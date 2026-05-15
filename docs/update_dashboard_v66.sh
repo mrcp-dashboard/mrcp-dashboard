@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-cd /opt/mrcp-dashboard/docs
+PROJECT_ROOT="${MRCP_PROJECT_ROOT:-/opt/mrcp-dashboard}"
+PROJECT_DIR="${MRCP_DOCS_DIR:-$PROJECT_ROOT/docs}"
+
+cd "$PROJECT_DIR"
 
 echo "=== MRCP UPDATE V6.6 ==="
 
@@ -13,9 +16,9 @@ if [ -f data_v2.json ]; then
 fi
 
 if [ -f ../build_data_v2.py ]; then
-  cd /opt/mrcp-dashboard
+  cd "$PROJECT_ROOT"
   ./venv/bin/python build_data_v2.py
-  cd /opt/mrcp-dashboard/docs
+  cd "$PROJECT_DIR"
 elif [ -f build_data_v2.py ]; then
   ./../venv/bin/python build_data_v2.py || python build_data_v2.py
 else

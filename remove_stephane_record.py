@@ -1,7 +1,10 @@
 import json
+import os
 from pathlib import Path
 
-DATA = Path("/opt/mrcp-dashboard/docs/data_v2.json")
+PROJECT_ROOT = Path(os.environ.get("MRCP_PROJECT_ROOT", "/opt/mrcp-dashboard"))
+DOCS_DIR = Path(os.environ.get("MRCP_DOCS_DIR", str(PROJECT_ROOT / "docs")))
+DATA = Path(os.environ.get("MRCP_DATA_FILE", str(DOCS_DIR / "data_v2.json")))
 
 BAD_PILOT = "Stephane Audifax"
 BAD_LAP = 15.296

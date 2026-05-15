@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-PROJECT_DIR="/opt/mrcp-dashboard/docs"
+PROJECT_ROOT="${MRCP_PROJECT_ROOT:-/opt/mrcp-dashboard}"
+PROJECT_DIR="${MRCP_DOCS_DIR:-$PROJECT_ROOT/docs}"
 
 cd "$PROJECT_DIR"
 
@@ -9,7 +10,7 @@ echo "============================================================"
 echo "MRCP DASHBOARD AUTO UPDATE - $(date)"
 echo "============================================================"
 
-source ../venv/bin/activate
+source "$PROJECT_ROOT/venv/bin/activate"
 
 echo "[1/4] Synchronisation SpeedHive"
 python speedhive_sync_linux.py --limit 200
@@ -18,7 +19,7 @@ echo "[2/4] Génération data_v2.json"
 python build_data_v2.py
 
 echo "[3/4] Git add"
-cd /opt/mrcp-dashboard
+cd "$PROJECT_ROOT"
 git add docs
 
 echo "[4/4] Git commit / push"
