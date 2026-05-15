@@ -138,7 +138,6 @@ Puis verifier au navigateur les pages principales listees dans "Demarrage local"
 
 ## Priorites de developpement suggerees
 
-1. Nettoyer le versioning des fichiers volumineux deja suivis (`*.log`, backups, rapports).
-2. Remplacer le code admin hardcode cote navigateur par une configuration serveur.
-3. Ajouter un test de generation minimal pour `build_data_v2.py`.
-4. Decouper progressivement `app_v2.js` en modules plus petits.
+1. Ajouter un test de generation minimal pour `build_data_v2.py`.
+2. Decouper progressivement `app_v2.js` en modules plus petits.
+3. Ameliorer l'experience mobile des pages admin.

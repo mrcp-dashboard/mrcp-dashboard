@@ -86,3 +86,13 @@ git status --short
 
 Verifier ensuite les pages principales en local, surtout apres modification de
 `app_v2.js`, `styles_v2.css`, `data_v2.json` ou des scripts `mrcp_v*.js`.
+
+## Fichiers generes
+
+Les logs et backups locaux ne doivent pas etre suivis par Git :
+
+- `*.log`
+- `docs/backups/`
+
+Le dashboard public utilise `docs/data_v2.json`. Les copies de rapports et logs
+peuvent rester sur le serveur, mais elles ne doivent plus bloquer les `git pull`.
