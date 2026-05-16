@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mrcp-dashboard-v4-4-2';
+const CACHE_NAME = 'mrcp-dashboard-v2026-05-16-cachefix-1';
 
 const ASSETS = [
   './index_v2.html',
@@ -23,15 +23,26 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html') || url.pathname.endsWith('index_v2.html')) {
+    event.respondWith(fetch(event.request, {cache: 'no-store'}).catch(() => caches.match('./index_v2.html')));
+    return;
+  }
 
   if (url.pathname.endsWith('data_v2.json')) {
     event.respondWith(fetch(event.request, {cache: 'no-store'}));
     return;
   }
 
-  if (url.pathname.endsWith('app_v2.js') || url.pathname.endsWith('styles_v2.css')) {
+  if (url.pathname.endsWith('app_v2.js') || url.pathname.endsWith('styles_v2.css') || url.pathname.endsWith('pilot_links_v53.js') || url.pathname.endsWith('mrcp_v55_widgets.js') || url.pathname.endsWith('mrcp_v54_intelligence.js')) {
     event.respondWith(fetch(event.request, {cache: 'no-store'}).catch(() => caches.match(event.request)));
     return;
   }

@@ -1443,7 +1443,26 @@ function bindAdmin(){
 }
 
 function setupPwa(){
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(e){console.log('SW non enregistré',e);});}
+  if('serviceWorker' in navigator){
+    var refreshing=false;
+    navigator.serviceWorker.addEventListener('controllerchange',function(){
+      if(refreshing)return;
+      refreshing=true;
+      location.reload();
+    });
+    navigator.serviceWorker.register('sw.js?v=20260516-cachefix1').then(function(reg){
+      if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+      reg.addEventListener('updatefound',function(){
+        var worker=reg.installing;
+        if(!worker)return;
+        worker.addEventListener('statechange',function(){
+          if(worker.state==='installed'&&navigator.serviceWorker.controller){
+            worker.postMessage({type:'SKIP_WAITING'});
+          }
+        });
+      });
+    }).catch(function(e){console.log('SW non enregistré',e);});
+  }
   var installBtn=document.getElementById('installPwaBtn');
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;if(installBtn)installBtn.classList.remove('hidden');});
   if(installBtn){installBtn.onclick=async function(){if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.classList.add('hidden');};}
