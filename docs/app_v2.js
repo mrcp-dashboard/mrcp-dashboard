@@ -937,6 +937,27 @@ function lapSuspicionReasons(l){
 }
 function suspiciousLaps(){return getAllLapsRaw(true).filter(function(l){return lapSuspicionReasons(l).length>0;}).sort(function(a,b){return a._time-b._time;});}
 function downloadJson(filename,obj){var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function hashParam(name, fallback){
+  var raw=(location.hash.split('?')[1]||'');
+  var params=new URLSearchParams(raw);
+  return params.get(name)||fallback;
+}
+function adminRecordLapsForView(view){
+  var rows;
+  if(view==='tt10') rows=getAllLapsRaw(true).filter(function(l){return l._track==='TT1/10';});
+  else if(view==='tt8') rows=getAllLapsRaw(true).filter(function(l){return l._track==='TT1/8';});
+  else if(view==='all') rows=getAllLapsRaw(true);
+  else rows=suspiciousLaps();
+  return rows.sort(function(a,b){
+    return (a._time-b._time)||String(b._date||b.session_name).localeCompare(String(a._date||a.session_name));
+  });
+}
+function adminRecordViewLabel(view){
+  if(view==='tt10')return'Tours TT1/10';
+  if(view==='tt8')return'Tours TT1/8';
+  if(view==='all')return'Tous les tours';
+  return'Tours suspects';
+}
 function qualityGroupKey(l, type){
   return type==='session' ? (l.session_id||l.session_name||l._date||'session') : (normalizeTransponder(l.transponder)||'sans-puce');
 }
@@ -967,7 +988,8 @@ function qualityGroupHtml(groups, type){
   }).join('')+'</div>';
 }
 function adminRecords(){
-  var laps=suspiciousLaps();
+  var view=hashParam('view','suspect');
+  var laps=adminRecordLapsForView(view);
   var o=getOverrides();
   var puceGroups=qualityGroups(laps.filter(function(l){return normalizeTransponder(l.transponder);}), 'transponder');
   var sessionGroups=qualityGroups(laps, 'session');
@@ -998,11 +1020,12 @@ function adminRecords(){
     '<div class="grid">' +
       '<div class="card"><h3>Exclusions</h3><div class="big" id="excludedCount">'+Object.keys(o.excluded).length+'</div></div>' +
       '<div class="card"><h3>Forçages piste</h3><div class="big" id="forcedTrackCount">'+Object.keys(o.forced_track).length+'</div></div>' +
-      '<div class="card"><h3>Tours suspects restants</h3><div class="big" id="suspectCount">'+laps.length+'</div></div>' +
+      '<div class="card"><h3>Tours affiches</h3><div class="big" id="suspectCount">'+laps.length+'</div><p class="small">'+escapeHtml(adminRecordViewLabel(view))+'</p></div>' +
     '</div>' +
     adminPreviewHtml() +
     '<p><button id="exportLapOverrides" class="btn-primary">Exporter lap_overrides.json</button> <button id="applyLapOverridesApi" class="btn-good">Appliquer via API</button> <button id="copyLapOverrides" class="btn-secondary">Copier JSON</button> <button id="clearLapOverrides" class="btn-danger">Vider corrections records</button></p>' +
     '<div id="adminRecordsStatus" class="admin-status hidden"></div>' +
+    '<div class="admin-record-toolbar"><label class="small" for="adminRecordView">Vue</label><select id="adminRecordView"><option value="suspect">Tours suspects</option><option value="tt10">Tous les TT1/10</option><option value="tt8">Tous les TT1/8</option><option value="all">Tous les tours</option></select><span class="small">Utilise cette vue pour corriger un tour TT1/10 qui n apparait pas dans les suspects.</span></div>' +
     '<section class="admin-history"><div class="panel-title"><h2>Nettoyage par puce</h2></div>'+qualityGroupHtml(puceGroups,'transponder')+'</section>' +
     '<section class="admin-history"><div class="panel-title"><h2>Nettoyage par session</h2></div>'+qualityGroupHtml(sessionGroups,'session')+'</section>' +
     '<textarea class="admin-json" id="lapOverridesText">'+escapeHtml(JSON.stringify(o,null,2))+'</textarea>' +
@@ -1024,6 +1047,15 @@ function adminRecords(){
 
     var suspect=document.getElementById('suspectCount');
     if(suspect) suspect.textContent=document.querySelectorAll('#adminRecordRows tr').length;
+  }
+
+  var recordView=document.getElementById('adminRecordView');
+  if(recordView){
+    recordView.value=view;
+    recordView.onchange=function(){
+      location.hash='#/admin-records?view='+encodeURIComponent(recordView.value);
+      adminRecords();
+    };
   }
 
   function removeCorrectedRow(btn){
