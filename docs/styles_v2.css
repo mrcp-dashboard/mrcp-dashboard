@@ -420,6 +420,22 @@ textarea.admin-json{width:100%;min-height:220px}
   text-align:right;
 }
 
+.live-day-table table{
+  min-width:820px;
+}
+.live-day-table td:nth-child(3),
+.live-day-table td:nth-child(4),
+.live-day-table td:nth-child(5),
+.live-day-table td:nth-child(6){
+  font-variant-numeric:tabular-nums;
+}
+.live-day-table tbody tr:first-child{
+  background:rgba(255,210,63,.08);
+}
+.live-day-table tbody tr:first-child td{
+  border-bottom-color:rgba(255,210,63,.22);
+}
+
 .live-refresh{
   display:flex;
   gap:10px;

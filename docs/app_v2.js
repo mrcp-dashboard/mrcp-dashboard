@@ -729,6 +729,117 @@ function liveTrackCounts(laps){
   return counts;
 }
 
+function dateKeyFromValue(value){
+  var s=String(value||'').trim();
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m)return m[3]+'-'+m[2]+'-'+m[1];
+  var t=Date.parse(s);
+  if(Number.isFinite(t)){
+    var d=new Date(t);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  return '';
+}
+
+function todayKey(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function liveDayPilotName(l){
+  var name=String(l._pilot||'').trim();
+  if(!name||name==='Pilote inconnu'||name.indexOf('Inconnu')>=0||/^[0-9]+/.test(name)){
+    return normalizeTransponder(l.transponder)||name||'Puce inconnue';
+  }
+  return name;
+}
+
+function liveDayRows(laps){
+  var map=new Map();
+  laps.forEach(function(l){
+    var key=liveDayPilotName(l);
+    var item=map.get(key)||{pilot:key,laps:0,best:Infinity,last:null,total:0,tracks:{},lastDate:''};
+    item.laps++;
+    item.total+=l._time;
+    item.last=l;
+    item.lastDate=l._date||l.session_name||'';
+    item.tracks[l._track]=true;
+    if(l._time<item.best)item.best=l._time;
+    map.set(key,item);
+  });
+  return Array.from(map.values()).map(function(r){
+    r.avg=r.laps?r.total/r.laps:null;
+    r.track=Object.keys(r.tracks).join(' / ')||'-';
+    return r;
+  }).sort(function(a,b){return a.best-b.best||b.laps-a.laps||a.pilot.localeCompare(b.pilot);});
+}
+
+function liveDayTable(rows){
+  if(!rows.length)return '<p class="small">Aucun tour date du jour pour le moment.</p>';
+  return '<div class="table-wrap live-day-table"><table><thead><tr><th>#</th><th>Pilote / puce</th><th>Tours</th><th>Meilleur</th><th>Tour actuel</th><th>Moyenne</th><th>Piste</th></tr></thead><tbody>'+
+    rows.map(function(r,i){
+      return '<tr>' +
+        '<td>'+(i+1)+'</td>' +
+        '<td><strong>'+escapeHtml(r.pilot)+'</strong></td>' +
+        '<td>'+r.laps+'</td>' +
+        '<td><strong>'+fmtTimeS(r.best)+'</strong></td>' +
+        '<td>'+fmtTimeS(r.last&&r.last._time)+'</td>' +
+        '<td>'+fmtTimeS(r.avg)+'</td>' +
+        '<td><span class="badge">'+escapeHtml(r.track)+'</span></td>' +
+      '</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+function liveDayPage(){
+  if(liveTimer) clearTimeout(liveTimer);
+  var key=todayKey();
+  var all=getAllLaps();
+  var dayLaps=all.filter(function(l){return dateKeyFromValue(l._date||l.session_date||l.date||l.session_name)===key;});
+  var filtered=applyFilters(dayLaps);
+  var rows=liveDayRows(filtered);
+  var best=rows[0]||null;
+  var counts=liveTrackCounts(dayLaps);
+  var lastUpdate=new Date().toLocaleTimeString('fr-FR');
+
+  app.innerHTML=
+    '<section class="live-hero">' +
+      '<div class="card live-card">' +
+        '<div class="live-status"><span class="live-dot"></span> LIVE JOUR</div>' +
+        '<h1 class="live-title">Live reel du jour</h1>' +
+        '<p class="pilot-sub">Tableau classe par meilleur tour du jour. Les pilotes inconnus sont affiches par puce.</p>' +
+        '<div class="goal-box">' +
+          '<div class="goal-pill"><span class="small">Date</span><strong>'+escapeHtml(key)+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">Pilotes / puces</span><strong>'+rows.length+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">Tours du jour</span><strong>'+dayLaps.length+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">TT1/8</span><strong>'+(counts['TT1/8']||0)+'</strong></div>' +
+          '<div class="goal-pill"><span class="small">TT1/10</span><strong>'+(counts['TT1/10']||0)+'</strong></div>' +
+        '</div>' +
+        '<div class="live-refresh">' +
+          '<button id="manualRefreshLiveDay" class="btn-primary">Rafraichir</button>' +
+          '<span class="small">Dernier rafraichissement : '+lastUpdate+'</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<h3>Meilleur tour du jour</h3>' +
+        '<div class="big">'+fmtTimeS(best&&best.best)+'</div>' +
+        '<p>'+(best?escapeHtml(best.pilot):'-')+'</p>' +
+        '<p class="small">Rafraichissement automatique toutes les 30 secondes.</p>' +
+      '</div>' +
+    '</section>' +
+    '<section class="card">' +
+      '<div class="panel-title"><h2>Classement live du jour</h2></div>' +
+      renderFilters() +
+      liveDayTable(rows) +
+    '</section>';
+
+  bindFilters(liveDayPage);
+  var manual=document.getElementById('manualRefreshLiveDay');
+  if(manual)manual.onclick=function(){location.reload();};
+  liveTimer=setTimeout(function(){location.reload();},30000);
+}
+
 function renderLiveRows(rows){
   if(!rows.length){
     return '<p class="small">Aucun tour live disponible pour le moment.</p>';
@@ -1277,7 +1388,7 @@ function adminPage(){
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
-function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live')===0)return livePage();
+function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/jour')===0)return liveDayPage();if(h.indexOf('#/live')===0)return livePage();
     if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/rapport')===0)return reportPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
