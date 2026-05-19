@@ -155,6 +155,8 @@ def main():
     log("SYNC SPEEDHIVE LINUX")
     log("=" * 70)
     log(f"Filtre actif : sessions à partir du {LIMIT_DATE_TEXT}")
+    today_text = datetime.now().date().isoformat()
+    log(f"Retéléchargement automatique actif pour les activités du jour : {today_text}")
 
     try:
         activities = get_activities(args.limit)
@@ -191,14 +193,19 @@ def main():
 
         try:
             before_exists = (CSV_DIR / f"sessions_{activity_id}.csv").exists()
+            force_today = bool(date_text and date_text == today_text)
+            force_download = args.force or force_today
 
             path = download_csv(
                 activity,
-                force=args.force
+                force=force_download
             )
 
             if path:
-                if before_exists and not args.force:
+                if before_exists and force_today and not args.force:
+                    downloaded += 1
+                    log(f"Retéléchargé activité du jour : {path.name} | {label}")
+                elif before_exists and not args.force:
                     skipped += 1
                     log(f"Déjà présent : {path.name} | {label}")
                 else:
