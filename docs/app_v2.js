@@ -756,6 +756,47 @@ function liveDayPilotName(l){
   return name;
 }
 
+function liveDaySourceLaps(dayKey){
+  var rows=[], o=getOverrides(), order=0;
+  function add(l,ctx){
+    var dateKey=dateKeyFromValue(l.date||l.session_date||ctx.session_date||ctx.session_name);
+    if(dateKey!==dayKey)return;
+    var t=lapSeconds(l);
+    if(!Number.isFinite(t)||t<=0)return;
+    var tp=ctx.transponder||l.transponder||'';
+    var lapNo=l.lap_no||l.lap||l.number||'';
+    var startTime=l.start_time||l.started_at||'';
+    var lapId=l.lap_id||l.id||lapKey(ctx.activity_id,tp,lapNo,startTime,t);
+    if(o.excluded[lapId]||l.exclude_from_records||l.excluded)return;
+    order++;
+    rows.push(Object.assign({},l,{
+      lap_id:lapId,
+      activity_id:ctx.activity_id||'',
+      session_id:ctx.session_id||ctx.activity_id||'',
+      session_name:ctx.session_name||'',
+      session_date:ctx.session_date||'',
+      transponder:tp,
+      pilot_name:ctx.pilot_name||lapPilot(l),
+      _time:t,
+      _track:forcedTrack(lapId)||l.track||ctx.track||normalizeTrack(l),
+      _pilot:ctx.pilot_name||lapPilot(l),
+      _date:ctx.session_date||l.date||l.session_date||'',
+      _order:order
+    }));
+  }
+  if(DATA&&Array.isArray(DATA.activities)&&DATA.activities.length){
+    DATA.activities.forEach(function(a){
+      var id=a.id||a.activity_id||a.session_id||'', name=a.name||a.title||a.session_name||a.date_fr||a.date||'', date=a.date||a.session_date||a.created_at||'';
+      (a.participants||[]).forEach(function(p){
+        var pilot=p.pilot_name||p.name||p.driver||('Inconnu #'+(p.transponder||'')), tp=p.transponder||p.transponder_id||'';
+        (p.laps||[]).forEach(function(l){add(l,{activity_id:id,session_id:id,session_name:name,session_date:date,pilot_name:pilot,transponder:tp,track:l.track||p.track||null});});
+      });
+    });
+    return rows;
+  }
+  return getAllLaps().filter(function(l){return dateKeyFromValue(l._date||l.session_date||l.date||l.session_name)===dayKey;});
+}
+
 function liveDayRows(laps){
   var map=new Map();
   laps.forEach(function(l){
@@ -763,7 +804,7 @@ function liveDayRows(laps){
     var item=map.get(key)||{pilot:key,laps:0,best:Infinity,last:null,total:0,tracks:{},lastDate:''};
     item.laps++;
     item.total+=l._time;
-    item.last=l;
+    if(!item.last||(l._order||0)>((item.last&&item.last._order)||0))item.last=l;
     item.lastDate=l._date||l.session_name||'';
     item.tracks[l._track]=true;
     if(l._time<item.best)item.best=l._time;
@@ -795,8 +836,7 @@ function liveDayTable(rows){
 function liveDayPage(){
   if(liveTimer) clearTimeout(liveTimer);
   var key=todayKey();
-  var all=getAllLaps();
-  var dayLaps=all.filter(function(l){return dateKeyFromValue(l._date||l.session_date||l.date||l.session_name)===key;});
+  var dayLaps=liveDaySourceLaps(key);
   var filtered=applyFilters(dayLaps);
   var rows=liveDayRows(filtered);
   var best=rows[0]||null;
