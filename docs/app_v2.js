@@ -673,6 +673,76 @@ function pilotSessionPage(path){
   var print=document.getElementById('printPilotProfile');
   if(print)print.onclick=function(){window.print();};
 }
+function sessionListRows(){
+  var rows=[];
+  (DATA&&DATA.activities||[]).forEach(function(a){
+    var sessionKey=a.id||a.activity_id||a.session_id||'';
+    var date=a.date_fr||a.date||a.session_date||'';
+    (a.participants||[]).forEach(function(p){
+      var laps=p.laps||[];
+      var first=laps[0]||{};
+      var last=laps[laps.length-1]||{};
+      var pilot=p.pilot_name||p.name||('Inconnu #'+(p.transponder||''));
+      rows.push({
+        key:sessionKey,
+        pilot:pilot,
+        transponder:p.transponder||p.transponder_id||'',
+        date:date,
+        sortDate:parseDateValue(a.date||a.session_date||date),
+        time:first.start_time||last.start_time||'',
+        laps:p.laps_count||laps.length||0,
+        best:p.best_lap||null,
+        avg:p.avg_lap||null,
+        track:p.track||Object.keys((p.track_counts||{})).join(' / ')||'-',
+        search:(pilot+' '+(p.transponder||'')+' '+date+' '+sessionKey).toLowerCase()
+      });
+    });
+  });
+  return rows.sort(function(a,b){
+    return b.sortDate-a.sortDate||String(b.time).localeCompare(String(a.time))||a.pilot.localeCompare(b.pilot);
+  });
+}
+function sessionListTable(rows, page){
+  var perPage=20;
+  var totalPages=Math.max(1,Math.ceil(rows.length/perPage));
+  page=Math.min(Math.max(1,page||1),totalPages);
+  var start=(page-1)*perPage;
+  var pageRows=rows.slice(start,start+perPage);
+  if(!pageRows.length)return '<p class="small">Aucune session trouvee.</p>';
+  return '<div class="table-wrap sessions-table"><table><thead><tr><th>Transpondeur / pilote</th><th>Date</th><th>Heure</th><th>Tours</th><th>Best</th><th>Moyenne</th><th>Piste</th><th></th></tr></thead><tbody>'+
+    pageRows.map(function(r){
+      return '<tr data-search="'+escapeHtml(r.search)+'">' +
+        '<td><a href="#/pilote-session/'+encodeURIComponent(r.pilot)+'/'+encodeURIComponent(r.key)+'"><strong>'+escapeHtml(r.pilot)+'</strong></a><div class="small">'+escapeHtml(r.transponder||'Sans puce')+'</div></td>' +
+        '<td>'+escapeHtml(r.date||'-')+'</td>' +
+        '<td>'+escapeHtml(r.time||'-')+'</td>' +
+        '<td>'+r.laps+'</td>' +
+        '<td><strong>'+fmtTimeS(r.best)+'</strong></td>' +
+        '<td>'+fmtTimeS(r.avg)+'</td>' +
+        '<td><span class="badge">'+escapeHtml(r.track)+'</span></td>' +
+        '<td><a class="mini-button" href="#/pilote-session/'+encodeURIComponent(r.pilot)+'/'+encodeURIComponent(r.key)+'">Ouvrir</a></td>' +
+      '</tr>';
+    }).join('')+'</tbody></table></div>'+sessionPagerHtml(page,totalPages);
+}
+function sessionPagerHtml(page,totalPages){
+  if(totalPages<=1)return '';
+  var prev=Math.max(1,page-1), next=Math.min(totalPages,page+1);
+  return '<div class="session-pager">' +
+    '<a class="btn-secondary '+(page===1?'disabled':'')+'" href="#/sessions?page='+prev+'">Precedent</a>' +
+    '<span class="small">Page '+page+' / '+totalPages+'</span>' +
+    '<a class="btn-secondary '+(page===totalPages?'disabled':'')+'" href="#/sessions?page='+next+'">Suivant</a>' +
+  '</div>';
+}
+function sessionsPage(){
+  var page=Number(hashParam('page','1'))||1;
+  var all=sessionListRows();
+  app.innerHTML='<section class="card"><div class="panel-title"><h2>Sessions</h2><span class="small">'+all.length+' sessions pilotes</span></div><input class="searchBox" id="sessionSearch" placeholder="Rechercher pilote, puce, date..."><div id="sessionsList">'+sessionListTable(all,page)+'</div></section>';
+  var search=document.getElementById('sessionSearch');
+  if(search)search.oninput=function(e){
+    var q=e.target.value.toLowerCase();
+    var filtered=all.filter(function(r){return r.search.indexOf(q)!==-1;});
+    document.getElementById('sessionsList').innerHTML=sessionListTable(filtered,1);
+  };
+}
 function podiums(){
   var laps=getAllLaps();
   var filtered=applyFilters(laps);
@@ -1519,7 +1589,7 @@ function adminPage(){
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/jour')===0)return liveDayPage();if(h.indexOf('#/live')===0)return livePage();
-    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/rapport')===0)return reportPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
+    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/rapport')===0)return reportPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
     var current=getAdminConfig();
@@ -1548,7 +1618,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260521-sessiondetail1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260521-sessions1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;
