@@ -310,7 +310,11 @@ textarea.admin-json{width:100%;min-height:220px}
 .progress-line{fill:none;stroke:var(--cyan);stroke-width:3}
 .progress-dot{fill:var(--gold);stroke:#001020;stroke-width:2}
 .progress-axis{stroke:rgba(255,255,255,.18);stroke-width:1}
+.progress-grid{stroke:rgba(255,255,255,.08);stroke-width:1}
 .progress-label{fill:var(--muted);font-size:11px}
+.axis-title{font-weight:700;fill:#dbe9ff}
+.session-chart-wrap{height:250px}
+.session-chart-svg .progress-line{stroke-width:2.5}
 .share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .mobile-sticky-action{display:none}
 

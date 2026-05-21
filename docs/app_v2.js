@@ -312,6 +312,44 @@ function renderProgressSvg(points){
   var dots=points.map(function(p,i){return '<circle class="progress-dot" cx="'+x(i).toFixed(1)+'" cy="'+yy(p.time).toFixed(1)+'" r="5"><title>'+escapeHtml(p.label)+' — '+fmtTimeS(p.time)+'</title></circle>';}).join('');
   return '<div class="progress-wrap"><svg class="progress-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><line class="progress-axis" x1="'+pad+'" y1="'+(h-pad)+'" x2="'+(w-pad)+'" y2="'+(h-pad)+'"></line><line class="progress-axis" x1="'+pad+'" y1="'+pad+'" x2="'+pad+'" y2="'+(h-pad)+'"></line><path class="progress-line" d="'+d+'"></path>'+dots+'<text class="progress-label" x="'+pad+'" y="16">Meilleur</text><text class="progress-label" x="'+(w-95)+'" y="'+(h-8)+'">Dernières sessions</text></svg></div>';
 }
+function renderSessionLapSvg(points){
+  if(points.length<2)return '<p class="small">Pas encore assez de tours pour afficher une courbe.</p>';
+  var w=760,h=250,left=58,right=18,top=18,bottom=42;
+  var times=points.map(function(p){return p.time;}).filter(function(v){return Number.isFinite(v);});
+  if(!times.length)return '<p class="small">Aucun chrono exploitable pour cette courbe.</p>';
+  var min=Math.min.apply(null,times),max=Math.max.apply(null,times);
+  var margin=Math.max((max-min)*0.08,0.2);
+  min=Math.max(0,min-margin);
+  max=max+margin;
+  if(max===min)max=min+1;
+  function x(i){return left+(points.length===1?0.5:i/(points.length-1))*(w-left-right);}
+  function y(v){return top+((max-v)/(max-min))*(h-top-bottom);}
+  var d=points.map(function(p,i){return (i?'L':'M')+x(i).toFixed(1)+' '+y(p.time).toFixed(1);}).join(' ');
+  var yTicks=[];
+  for(var yi=0;yi<5;yi++){
+    var tv=min+((max-min)/4)*yi;
+    var ty=y(tv);
+    yTicks.push('<line class="progress-grid" x1="'+left+'" y1="'+ty.toFixed(1)+'" x2="'+(w-right)+'" y2="'+ty.toFixed(1)+'"></line><text class="progress-label" x="8" y="'+(ty+4).toFixed(1)+'">'+fmtTime(tv)+'</text>');
+  }
+  var step=Math.max(1,Math.ceil(points.length/6));
+  var xTicks=points.map(function(p,i){
+    if(i!==0&&i!==points.length-1&&(i%step)!==0)return '';
+    var tx=x(i);
+    return '<line class="progress-axis" x1="'+tx.toFixed(1)+'" y1="'+(h-bottom)+'" x2="'+tx.toFixed(1)+'" y2="'+(h-bottom+5)+'"></line><text class="progress-label" text-anchor="middle" x="'+tx.toFixed(1)+'" y="'+(h-18)+'">'+escapeHtml(String(p.lapNo))+'</text>';
+  }).join('');
+  var dots=points.map(function(p,i){
+    return '<circle class="progress-dot" cx="'+x(i).toFixed(1)+'" cy="'+y(p.time).toFixed(1)+'" r="4"><title>Tour '+escapeHtml(String(p.lapNo))+' - '+fmtTimeS(p.time)+'</title></circle>';
+  }).join('');
+  return '<div class="progress-wrap session-chart-wrap"><svg class="progress-svg session-chart-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">'+
+    yTicks.join('')+
+    '<line class="progress-axis" x1="'+left+'" y1="'+(h-bottom)+'" x2="'+(w-right)+'" y2="'+(h-bottom)+'"></line>'+
+    '<line class="progress-axis" x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(h-bottom)+'"></line>'+
+    xTicks+
+    '<path class="progress-line" d="'+d+'"></path>'+dots+
+    '<text class="progress-label axis-title" x="'+(left+8)+'" y="12">Secondes</text>'+
+    '<text class="progress-label axis-title" text-anchor="end" x="'+(w-right)+'" y="'+(h-4)+'">Numero de tour</text>'+
+  '</svg></div>';
+}
 
 function updateAdminNav(){var nav=document.getElementById('adminNav');if(nav)nav.classList.toggle('hidden',!state.isAdmin);}
 function setActiveNav(){var hash=location.hash||'#/';document.querySelectorAll('.nav-link').forEach(function(el){el.classList.remove('active');});document.querySelectorAll('.nav-link[href]').forEach(function(el){var href=el.getAttribute('href');if(href===hash||(hash.startsWith(href)&&href!=='#/'))el.classList.add('active');});if(hash==='#/'){var home=document.querySelector('.nav-link[href="#/"]');if(home)home.classList.add('active');}}
@@ -430,7 +468,7 @@ function pilotSessionDetailHtml(name, sessionKey){
   }
   var laps=sortedSessionLaps(session);
   var consistency=session.laps>1?Math.sqrt(laps.reduce(function(sum,l){return sum+Math.pow(l._time-session.avg,2);},0)/laps.length):0;
-  var points=laps.map(function(l,i){return{label:'Tour '+(l.lap_no||i+1),time:l._time};});
+  var points=laps.map(function(l,i){return{lapNo:l.lap_no||i+1,time:l._time};});
   return '<section class="card session-detail-hero">' +
     '<div><a class="mini-button" href="#/pilote/'+encodeURIComponent(name)+'">Retour pilote</a><h1>'+escapeHtml(session.name)+'</h1><p class="small">'+escapeHtml(name)+' · '+escapeHtml(Object.keys(session.tracks).join(' / ')||'-')+'</p></div>' +
     '<div class="session-detail-actions"><button id="printPilotProfile" class="btn-secondary">Imprimer</button></div>' +
@@ -441,7 +479,7 @@ function pilotSessionDetailHtml(name, sessionKey){
     '<div class="card"><h3>Moyenne</h3><div class="big">'+fmtTimeS(session.avg)+'</div></div>' +
     '<div class="card"><h3>Regularite</h3><div class="big">'+fmtTimeS(consistency)+'</div></div>' +
   '</section>' +
-  '<section class="card"><h3>Courbe de session</h3>'+renderProgressSvg(points)+'</section>' +
+  '<section class="card"><h3>Courbe de session</h3>'+renderSessionLapSvg(points)+'</section>' +
   '<section class="card"><h3>Tours de la session</h3>'+sessionLapsTable(session)+'</section>';
 }
 
@@ -1618,7 +1656,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260521-sessions1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260521-sessionchart1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;
