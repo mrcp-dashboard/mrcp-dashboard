@@ -468,7 +468,7 @@ function pilotSessionDetailHtml(name, sessionKey){
   }
   var laps=sortedSessionLaps(session);
   var consistency=session.laps>1?Math.sqrt(laps.reduce(function(sum,l){return sum+Math.pow(l._time-session.avg,2);},0)/laps.length):0;
-  var points=laps.map(function(l,i){return{lapNo:l.lap_no||i+1,time:l._time};});
+  var points=laps.map(function(l,i){return{lapNo:i+1,time:l._time};});
   return '<section class="card session-detail-hero">' +
     '<div><a class="mini-button" href="#/pilote/'+encodeURIComponent(name)+'">Retour pilote</a><h1>'+escapeHtml(session.name)+'</h1><p class="small">'+escapeHtml(name)+' · '+escapeHtml(Object.keys(session.tracks).join(' / ')||'-')+'</p></div>' +
     '<div class="session-detail-actions"><button id="printPilotProfile" class="btn-secondary">Imprimer</button></div>' +
@@ -1656,7 +1656,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260521-sessionchart1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260521-sessionchart2').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;
