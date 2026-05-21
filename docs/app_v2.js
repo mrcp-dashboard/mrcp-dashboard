@@ -372,10 +372,12 @@ function pilotSessions(stats){
         best:Infinity,
         avg:0,
         total:0,
-        tracks:{}
+        tracks:{},
+        lapsList:[]
       };
     }
     map[key].laps += 1;
+    map[key].lapsList.push(l);
     map[key].total += l._time;
     if(l._time < map[key].best) map[key].best = l._time;
     map[key].tracks[l._track] = true;
@@ -393,6 +395,54 @@ function pilotConsistency(stats){
   var avg = stats.avg;
   var variance = stats.laps.reduce(function(sum,l){return sum + Math.pow(l._time - avg, 2);}, 0) / stats.laps.length;
   return Math.sqrt(variance);
+}
+
+function lapSortValue(l){
+  var start=String(l.start_time||l.started_at||'');
+  var n=Number(String(start).replace(/:/g,''));
+  if(Number.isFinite(n)&&n>0)return n;
+  return Number(l.lap_no||l.lap||l.number||0);
+}
+
+function sortedSessionLaps(session){
+  return (session.lapsList||[]).slice().sort(function(a,b){
+    return lapSortValue(a)-lapSortValue(b)||Number(a.lap_no||0)-Number(b.lap_no||0)||a._time-b._time;
+  });
+}
+
+function sessionLapsTable(session){
+  var laps=sortedSessionLaps(session);
+  if(!laps.length)return '<p class="small">Aucun tour dans cette session.</p>';
+  var best=session.best;
+  return '<div class="table-wrap session-laps-table"><table><thead><tr><th>#</th><th>Temps</th><th>Ecart best</th><th>Piste</th><th>Heure</th></tr></thead><tbody>'+
+    laps.map(function(l,i){
+      var gap=l._time-best;
+      var cls=gap===0?' class="best-lap-row"':'';
+      return '<tr'+cls+'><td>'+(l.lap_no||i+1)+'</td><td><strong>'+fmtTimeS(l._time)+'</strong></td><td>'+(gap===0?'Best':'+'+fmtTimeS(gap))+'</td><td><span class="badge">'+escapeHtml(l._track)+'</span></td><td>'+escapeHtml(l.start_time||l.started_at||'-')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+function pilotSessionDetailHtml(name, sessionKey){
+  var stats=pilotStats(name);
+  var session=pilotSessions(stats).filter(function(s){return s.key===sessionKey;})[0];
+  if(!session){
+    return '<section class="card"><h2>Session introuvable</h2><p class="small">Impossible de retrouver cette session pour '+escapeHtml(name)+'.</p><p><a class="btn-secondary" href="#/pilote/'+encodeURIComponent(name)+'">Retour fiche pilote</a></p></section>';
+  }
+  var laps=sortedSessionLaps(session);
+  var consistency=session.laps>1?Math.sqrt(laps.reduce(function(sum,l){return sum+Math.pow(l._time-session.avg,2);},0)/laps.length):0;
+  var points=laps.map(function(l,i){return{label:'Tour '+(l.lap_no||i+1),time:l._time};});
+  return '<section class="card session-detail-hero">' +
+    '<div><a class="mini-button" href="#/pilote/'+encodeURIComponent(name)+'">Retour pilote</a><h1>'+escapeHtml(session.name)+'</h1><p class="small">'+escapeHtml(name)+' · '+escapeHtml(Object.keys(session.tracks).join(' / ')||'-')+'</p></div>' +
+    '<div class="session-detail-actions"><button id="printPilotProfile" class="btn-secondary">Imprimer</button></div>' +
+  '</section>' +
+  '<section class="grid">' +
+    '<div class="card"><h3>Tours</h3><div class="big">'+session.laps+'</div></div>' +
+    '<div class="card"><h3>Meilleur</h3><div class="big">'+fmtTimeS(session.best)+'</div></div>' +
+    '<div class="card"><h3>Moyenne</h3><div class="big">'+fmtTimeS(session.avg)+'</div></div>' +
+    '<div class="card"><h3>Regularite</h3><div class="big">'+fmtTimeS(consistency)+'</div></div>' +
+  '</section>' +
+  '<section class="card"><h3>Courbe de session</h3>'+renderProgressSvg(points)+'</section>' +
+  '<section class="card"><h3>Tours de la session</h3>'+sessionLapsTable(session)+'</section>';
 }
 
 function pilotTrackTarget(stats, track){
@@ -563,7 +613,7 @@ function pilotFullProfileHtml(name){
     '<h3>📅 Sessions du pilote</h3>' +
     '<div class="table-wrap"><table><thead><tr><th>Session</th><th>Tours</th><th>Best</th><th>Moyenne</th><th>Pistes</th></tr></thead><tbody>' +
       sessions.slice(0,40).map(function(x){
-        return '<tr><td>'+escapeHtml(x.name)+'</td><td>'+x.laps+'</td><td><strong>'+fmtTimeS(x.best)+'</strong></td><td>'+fmtTimeS(x.avg)+'</td><td><span class="badge">'+escapeHtml(Object.keys(x.tracks).join(' / '))+'</span></td></tr>';
+        return '<tr><td><a href="#/pilote-session/'+encodeURIComponent(name)+'/'+encodeURIComponent(x.key)+'">'+escapeHtml(x.name)+'</a></td><td>'+x.laps+'</td><td><strong>'+fmtTimeS(x.best)+'</strong></td><td>'+fmtTimeS(x.avg)+'</td><td><span class="badge">'+escapeHtml(Object.keys(x.tracks).join(' / '))+'</span></td></tr>';
       }).join('') +
     '</tbody></table></div>' +
   '</section>' +
@@ -614,6 +664,14 @@ function pilotPage(encoded){
   var name=decodeURIComponent(encoded);
   app.innerHTML = pilotFullProfileHtml(name);
   bindPilotProfileButtons(name);
+}
+function pilotSessionPage(path){
+  var parts=path.split('/');
+  var name=decodeURIComponent(parts.shift()||'');
+  var sessionKey=decodeURIComponent(parts.join('/')||'');
+  app.innerHTML=pilotSessionDetailHtml(name,sessionKey);
+  var print=document.getElementById('printPilotProfile');
+  if(print)print.onclick=function(){window.print();};
 }
 function podiums(){
   var laps=getAllLaps();
@@ -1461,7 +1519,7 @@ function adminPage(){
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/jour')===0)return liveDayPage();if(h.indexOf('#/live')===0)return livePage();
-    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/rapport')===0)return reportPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
+    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/rapport')===0)return reportPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
     var current=getAdminConfig();
@@ -1490,7 +1548,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260516-cachefix1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260521-sessiondetail1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;

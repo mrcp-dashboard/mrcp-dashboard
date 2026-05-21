@@ -258,6 +258,33 @@ textarea.admin-json{width:100%;min-height:220px}
   color:var(--muted);
   font-size:12px;
 }
+.session-detail-hero{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.session-detail-hero h1{
+  margin:10px 0 4px;
+}
+.session-detail-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.session-laps-table table{
+  min-width:620px;
+}
+.session-laps-table td:nth-child(2),
+.session-laps-table td:nth-child(3){
+  font-variant-numeric:tabular-nums;
+}
+.best-lap-row{
+  background:rgba(255,210,63,.08);
+}
+.best-lap-row td{
+  border-bottom-color:rgba(255,210,63,.22);
+}
 .progress-wrap{width:100%;height:220px;margin-top:8px}
 .progress-svg{width:100%;height:100%;overflow:visible}
 .progress-line{fill:none;stroke:var(--cyan);stroke-width:3}
@@ -291,6 +318,7 @@ textarea.admin-json{width:100%;min-height:220px}
   .kpi-grid,.grid{grid-template-columns:1fr 1fr;gap:10px}
   .target-grid{grid-template-columns:1fr}
   .target-meta{grid-template-columns:1fr}
+  .session-detail-hero{align-items:stretch;flex-direction:column}
   .podium-summary-grid{grid-template-columns:1fr}
   .report-hero{align-items:stretch;flex-direction:column}
   .report-grid,.report-columns{grid-template-columns:1fr}
