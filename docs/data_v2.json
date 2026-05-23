@@ -1,6 +1,6 @@
 {
   "schema_version": 3.4,
-  "generated_at": "2026-05-23T13:10:05",
+  "generated_at": "2026-05-23T13:20:05",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,9 +9,9 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 155,
-    "pilots_count": 65,
-    "laps_count": 8191,
+    "activities_count": 156,
+    "pilots_count": 66,
+    "laps_count": 8192,
     "tracks": {
       "TT1/8": {
         "laps_count": 8048,
@@ -19,18 +19,18 @@
         "pilots_count": 65
       },
       "TT1/10": {
-        "laps_count": 143,
-        "activities_count": 11,
-        "pilots_count": 10
+        "laps_count": 144,
+        "activities_count": 12,
+        "pilots_count": 11
       }
     }
   },
   "records": {
     "best_lap": {
-      "pilot": "Fouad Elward",
-      "transponder": "9070058",
-      "time": 20.5,
-      "slug": "fouad-elward-9070058"
+      "pilot": "Inconnu #3414210",
+      "transponder": "3414210",
+      "time": 15.642,
+      "slug": "inconnu-3414210-3414210"
     },
     "most_active": {
       "pilot": "GREGOIRE BARROSO",
@@ -42,7 +42,7 @@
   "data_quality": {
     "global_score": 0,
     "suspicious_laps_count": 6494,
-    "unknown_pilots_count": 7,
+    "unknown_pilots_count": 8,
     "ignored_raw_laps_count": 0,
     "overrides": {
       "excluded_count": 108,
@@ -6553,6 +6553,11 @@
     ],
     "unknown_pilots": [
       {
+        "transponder": "3414210",
+        "laps_count": 1,
+        "best_lap": 15.642
+      },
+      {
         "transponder": "2873646",
         "laps_count": 95,
         "best_lap": 23.049
@@ -9106,6 +9111,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "7828670907",
+        "date_fr": "23/05/2026",
+        "tracks": [
+          "TT1/10"
+        ],
+        "laps_count": 1,
+        "quality_score": 97,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 1
+      },
+      {
         "id": "7811459391",
         "date_fr": "17/05/2026",
         "tracks": [
@@ -9175,6 +9191,62 @@
     ]
   },
   "activities": [
+    {
+      "id": "7828670907",
+      "date": "2026-05-23",
+      "date_fr": "23/05/2026",
+      "source_file": "sessions_7828670907.csv",
+      "pilot_count": 1,
+      "laps_count": 1,
+      "best_lap": 15.642,
+      "best_pilot": "Inconnu #3414210",
+      "tracks": [
+        "TT1/10"
+      ],
+      "track": "TT1/10",
+      "track_counts": {
+        "TT1/10": 1
+      },
+      "quality_score": 97,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 1,
+      "participants": [
+        {
+          "transponder": "3414210",
+          "pilot_name": "Inconnu #3414210",
+          "pilot_slug": "inconnu-3414210-3414210",
+          "laps_count": 1,
+          "best_lap": 15.642,
+          "avg_lap": 15.642,
+          "consistency": 0,
+          "tracks": [
+            "TT1/10"
+          ],
+          "track": "TT1/10",
+          "track_counts": {
+            "TT1/10": 1
+          },
+          "laps": [
+            {
+              "activity_id": "7828670907",
+              "transponder": "3414210",
+              "raw_transponder": "3414210",
+              "pilot_name": "Inconnu #3414210",
+              "date": "2026-05-23",
+              "date_fr": "23/05/2026",
+              "start_time": "15:16:59",
+              "lap_no": 1,
+              "lap_time": 15.642,
+              "speed": "59.839 km/h",
+              "track": "TT1/10",
+              "base_track": "TT1/10",
+              "lap_id": "7828670907|3414210|1|15:16:59|15.642"
+            }
+          ],
+          "rank": 1
+        }
+      ]
+    },
     {
       "id": "7821026778",
       "date": "2026-05-22",
@@ -138441,6 +138513,40 @@
     }
   ],
   "pilots": [
+    {
+      "transponder": "3414210",
+      "name": "Inconnu #3414210",
+      "slug": "inconnu-3414210-3414210",
+      "activities": [
+        {
+          "activity_id": "7828670907",
+          "date": "2026-05-23",
+          "date_fr": "23/05/2026",
+          "rank": 1,
+          "laps_count": 1,
+          "best_lap": 15.642,
+          "avg_lap": 15.642,
+          "consistency": 0,
+          "tracks": [
+            "TT1/10"
+          ],
+          "track": "TT1/10",
+          "track_counts": {
+            "TT1/10": 1
+          }
+        }
+      ],
+      "total_laps": 1,
+      "best_lap": 15.642,
+      "tracks": [
+        "TT1/10"
+      ],
+      "track_counts": {
+        "TT1/10": 1
+      },
+      "activities_count": 1,
+      "avg_best_lap": 15.642
+    },
     {
       "transponder": "9070058",
       "name": "Fouad Elward",
