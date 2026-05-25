@@ -112,6 +112,8 @@ main{max-width:1500px;margin:auto}
 .mini-button{padding:8px 14px;border-radius:999px;font-size:14px;background:rgba(15,133,255,.16)}
 .activity-row,.record-row{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07)}
 .session-home-row{grid-template-columns:minmax(96px,auto) minmax(0,1fr) auto}
+.session-home-link{color:inherit;text-decoration:none;border-radius:12px;padding-left:10px;padding-right:10px;margin-left:-10px;margin-right:-10px}
+.session-home-link:hover{background:rgba(15,133,255,.10)}
 .record-row{gap:10px;padding:10px 0}
 .activity-date{min-width:100px;color:#e7eefc}.activity-track,.record-name{font-weight:850}.activity-sub,.record-sub{color:var(--muted);font-size:13px}
 .record-name{font-size:15px;line-height:1.2;letter-spacing:0}

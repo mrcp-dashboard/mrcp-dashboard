@@ -282,7 +282,7 @@ function fmtKm(v){
   if(!Number.isFinite(n))return '-';
   return n>=1000?n.toLocaleString('fr-FR',{maximumFractionDigits:0}):n.toLocaleString('fr-FR',{maximumFractionDigits:1});
 }
-function latestActivities(limit){var map={};getAllLaps().forEach(function(l){var key=l.session_id||l.session_name||l._date||'session';if(!map[key]){var sortDate=parseDateValue(l._date||l.session_date||l.date||key);if(sortDate===Number.MAX_SAFE_INTEGER)sortDate=0;map[key]={key:key,name:l.session_name||l._date||key,date:l._date||'',sortDate:sortDate,pilots:{},tracks:{},laps:0,best:null};}map[key].pilots[l._pilot]=true;map[key].tracks[l._track]=true;map[key].laps++;if(!map[key].best||l._time<map[key].best)map[key].best=l._time;});return Object.values(map).sort(function(a,b){return b.sortDate-a.sortDate||String(b.date||b.name).localeCompare(String(a.date||a.name));}).slice(0,limit||5);}
+function latestActivities(limit){var map={};getAllLaps().forEach(function(l){var key=l.session_id||l.session_name||l._date||'session';if(!map[key]){var sortDate=parseDateValue(l._date||l.session_date||l.date||key);if(sortDate===Number.MAX_SAFE_INTEGER)sortDate=0;map[key]={key:key,name:l.session_name||l._date||key,date:l._date||'',sortDate:sortDate,pilots:{},tracks:{},laps:0,best:null,bestPilot:'',bestTransponder:''};}map[key].pilots[l._pilot]=true;map[key].tracks[l._track]=true;map[key].laps++;if(!map[key].best||l._time<map[key].best){map[key].best=l._time;map[key].bestPilot=l._pilot;map[key].bestTransponder=normalizeTransponder(l.transponder||'');}});return Object.values(map).sort(function(a,b){return b.sortDate-a.sortDate||String(b.date||b.name).localeCompare(String(a.date||a.name));}).slice(0,limit||5);}
 
 function pilotStats(name){
   var laps=getAllLaps().filter(function(l){return l._pilot===name;});
@@ -410,11 +410,14 @@ function home(){
   var laps=getAllLaps(), sessions=latestActivities(10), pilotsCount=bestByPilot(laps).length, distanceKm=totalDistanceKm(laps);
   var sessionRows=sessions.map(function(a){
     var tracks=Object.keys(a.tracks).join(' / ')||'-';
-    return '<div class="activity-row session-home-row">' +
+    var pilot=a.bestPilot||('Inconnu #'+(a.bestTransponder||''));
+    var pilotLabel=a.bestPilot||a.bestTransponder||'Pilote inconnu';
+    var href='#/pilote-session/'+encodeURIComponent(pilot)+'/'+encodeURIComponent(a.key);
+    return '<a class="activity-row session-home-row session-home-link" href="'+href+'">' +
       '<div class="activity-date">'+escapeHtml(a.date||a.name)+'</div>' +
-      '<div><div class="activity-track">'+escapeHtml(tracks)+'</div><div class="activity-sub">'+a.laps+' tours · '+Object.keys(a.pilots).length+' pilotes</div></div>' +
+      '<div><div class="activity-track">'+escapeHtml(pilotLabel)+'</div><div class="activity-sub">'+escapeHtml(tracks)+' · '+a.laps+' tours · '+Object.keys(a.pilots).length+' pilotes</div></div>' +
       '<div><strong>'+fmtTimeS(a.best)+'</strong><div class="activity-sub">best</div></div>' +
-    '</div>';
+    '</a>';
   }).join('');
   app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/mes-chronos" class="btn-secondary">Mes chronos</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏆 Podiums du moment</h2></div>'+homePodiumsHtml()+'</div></section>';
 }
@@ -1679,7 +1682,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260525-homeclean1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260525-homesessions1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;
