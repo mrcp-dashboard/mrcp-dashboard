@@ -1,6 +1,6 @@
 {
   "schema_version": 3.4,
-  "generated_at": "2026-05-25T18:50:08",
+  "generated_at": "2026-05-25T19:00:09",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 168,
     "pilots_count": 69,
-    "laps_count": 8577,
+    "laps_count": 8579,
     "tracks": {
       "TT1/8": {
-        "laps_count": 8417,
+        "laps_count": 8419,
         "activities_count": 167,
         "pilots_count": 68
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 6804,
+    "suspicious_laps_count": 6806,
     "unknown_pilots_count": 11,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -8007,6 +8007,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "7840063998",
+        "date_fr": "25/05/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 71,
+        "quality_score": 0,
+        "suspicious_laps_count": 61,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7681780023",
         "date_fr": "19/04/2026",
         "tracks": [
@@ -8037,17 +8048,6 @@
         "laps_count": 68,
         "quality_score": 0,
         "suspicious_laps_count": 60,
-        "unknown_pilots_count": 0
-      },
-      {
-        "id": "7840063998",
-        "date_fr": "25/05/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 69,
-        "quality_score": 0,
-        "suspicious_laps_count": 59,
         "unknown_pilots_count": 0
       },
       {
@@ -10423,7 +10423,7 @@
       "date_fr": "25/05/2026",
       "source_file": "sessions_7840063998.csv",
       "pilot_count": 1,
-      "laps_count": 69,
+      "laps_count": 71,
       "best_lap": 33.443,
       "best_pilot": "Xavier Castets",
       "tracks": [
@@ -10431,26 +10431,26 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 69
+        "TT1/8": 71
       },
       "quality_score": 0,
-      "suspicious_laps_count": 59,
+      "suspicious_laps_count": 61,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "8522451",
           "pilot_name": "Xavier Castets",
           "pilot_slug": "xavier-castets-8522451",
-          "laps_count": 69,
+          "laps_count": 71,
           "best_lap": 33.443,
-          "avg_lap": 38.853,
-          "consistency": 6.031,
+          "avg_lap": 38.795,
+          "consistency": 5.956,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 69
+            "TT1/8": 71
           },
           "laps": [
             {
@@ -11487,6 +11487,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7840063998|8522451|1|20:49:16|36.923"
+            },
+            {
+              "activity_id": "7840063998",
+              "transponder": "8522451",
+              "raw_transponder": "8522451",
+              "pilot_name": "Xavier Castets",
+              "date": "2026-05-25",
+              "date_fr": "25/05/2026",
+              "start_time": "20:49:53",
+              "lap_no": 2,
+              "lap_time": 36.187,
+              "speed": "25.866 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7840063998|8522451|2|20:49:53|36.187"
+            },
+            {
+              "activity_id": "7840063998",
+              "transponder": "8522451",
+              "raw_transponder": "8522451",
+              "pilot_name": "Xavier Castets",
+              "date": "2026-05-25",
+              "date_fr": "25/05/2026",
+              "start_time": "20:50:29",
+              "lap_no": 3,
+              "lap_time": 37.422,
+              "speed": "25.012 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7840063998|8522451|3|20:50:29|37.422"
             }
           ],
           "rank": 1
@@ -146296,16 +146326,16 @@
           "date": "2026-05-25",
           "date_fr": "25/05/2026",
           "rank": 1,
-          "laps_count": 69,
+          "laps_count": 71,
           "best_lap": 33.443,
-          "avg_lap": 38.853,
-          "consistency": 6.031,
+          "avg_lap": 38.795,
+          "consistency": 5.956,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 69
+            "TT1/8": 71
           }
         },
         {
@@ -146343,13 +146373,13 @@
           }
         }
       ],
-      "total_laps": 237,
+      "total_laps": 239,
       "best_lap": 33.443,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 237
+        "TT1/8": 239
       },
       "activities_count": 3,
       "avg_best_lap": 34.141
