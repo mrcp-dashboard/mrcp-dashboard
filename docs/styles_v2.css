@@ -105,10 +105,13 @@ main{max-width:1500px;margin:auto}
 .kpi-value,.big{font-size:30px;font-weight:1000}
 .kpi-label,.small{color:var(--muted);font-size:13px}
 .dashboard-grid{display:grid;grid-template-columns:1fr 1.15fr 1.15fr;gap:16px}
+.home-dashboard-grid{grid-template-columns:minmax(0,1.45fr) minmax(320px,.85fr)}
+.home-sessions-card{min-height:0}
 .panel-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .panel-title h2{font-size:20px;display:flex;gap:10px;align-items:center;margin:0}
 .mini-button{padding:8px 14px;border-radius:999px;font-size:14px;background:rgba(15,133,255,.16)}
 .activity-row,.record-row{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.session-home-row{grid-template-columns:minmax(96px,auto) minmax(0,1fr) auto}
 .record-row{gap:10px;padding:10px 0}
 .activity-date{min-width:100px;color:#e7eefc}.activity-track,.record-name{font-weight:850}.activity-sub,.record-sub{color:var(--muted);font-size:13px}
 .record-name{font-size:15px;line-height:1.2;letter-spacing:0}
@@ -342,6 +345,7 @@ textarea.admin-json{width:100%;min-height:220px}
   .kpi-grid,.grid{grid-template-columns:1fr 1fr;gap:10px}
   .target-grid{grid-template-columns:1fr}
   .target-meta{grid-template-columns:1fr}
+  .session-home-row{grid-template-columns:1fr;gap:6px}
   .session-detail-hero{align-items:stretch;flex-direction:column}
   .podium-summary-grid{grid-template-columns:1fr}
   .report-hero{align-items:stretch;flex-direction:column}

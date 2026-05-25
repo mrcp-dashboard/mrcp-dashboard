@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mrcp-dashboard-v2026-05-25-adminmerge-1';
+const CACHE_NAME = 'mrcp-dashboard-v2026-05-25-homeclean-1';
 
 const ASSETS = [
   './index_v2.html',

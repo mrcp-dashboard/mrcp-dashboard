@@ -5,6 +5,7 @@ var DATA = null;
 var app = document.getElementById('app');
 var deferredPrompt = null;
 var ADMIN_CFG_KEY = 'mrcp_admin_api_config';
+var DEFAULT_LAP_DISTANCE_METERS = 250;
 var state = { track:'all', isAdmin: !!getAdminConfig().token };
 
 function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
@@ -267,7 +268,21 @@ function getAllLaps(){return getAllLapsRaw(false);}
 function applyFilters(laps){return state.track==='all'?laps:laps.filter(function(l){return l._track===state.track;});}
 function bestByPilot(laps){var m=new Map();laps.forEach(function(l){if(!m.has(l._pilot)||l._time<m.get(l._pilot)._time)m.set(l._pilot,l);});return Array.from(m.values()).sort(function(a,b){return a._time-b._time;});}
 function allPilots(){return bestByPilot(getAllLaps()).map(function(l){return l._pilot;}).sort(function(a,b){return a.localeCompare(b);});}
-function latestActivities(){var map={};getAllLaps().forEach(function(l){var key=l.session_id||l.session_name||l._date||'session';if(!map[key])map[key]={name:l.session_name||l._date||key,date:l._date||'',pilots:{},tracks:{},laps:0};map[key].pilots[l._pilot]=true;map[key].tracks[l._track]=true;map[key].laps++;});return Object.values(map).sort(function(a,b){return String(b.date).localeCompare(String(a.date));}).slice(0,5);}
+function lapDistanceMeters(track){
+  var distances=(DATA&&DATA.meta&&DATA.meta.track_distances_m)||{};
+  var value=Number(distances[track]||distances.default||DEFAULT_LAP_DISTANCE_METERS);
+  return Number.isFinite(value)&&value>0?value:DEFAULT_LAP_DISTANCE_METERS;
+}
+function totalDistanceKm(laps){
+  var meters=laps.reduce(function(sum,l){return sum+lapDistanceMeters(l._track);},0);
+  return meters/1000;
+}
+function fmtKm(v){
+  var n=Number(v);
+  if(!Number.isFinite(n))return '-';
+  return n>=1000?n.toLocaleString('fr-FR',{maximumFractionDigits:0}):n.toLocaleString('fr-FR',{maximumFractionDigits:1});
+}
+function latestActivities(limit){var map={};getAllLaps().forEach(function(l){var key=l.session_id||l.session_name||l._date||'session';if(!map[key]){var sortDate=parseDateValue(l._date||l.session_date||l.date||key);if(sortDate===Number.MAX_SAFE_INTEGER)sortDate=0;map[key]={key:key,name:l.session_name||l._date||key,date:l._date||'',sortDate:sortDate,pilots:{},tracks:{},laps:0,best:null};}map[key].pilots[l._pilot]=true;map[key].tracks[l._track]=true;map[key].laps++;if(!map[key].best||l._time<map[key].best)map[key].best=l._time;});return Object.values(map).sort(function(a,b){return b.sortDate-a.sortDate||String(b.date||b.name).localeCompare(String(a.date||a.name));}).slice(0,limit||5);}
 
 function pilotStats(name){
   var laps=getAllLaps().filter(function(l){return l._pilot===name;});
@@ -392,8 +407,16 @@ function podiumHallOfFameHtml(laps){
 }
 
 function home(){
-  var laps=getAllLaps(), best=bestByPilot(laps), activities=latestActivities(), pilotsCount=bestByPilot(laps).length;
-  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/mes-chronos" class="btn-primary">Mes chronos</a><a href="#/podiums" class="btn-secondary">Podiums</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">🏁</div><div><div class="kpi-label">Activités</div><div class="kpi-value">'+activities.length+'</div><div class="kpi-label">sessions</div></div></div><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">🏆</div><div><div class="kpi-label">Records</div><div class="kpi-value">'+best.length+'</div><div class="kpi-label">meilleurs tours</div></div></div></div></div></section><section class="dashboard-grid"><div class="card"><div class="panel-title"><h2>📅 Dernières activités</h2></div><div>'+activities.map(function(a){var tracks=Object.keys(a.tracks).join(' / ')||'-';return'<div class="activity-row"><div class="activity-date">'+escapeHtml(a.date||a.name)+'</div><div><div class="activity-track">☀️ '+escapeHtml(tracks)+'</div><div class="activity-sub">'+a.laps+' tours</div></div><div><strong>'+Object.keys(a.pilots).length+'</strong><div class="activity-sub">pilotes</div></div></div>';}).join('')+'</div></div><div class="card"><div class="panel-title"><h2>⭐ Meilleurs tours</h2><a class="mini-button" href="#/podiums">Voir tous</a></div>'+best.slice(0,5).map(function(r,i){return'<div class="record-row"><div class="record-rank">'+(i+1)+'</div><div><div class="record-name">'+escapeHtml(r._pilot)+'</div><div class="record-sub"><span class="badge">'+escapeHtml(r._track)+'</span></div></div><div class="record-time">'+fmtTime(r._time)+'<div class="record-sub">'+escapeHtml(r._date||'')+'</div></div></div>';}).join('')+'</div><div class="card"><div class="panel-title"><h2>🏆 Podiums du moment</h2></div>'+homePodiumsHtml()+'</div></section>';
+  var laps=getAllLaps(), sessions=latestActivities(10), pilotsCount=bestByPilot(laps).length, distanceKm=totalDistanceKm(laps);
+  var sessionRows=sessions.map(function(a){
+    var tracks=Object.keys(a.tracks).join(' / ')||'-';
+    return '<div class="activity-row session-home-row">' +
+      '<div class="activity-date">'+escapeHtml(a.date||a.name)+'</div>' +
+      '<div><div class="activity-track">'+escapeHtml(tracks)+'</div><div class="activity-sub">'+a.laps+' tours · '+Object.keys(a.pilots).length+' pilotes</div></div>' +
+      '<div><strong>'+fmtTimeS(a.best)+'</strong><div class="activity-sub">best</div></div>' +
+    '</div>';
+  }).join('');
+  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/mes-chronos" class="btn-secondary">Mes chronos</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏆 Podiums du moment</h2></div>'+homePodiumsHtml()+'</div></section>';
 }
 
 
@@ -1656,7 +1679,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260525-adminmerge1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260525-homeclean1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;
