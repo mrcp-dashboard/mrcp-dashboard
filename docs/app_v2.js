@@ -293,6 +293,38 @@ function dateInputValue(value){
 }
 function latestActivities(limit){var map={};getAllLaps().forEach(function(l){var key=l.session_id||l.session_name||l._date||'session';if(!map[key]){var sortDate=parseDateValue(l._date||l.session_date||l.date||key);if(sortDate===Number.MAX_SAFE_INTEGER)sortDate=0;map[key]={key:key,name:l.session_name||l._date||key,date:l._date||'',sortDate:sortDate,pilots:{},tracks:{},laps:0,best:null,bestPilot:'',bestTransponder:''};}map[key].pilots[l._pilot]=true;map[key].tracks[l._track]=true;map[key].laps++;if(!map[key].best||l._time<map[key].best){map[key].best=l._time;map[key].bestPilot=l._pilot;map[key].bestTransponder=normalizeTransponder(l.transponder||'');}});return Object.values(map).sort(function(a,b){return b.sortDate-a.sortDate||String(b.date||b.name).localeCompare(String(a.date||a.name));}).slice(0,limit||5);}
 
+function personalRecordMap(){
+  var map={}, best={};
+  getAllLaps().slice().sort(function(a,b){
+    return parseDateValue(a._date||a.session_date||a.date)-parseDateValue(b._date||b.session_date||b.date)||lapSortValue(a)-lapSortValue(b)||a._time-b._time;
+  }).forEach(function(l){
+    var key=l._pilot+'|'+l._track;
+    if(best[key]!=null&&l._time<best[key]){
+      map[l.lap_id]=true;
+    }
+    if(best[key]==null||l._time<best[key])best[key]=l._time;
+  });
+  return map;
+}
+
+function pilotBadges(stats){
+  var badges=[];
+  var dayKey=todayKey();
+  var dayLaps=stats.laps.filter(function(l){return dateKeyFromValue(l._date||l.session_date||l.date||l.session_name)===dayKey;});
+  var pr=personalRecordMap();
+  if(stats.sessions<=1)badges.push('Premier roulage');
+  if(dayLaps.length>=50)badges.push('+50 tours aujourd hui');
+  if(dayLaps.some(function(l){return pr[l.lap_id]||l.personal_record;}))badges.push('Record perso battu');
+  if(pilotConsistency(stats)!=null&&pilotConsistency(stats)<2)badges.push('Regulier');
+  if(liveDayRows(liveDaySourceLaps(dayKey)).slice(0,3).some(function(r){return r.pilot===stats.name;}))badges.push('Top 3 du jour');
+  return badges.slice(0,5);
+}
+
+function badgesHtml(badges){
+  if(!badges||!badges.length)return '';
+  return '<div class="badge-row">'+badges.map(function(b){return '<span class="pilot-badge">'+escapeHtml(b)+'</span>';}).join('')+'</div>';
+}
+
 function pilotStats(name){
   var laps=getAllLaps().filter(function(l){return l._pilot===name;});
   var sorted=laps.slice().sort(function(a,b){return a._time-b._time;});
@@ -422,6 +454,8 @@ function home(){
   var dayLaps=liveDaySourceLaps(todayKey());
   var dayRows=liveDayRows(dayLaps);
   var dayBest=dayRows[0]||null;
+  var dayBest18=liveDayRows(dayLaps.filter(function(l){return l._track==='TT1/8';}))[0]||null;
+  var dayBest10=liveDayRows(dayLaps.filter(function(l){return l._track==='TT1/10';}))[0]||null;
   var sessionRows=sessions.map(function(a){
     var tracks=Object.keys(a.tracks).join(' / ')||'-';
     var pilot=a.bestPilot||('Inconnu #'+(a.bestTransponder||''));
@@ -433,7 +467,7 @@ function home(){
       '<div><strong>'+fmtTimeS(a.best)+'</strong><div class="activity-sub">best</div></div>' +
     '</a>';
   }).join('');
-  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/mes-chronos" class="btn-secondary">Mes chronos</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div><div class="kpi"><div class="kpi-icon">📋</div><div><div class="kpi-label">Tours aujourd hui</div><div class="kpi-value">'+dayLaps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">'+escapeHtml(todayKey())+'</div></div></div><div class="kpi"><div class="kpi-icon">👤</div><div><div class="kpi-label">Pilotes jour</div><div class="kpi-value">'+dayRows.length+'</div><div class="kpi-label">actifs</div></div></div><div class="kpi"><div class="kpi-icon">⚡</div><div><div class="kpi-label">Best jour</div><div class="kpi-value">'+fmtTime(dayBest&&dayBest.best)+'</div><div class="kpi-label">'+escapeHtml(dayBest?dayBest.pilot:'-')+'</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏆 Podiums du moment</h2></div>'+homePodiumsHtml()+'</div></section>';
+  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/journee?date='+todayKey()+'" class="btn-secondary">Vue journée</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div><div class="kpi"><div class="kpi-icon">📋</div><div><div class="kpi-label">Tours aujourd hui</div><div class="kpi-value">'+dayLaps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">'+escapeHtml(todayKey())+'</div></div></div><div class="kpi"><div class="kpi-icon">👤</div><div><div class="kpi-label">Pilotes jour</div><div class="kpi-value">'+dayRows.length+'</div><div class="kpi-label">actifs</div></div></div><div class="kpi"><div class="kpi-icon">⚡</div><div><div class="kpi-label">Best jour</div><div class="kpi-value">'+fmtTime(dayBest&&dayBest.best)+'</div><div class="kpi-label">'+escapeHtml(dayBest?dayBest.pilot:'-')+'</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏁 Records du jour</h2><a class="mini-button" href="#/journee?date='+todayKey()+'">Voir journée</a></div><div class="day-record-grid"><div><span class="badge">TT1/8</span><strong>'+fmtTimeS(dayBest18&&dayBest18.best)+'</strong><small>'+escapeHtml(dayBest18?dayBest18.pilot:'-')+'</small></div><div><span class="badge">TT1/10</span><strong>'+fmtTimeS(dayBest10&&dayBest10.best)+'</strong><small>'+escapeHtml(dayBest10?dayBest10.pilot:'-')+'</small></div></div>'+homePodiumsHtml()+'</div></section>';
 }
 
 function sessionPaceBlocksHtml(laps){
@@ -664,12 +698,16 @@ function pilotFullProfileHtml(name){
   var sessions = pilotSessions(s);
   var chartTrack = best18 ? 'TT1/8' : (best10 ? 'TT1/10' : 'all');
   var progress = pilotProgressData(s, chartTrack);
+  var progress18 = pilotProgressData(s, 'TT1/8');
+  var progress10 = pilotProgressData(s, 'TT1/10');
   var insights = pilotAiInsights(s);
   var consistency = pilotConsistency(s);
+  var badges = pilotBadges(s);
 
   return '<section class="pilot-hero">' +
     '<div class="card pilot-main-card">' +
       '<div class="pilot-name">🏎️ '+escapeHtml(name)+'</div>' +
+      badgesHtml(badges) +
       '<p class="pilot-sub">Profil pilote complet : performances, progression, régularité et QR code.</p>' +
       '<div class="goal-box">' +
         '<div class="goal-pill"><span class="small">Best TT1/8</span><strong>'+fmtTimeS(best18&&best18._time)+'</strong></div>' +
@@ -715,6 +753,11 @@ function pilotFullProfileHtml(name){
   '<section class="card">' +
     '<h3>📈 Progression récente — '+escapeHtml(chartTrack)+'</h3>' +
     renderProgressSvg(progress) +
+  '</section>' +
+
+  '<section class="report-columns">' +
+    '<div class="card"><h3>Progression TT1/8</h3>'+renderProgressSvg(progress18)+'</div>' +
+    '<div class="card"><h3>Progression TT1/10</h3>'+renderProgressSvg(progress10)+'</div>' +
   '</section>' +
 
   '<section class="card">' +
@@ -788,6 +831,7 @@ function pilotSessionPage(path){
 }
 function sessionListRows(){
   var rows=[];
+  var pr=personalRecordMap();
   (DATA&&DATA.activities||[]).forEach(function(a){
     var sessionKey=a.id||a.activity_id||a.session_id||'';
     var date=a.date_fr||a.date||a.session_date||'';
@@ -796,6 +840,7 @@ function sessionListRows(){
       var first=laps[0]||{};
       var last=laps[laps.length-1]||{};
       var pilot=p.pilot_name||p.name||('Inconnu #'+(p.transponder||''));
+      var hasPr=laps.some(function(l){return pr[l.lap_id]||l.personal_record;});
       rows.push({
         key:sessionKey,
         pilot:pilot,
@@ -807,6 +852,7 @@ function sessionListRows(){
         laps:p.laps_count||laps.length||0,
         best:p.best_lap||null,
         avg:p.avg_lap||null,
+        personalRecord:hasPr,
         track:p.track||Object.keys((p.track_counts||{})).join(' / ')||'-',
         search:(pilot+' '+(p.transponder||'')+' '+date+' '+sessionKey).toLowerCase()
       });
@@ -831,7 +877,7 @@ function sessionListTable(rows, page){
         group='<tr class="session-day-row"><td colspan="8">'+escapeHtml(r.date||'Date inconnue')+'</td></tr>';
       }
       return group+'<tr data-search="'+escapeHtml(r.search)+'">' +
-        '<td><a href="#/pilote-session/'+encodeURIComponent(r.pilot)+'/'+encodeURIComponent(r.key)+'"><strong>'+escapeHtml(r.pilot)+'</strong></a><div class="small">'+escapeHtml(r.transponder||'Sans puce')+'</div></td>' +
+        '<td><a href="#/pilote-session/'+encodeURIComponent(r.pilot)+'/'+encodeURIComponent(r.key)+'"><strong>'+escapeHtml(r.pilot)+'</strong></a><div class="small">'+escapeHtml(r.transponder||'Sans puce')+(r.personalRecord?' · Record perso':'')+'</div></td>' +
         '<td>'+escapeHtml(r.date||'-')+'</td>' +
         '<td>'+escapeHtml(r.time||'-')+'</td>' +
         '<td>'+r.laps+'</td>' +
@@ -871,6 +917,24 @@ function sessionsPage(){
   if(today)today.onclick=function(){document.getElementById('sessionDate').value=todayKey();applySessionFilters();};
   var reset=document.getElementById('sessionReset');
   if(reset)reset.onclick=function(){document.getElementById('sessionSearch').value='';document.getElementById('sessionTrack').value='all';document.getElementById('sessionDate').value='';applySessionFilters();};
+}
+
+function dayViewPage(){
+  if(liveTimer) clearTimeout(liveTimer);
+  var date=hashParam('date',todayKey());
+  var dayLaps=liveDaySourceLaps(date);
+  var rows=liveDayRows(dayLaps);
+  var sessions=latestActivities(200).filter(function(s){return dateInputValue(s.date)===date;});
+  var counts=liveTrackCounts(dayLaps);
+  var best18=liveDayRows(dayLaps.filter(function(l){return l._track==='TT1/8';}))[0]||null;
+  var best10=liveDayRows(dayLaps.filter(function(l){return l._track==='TT1/10';}))[0]||null;
+  var sessionRows=sessions.map(function(s){
+    var pilot=s.bestPilot||('Inconnu #'+(s.bestTransponder||''));
+    return '<a class="activity-row session-home-row session-home-link" href="#/pilote-session/'+encodeURIComponent(pilot)+'/'+encodeURIComponent(s.key)+'"><div class="activity-date">'+escapeHtml(s.date||s.name)+'</div><div><div class="activity-track">'+escapeHtml(s.bestPilot||s.bestTransponder||'-')+'</div><div class="activity-sub">'+s.laps+' tours · '+Object.keys(s.pilots).length+' pilotes · '+escapeHtml(Object.keys(s.tracks).join(' / ')||'-')+'</div></div><div><strong>'+fmtTimeS(s.best)+'</strong><div class="activity-sub">best</div></div></a>';
+  }).join('');
+  app.innerHTML='<section class="card"><div class="panel-title"><h2>Vue journée</h2><input id="dayViewDate" type="date" value="'+escapeHtml(date)+'"></div><div class="grid"><div class="card"><h3>Tours</h3><div class="big">'+dayLaps.length+'</div></div><div class="card"><h3>Pilotes</h3><div class="big">'+rows.length+'</div></div><div class="card"><h3>TT1/8</h3><div class="big">'+(counts['TT1/8']||0)+'</div><p class="small">'+fmtTimeS(best18&&best18.best)+' '+escapeHtml(best18?best18.pilot:'')+'</p></div><div class="card"><h3>TT1/10</h3><div class="big">'+(counts['TT1/10']||0)+'</div><p class="small">'+fmtTimeS(best10&&best10.best)+' '+escapeHtml(best10?best10.pilot:'')+'</p></div></div></section><section class="card"><div class="panel-title"><h2>Classement du jour</h2><a class="mini-button" href="#/jour">Live jour</a></div>'+liveDayTable(rows)+'</section><section class="card"><div class="panel-title"><h2>Sessions du jour</h2></div>'+(sessionRows||'<p class="small">Aucune session pour cette date.</p>')+'</section>';
+  var input=document.getElementById('dayViewDate');
+  if(input)input.onchange=function(){location.hash='#/journee?date='+input.value;};
 }
 function podiums(){
   var laps=getAllLaps();
@@ -1537,7 +1601,7 @@ function adminPage(){
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
-function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/jour')===0)return liveDayPage();
+function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return liveDayPage();
     if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
@@ -1567,7 +1631,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260525-dashboardplus1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260525-daypilot1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;

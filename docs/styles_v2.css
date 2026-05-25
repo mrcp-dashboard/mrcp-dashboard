@@ -340,6 +340,12 @@ textarea.admin-json{width:100%;min-height:220px}
 .pace-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
 .pace-block{display:grid;gap:4px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.04)}
 .pace-block span{color:var(--muted);font-size:13px}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pilot-badge{display:inline-flex;align-items:center;border:1px solid rgba(48,240,170,.35);background:rgba(48,240,170,.12);color:#dfffee;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:900}
+.day-record-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.day-record-grid>div{display:grid;gap:5px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04)}
+.day-record-grid strong{font-size:24px}
+.day-record-grid small{color:var(--muted)}
 .share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .mobile-sticky-action{display:none}
 

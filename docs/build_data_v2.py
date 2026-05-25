@@ -342,6 +342,32 @@ def build() -> dict[str, Any]:
         if activity["laps_count"]:
             activities.append(activity)
 
+    personal_best: dict[tuple[str, str], float] = {}
+    chronological_laps = []
+    for activity in activities:
+        for part in activity["participants"]:
+            for lap in part.get("laps", []):
+                chronological_laps.append(lap)
+    chronological_laps.sort(key=lambda lap: (
+        lap.get("date") or "",
+        lap.get("start_time") or "",
+        lap.get("activity_id") or "",
+        lap.get("lap_no") or 0,
+    ))
+    for lap in chronological_laps:
+        key = (str(lap.get("transponder") or ""), str(lap.get("track") or ""))
+        best = personal_best.get(key)
+        if best is not None and lap["lap_time"] < best:
+            lap["personal_record"] = True
+        if best is None or lap["lap_time"] < best:
+            personal_best[key] = lap["lap_time"]
+
+    for activity in activities:
+        for part in activity["participants"]:
+            records = [lap for lap in part.get("laps", []) if lap.get("personal_record")]
+            part["personal_records_count"] = len(records)
+            part["has_personal_record"] = bool(records)
+
     pilots_index: dict[str, dict[str, Any]] = {}
     for activity in activities:
         for part in activity["participants"]:
@@ -414,7 +440,7 @@ def build() -> dict[str, Any]:
     global_score = max(0, min(100, round(100 - len(suspicious_laps) * 0.6 - len(unknown_pilots) * 0.8 - len(quality_collector["ignored_raw_laps"]) * 0.1)))
 
     return {
-        "schema_version": 3.4,
+        "schema_version": 3.5,
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "club_name": CLUB_NAME,
         "source": "SpeedHive Practice 4308",
