@@ -1222,7 +1222,7 @@ function adminRecords(){
   }).join('');
 
   if(!adminOnly('Records admin',
-    '<p class="small">Mode correction rapide : après un clic sur Supprimer / TT1/10 / TT1/8, la ligne disparaît automatiquement pour passer à la suivante. Ensuite exporte <strong>lap_overrides.json</strong>.</p>' +
+    '<p class="small">Mode correction rapide : après un clic sur Supprimer / TT1/10 / TT1/8, la ligne disparaît automatiquement pour passer à la suivante. Ensuite applique via API ou exporte <strong>lap_overrides.json</strong>. L API fusionne avec les corrections déjà publiées.</p>' +
     '<div class="grid">' +
       '<div class="card"><h3>Exclusions</h3><div class="big" id="excludedCount">'+Object.keys(o.excluded).length+'</div></div>' +
       '<div class="card"><h3>Forçages piste</h3><div class="big" id="forcedTrackCount">'+Object.keys(o.forced_track).length+'</div></div>' +
@@ -1366,7 +1366,7 @@ function adminRecords(){
   };
 
   document.getElementById('clearLapOverrides').onclick=function(){
-    if(confirm('Vider toutes les corrections records locales ?')){
+    if(confirm('Vider uniquement les corrections records locales de ce navigateur ? Les corrections déjà publiées sur GitHub seront conservées par l API.')){
       setOverrides({excluded:{},forced_track:{}});
       adminRecords();
     }
@@ -1656,7 +1656,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260521-sessionchart2').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260525-adminmerge1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;

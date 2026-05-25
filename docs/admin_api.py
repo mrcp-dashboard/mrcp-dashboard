@@ -83,6 +83,59 @@ def correction_counts(lap_overrides, pilot_corrections):
     }
 
 
+def load_json_file(path, default):
+    if not path.exists():
+        return default
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return default
+    return data if isinstance(data, dict) else default
+
+
+def normalize_lap_overrides(data):
+    data = data if isinstance(data, dict) else {}
+    excluded = data.get("excluded") if isinstance(data.get("excluded"), dict) else {}
+    forced_track = data.get("forced_track") if isinstance(data.get("forced_track"), dict) else {}
+    return {
+        "excluded": dict(excluded),
+        "forced_track": dict(forced_track),
+    }
+
+
+def merge_lap_overrides(existing, incoming):
+    merged = normalize_lap_overrides(existing)
+    incoming = normalize_lap_overrides(incoming)
+
+    for lap_id, value in incoming["excluded"].items():
+        merged["excluded"][str(lap_id)] = value if isinstance(value, dict) else {"reason": "Exclu admin"}
+        merged["forced_track"].pop(str(lap_id), None)
+
+    for lap_id, track in incoming["forced_track"].items():
+        merged["forced_track"][str(lap_id)] = track
+        merged["excluded"].pop(str(lap_id), None)
+
+    return merged
+
+
+def normalize_pilot_corrections(data):
+    data = data if isinstance(data, dict) else {}
+    names = data.get("names") if isinstance(data.get("names"), dict) else {}
+    transponders = data.get("transponders") if isinstance(data.get("transponders"), dict) else {}
+    return {
+        "names": dict(names),
+        "transponders": dict(transponders),
+    }
+
+
+def merge_pilot_corrections(existing, incoming):
+    merged = normalize_pilot_corrections(existing)
+    incoming = normalize_pilot_corrections(incoming)
+    merged["names"].update(incoming["names"])
+    merged["transponders"].update(incoming["transponders"])
+    return merged
+
+
 def load_admin_history():
     if not HISTORY_FILE.exists():
         return []
@@ -316,6 +369,21 @@ def apply_corrections():
 
     written = []
     backup = make_admin_backup("before_apply", message)
+
+    if lap_overrides is not None:
+        path = DOCS_DIR / "lap_overrides.json"
+        existing = load_json_file(path, {"excluded": {}, "forced_track": {}})
+        lap_overrides = merge_lap_overrides(existing, lap_overrides)
+        path.write_text(json.dumps(lap_overrides, ensure_ascii=False, indent=2), encoding="utf-8")
+        written.append(str(path))
+
+    if pilot_corrections is not None:
+        path = DOCS_DIR / "corrections.json"
+        existing = load_json_file(path, {"names": {}, "transponders": {}})
+        pilot_corrections = merge_pilot_corrections(existing, pilot_corrections)
+        path.write_text(json.dumps(pilot_corrections, ensure_ascii=False, indent=2), encoding="utf-8")
+        written.append(str(path))
+
     history_entry = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "message": message,
@@ -325,16 +393,6 @@ def apply_corrections():
         "commit": "",
         "backup": backup,
     }
-
-    if lap_overrides is not None:
-        path = DOCS_DIR / "lap_overrides.json"
-        path.write_text(json.dumps(lap_overrides, ensure_ascii=False, indent=2), encoding="utf-8")
-        written.append(str(path))
-
-    if pilot_corrections is not None:
-        path = DOCS_DIR / "corrections.json"
-        path.write_text(json.dumps(pilot_corrections, ensure_ascii=False, indent=2), encoding="utf-8")
-        written.append(str(path))
 
     commands = []
 
