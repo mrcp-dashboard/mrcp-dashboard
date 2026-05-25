@@ -293,6 +293,22 @@ textarea.admin-json{width:100%;min-height:220px}
 .sessions-table table{
   min-width:900px;
 }
+.session-day-row td{
+  background:rgba(15,133,255,.10);
+  color:#dff0ff;
+  font-weight:900;
+}
+.session-filter-bar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.session-filter-bar .searchBox{
+  margin:0;
+  flex:1 1 280px;
+}
 .sessions-table td:nth-child(4),
 .sessions-table td:nth-child(5),
 .sessions-table td:nth-child(6){
@@ -314,12 +330,16 @@ textarea.admin-json{width:100%;min-height:220px}
 .progress-svg{width:100%;height:100%;overflow:visible}
 .progress-line{fill:none;stroke:var(--cyan);stroke-width:3}
 .progress-dot{fill:var(--gold);stroke:#001020;stroke-width:2}
+.progress-dot-best{fill:#30f0aa;stroke:#eafff7;stroke-width:2.5}
 .progress-axis{stroke:rgba(255,255,255,.18);stroke-width:1}
 .progress-grid{stroke:rgba(255,255,255,.08);stroke-width:1}
 .progress-label{fill:var(--muted);font-size:11px}
 .axis-title{font-weight:700;fill:#dbe9ff}
 .session-chart-wrap{height:250px}
 .session-chart-svg .progress-line{stroke-width:2.5}
+.pace-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.pace-block{display:grid;gap:4px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.04)}
+.pace-block span{color:var(--muted);font-size:13px}
 .share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .mobile-sticky-action{display:none}
 

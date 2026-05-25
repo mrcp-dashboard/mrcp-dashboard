@@ -6,6 +6,7 @@ var app = document.getElementById('app');
 var deferredPrompt = null;
 var ADMIN_CFG_KEY = 'mrcp_admin_api_config';
 var DEFAULT_LAP_DISTANCE_METERS = 250;
+var TRACK_LAP_DISTANCE_METERS = {'TT1/8':250,'TT1/10':180};
 var state = { track:'all', isAdmin: !!getAdminConfig().token };
 
 function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
@@ -270,7 +271,7 @@ function bestByPilot(laps){var m=new Map();laps.forEach(function(l){if(!m.has(l.
 function allPilots(){return bestByPilot(getAllLaps()).map(function(l){return l._pilot;}).sort(function(a,b){return a.localeCompare(b);});}
 function lapDistanceMeters(track){
   var distances=(DATA&&DATA.meta&&DATA.meta.track_distances_m)||{};
-  var value=Number(distances[track]||distances.default||DEFAULT_LAP_DISTANCE_METERS);
+  var value=Number(distances[track]||TRACK_LAP_DISTANCE_METERS[track]||distances.default||DEFAULT_LAP_DISTANCE_METERS);
   return Number.isFinite(value)&&value>0?value:DEFAULT_LAP_DISTANCE_METERS;
 }
 function totalDistanceKm(laps){
@@ -281,6 +282,14 @@ function fmtKm(v){
   var n=Number(v);
   if(!Number.isFinite(n))return '-';
   return n>=1000?n.toLocaleString('fr-FR',{maximumFractionDigits:0}):n.toLocaleString('fr-FR',{maximumFractionDigits:1});
+}
+function dateInputValue(value){
+  var s=String(value||'').trim();
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m)return m[3]+'-'+m[2]+'-'+m[1];
+  return '';
 }
 function latestActivities(limit){var map={};getAllLaps().forEach(function(l){var key=l.session_id||l.session_name||l._date||'session';if(!map[key]){var sortDate=parseDateValue(l._date||l.session_date||l.date||key);if(sortDate===Number.MAX_SAFE_INTEGER)sortDate=0;map[key]={key:key,name:l.session_name||l._date||key,date:l._date||'',sortDate:sortDate,pilots:{},tracks:{},laps:0,best:null,bestPilot:'',bestTransponder:''};}map[key].pilots[l._pilot]=true;map[key].tracks[l._track]=true;map[key].laps++;if(!map[key].best||l._time<map[key].best){map[key].best=l._time;map[key].bestPilot=l._pilot;map[key].bestTransponder=normalizeTransponder(l.transponder||'');}});return Object.values(map).sort(function(a,b){return b.sortDate-a.sortDate||String(b.date||b.name).localeCompare(String(a.date||a.name));}).slice(0,limit||5);}
 
@@ -340,6 +349,7 @@ function renderSessionLapSvg(points){
   function x(i){return left+(points.length===1?0.5:i/(points.length-1))*(w-left-right);}
   function y(v){return top+((max-v)/(max-min))*(h-top-bottom);}
   var d=points.map(function(p,i){return (i?'L':'M')+x(i).toFixed(1)+' '+y(p.time).toFixed(1);}).join(' ');
+  var best=Math.min.apply(null,times);
   var yTicks=[];
   for(var yi=0;yi<5;yi++){
     var tv=min+((max-min)/4)*yi;
@@ -353,7 +363,8 @@ function renderSessionLapSvg(points){
     return '<line class="progress-axis" x1="'+tx.toFixed(1)+'" y1="'+(h-bottom)+'" x2="'+tx.toFixed(1)+'" y2="'+(h-bottom+5)+'"></line><text class="progress-label" text-anchor="middle" x="'+tx.toFixed(1)+'" y="'+(h-18)+'">'+escapeHtml(String(p.lapNo))+'</text>';
   }).join('');
   var dots=points.map(function(p,i){
-    return '<circle class="progress-dot" cx="'+x(i).toFixed(1)+'" cy="'+y(p.time).toFixed(1)+'" r="4"><title>Tour '+escapeHtml(String(p.lapNo))+' - '+fmtTimeS(p.time)+'</title></circle>';
+    var isBest=Math.abs(p.time-best)<0.0005;
+    return '<circle class="progress-dot '+(isBest?'progress-dot-best':'')+'" cx="'+x(i).toFixed(1)+'" cy="'+y(p.time).toFixed(1)+'" r="'+(isBest?6:4)+'"><title>Tour '+escapeHtml(String(p.lapNo))+' - '+fmtTimeS(p.time)+(isBest?' - Best':'')+'</title></circle>';
   }).join('');
   return '<div class="progress-wrap session-chart-wrap"><svg class="progress-svg session-chart-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">'+
     yTicks.join('')+
@@ -408,6 +419,9 @@ function podiumHallOfFameHtml(laps){
 
 function home(){
   var laps=getAllLaps(), sessions=latestActivities(10), pilotsCount=bestByPilot(laps).length, distanceKm=totalDistanceKm(laps);
+  var dayLaps=liveDaySourceLaps(todayKey());
+  var dayRows=liveDayRows(dayLaps);
+  var dayBest=dayRows[0]||null;
   var sessionRows=sessions.map(function(a){
     var tracks=Object.keys(a.tracks).join(' / ')||'-';
     var pilot=a.bestPilot||('Inconnu #'+(a.bestTransponder||''));
@@ -419,7 +433,21 @@ function home(){
       '<div><strong>'+fmtTimeS(a.best)+'</strong><div class="activity-sub">best</div></div>' +
     '</a>';
   }).join('');
-  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/mes-chronos" class="btn-secondary">Mes chronos</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏆 Podiums du moment</h2></div>'+homePodiumsHtml()+'</div></section>';
+  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/mes-chronos" class="btn-secondary">Mes chronos</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div><div class="kpi"><div class="kpi-icon">📋</div><div><div class="kpi-label">Tours aujourd hui</div><div class="kpi-value">'+dayLaps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">'+escapeHtml(todayKey())+'</div></div></div><div class="kpi"><div class="kpi-icon">👤</div><div><div class="kpi-label">Pilotes jour</div><div class="kpi-value">'+dayRows.length+'</div><div class="kpi-label">actifs</div></div></div><div class="kpi"><div class="kpi-icon">⚡</div><div><div class="kpi-label">Best jour</div><div class="kpi-value">'+fmtTime(dayBest&&dayBest.best)+'</div><div class="kpi-label">'+escapeHtml(dayBest?dayBest.pilot:'-')+'</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏆 Podiums du moment</h2></div>'+homePodiumsHtml()+'</div></section>';
+}
+
+function sessionPaceBlocksHtml(laps){
+  if(laps.length<2)return '<p class="small">Pas assez de tours pour analyser le rythme.</p>';
+  var blocks=[];
+  for(var i=0;i<laps.length;i+=5){
+    var part=laps.slice(i,i+5);
+    var avg=part.reduce(function(sum,l){return sum+l._time;},0)/part.length;
+    var best=part.reduce(function(min,l){return Math.min(min,l._time);},Infinity);
+    blocks.push({from:i+1,to:i+part.length,avg:avg,best:best});
+  }
+  return '<div class="pace-blocks">'+blocks.map(function(b){
+    return '<div class="pace-block"><strong>Tours '+b.from+'-'+b.to+'</strong><span>Moy. '+fmtTimeS(b.avg)+'</span><span>Best '+fmtTimeS(b.best)+'</span></div>';
+  }).join('')+'</div>';
 }
 
 
@@ -497,7 +525,7 @@ function pilotSessionDetailHtml(name, sessionKey){
   var points=laps.map(function(l,i){return{lapNo:i+1,time:l._time};});
   return '<section class="card session-detail-hero">' +
     '<div><a class="mini-button" href="#/pilote/'+encodeURIComponent(name)+'">Retour pilote</a><h1>'+escapeHtml(session.name)+'</h1><p class="small">'+escapeHtml(name)+' · '+escapeHtml(Object.keys(session.tracks).join(' / ')||'-')+'</p></div>' +
-    '<div class="session-detail-actions"><button id="printPilotProfile" class="btn-secondary">Imprimer</button></div>' +
+    '<div class="session-detail-actions"><button id="copySessionLink" class="btn-secondary">Copier lien</button><button id="printPilotProfile" class="btn-secondary">Imprimer</button></div>' +
   '</section>' +
   '<section class="grid">' +
     '<div class="card"><h3>Tours</h3><div class="big">'+session.laps+'</div></div>' +
@@ -506,6 +534,7 @@ function pilotSessionDetailHtml(name, sessionKey){
     '<div class="card"><h3>Regularite</h3><div class="big">'+fmtTimeS(consistency)+'</div></div>' +
   '</section>' +
   '<section class="card"><h3>Courbe de session</h3>'+renderSessionLapSvg(points)+'</section>' +
+  '<section class="card"><h3>Rythme par blocs de 5 tours</h3>'+sessionPaceBlocksHtml(laps)+'</section>' +
   '<section class="card"><h3>Tours de la session</h3>'+sessionLapsTable(session)+'</section>';
 }
 
@@ -541,6 +570,16 @@ function pilotTargetsHtml(stats){
       '</div>' +
     '</div>';
   }).join('')+'</div>';
+}
+
+function pilotPersonalRecordsHtml(stats){
+  return '<div class="table-wrap"><table><thead><tr><th>Piste</th><th>Record perso</th><th>Date</th><th>Session</th><th>Tours piste</th></tr></thead><tbody>'+
+    ['TT1/8','TT1/10'].map(function(track){
+      var laps=stats.laps.filter(function(l){return l._track===track;});
+      var best=pilotBestByTrack(stats,track);
+      return '<tr><td><span class="badge">'+escapeHtml(track)+'</span></td><td><strong>'+fmtTimeS(best&&best._time)+'</strong></td><td>'+escapeHtml(best&&(best._date||best.session_date)||'-')+'</td><td>'+escapeHtml(best&&(best.session_name||best.session_id)||'-')+'</td><td>'+laps.length+'</td></tr>';
+    }).join('')+
+  '</tbody></table></div>';
 }
 
 function pilotAiInsights(stats){
@@ -663,6 +702,11 @@ function pilotFullProfileHtml(name){
     pilotTargetsHtml(s) +
   '</section>' +
 
+  '<section class="card">' +
+    '<div class="panel-title"><h3>Records personnels par piste</h3></div>' +
+    pilotPersonalRecordsHtml(s) +
+  '</section>' +
+
   '<section class="card ai-card">' +
     '<h3>🧠 Analyse progression IA</h3>' +
     '<div class="ai-list">' + insights.map(function(x){return '<div class="ai-item">💡 '+escapeHtml(x)+'</div>';}).join('') + '</div>' +
@@ -674,7 +718,7 @@ function pilotFullProfileHtml(name){
   '</section>' +
 
   '<section class="card">' +
-    '<h3>📅 Sessions du pilote</h3>' +
+    '<h3>📅 Dernières sessions cliquables</h3>' +
     '<div class="table-wrap"><table><thead><tr><th>Session</th><th>Tours</th><th>Best</th><th>Moyenne</th><th>Pistes</th></tr></thead><tbody>' +
       sessions.slice(0,40).map(function(x){
         return '<tr><td><a href="#/pilote-session/'+encodeURIComponent(name)+'/'+encodeURIComponent(x.key)+'">'+escapeHtml(x.name)+'</a></td><td>'+x.laps+'</td><td><strong>'+fmtTimeS(x.best)+'</strong></td><td>'+fmtTimeS(x.avg)+'</td><td><span class="badge">'+escapeHtml(Object.keys(x.tracks).join(' / '))+'</span></td></tr>';
@@ -734,6 +778,11 @@ function pilotSessionPage(path){
   var name=decodeURIComponent(parts.shift()||'');
   var sessionKey=decodeURIComponent(parts.join('/')||'');
   app.innerHTML=pilotSessionDetailHtml(name,sessionKey);
+  var copy=document.getElementById('copySessionLink');
+  if(copy)copy.onclick=function(){
+    navigator.clipboard.writeText(location.origin+location.pathname+'#/pilote-session/'+encodeURIComponent(name)+'/'+encodeURIComponent(sessionKey));
+    alert('Lien session copié');
+  };
   var print=document.getElementById('printPilotProfile');
   if(print)print.onclick=function(){window.print();};
 }
@@ -752,6 +801,7 @@ function sessionListRows(){
         pilot:pilot,
         transponder:p.transponder||p.transponder_id||'',
         date:date,
+        dateKey:dateInputValue(a.date||a.session_date||date),
         sortDate:parseDateValue(a.date||a.session_date||date),
         time:first.start_time||last.start_time||'',
         laps:p.laps_count||laps.length||0,
@@ -773,9 +823,14 @@ function sessionListTable(rows, page){
   var start=(page-1)*perPage;
   var pageRows=rows.slice(start,start+perPage);
   if(!pageRows.length)return '<p class="small">Aucune session trouvee.</p>';
-  return '<div class="table-wrap sessions-table"><table><thead><tr><th>Transpondeur / pilote</th><th>Date</th><th>Heure</th><th>Tours</th><th>Best</th><th>Moyenne</th><th>Piste</th><th></th></tr></thead><tbody>'+
-    pageRows.map(function(r){
-      return '<tr data-search="'+escapeHtml(r.search)+'">' +
+  var lastDate='';
+  var body=pageRows.map(function(r){
+      var group='';
+      if(r.date!==lastDate){
+        lastDate=r.date;
+        group='<tr class="session-day-row"><td colspan="8">'+escapeHtml(r.date||'Date inconnue')+'</td></tr>';
+      }
+      return group+'<tr data-search="'+escapeHtml(r.search)+'">' +
         '<td><a href="#/pilote-session/'+encodeURIComponent(r.pilot)+'/'+encodeURIComponent(r.key)+'"><strong>'+escapeHtml(r.pilot)+'</strong></a><div class="small">'+escapeHtml(r.transponder||'Sans puce')+'</div></td>' +
         '<td>'+escapeHtml(r.date||'-')+'</td>' +
         '<td>'+escapeHtml(r.time||'-')+'</td>' +
@@ -785,7 +840,8 @@ function sessionListTable(rows, page){
         '<td><span class="badge">'+escapeHtml(r.track)+'</span></td>' +
         '<td><a class="mini-button" href="#/pilote-session/'+encodeURIComponent(r.pilot)+'/'+encodeURIComponent(r.key)+'">Ouvrir</a></td>' +
       '</tr>';
-    }).join('')+'</tbody></table></div>'+sessionPagerHtml(page,totalPages);
+    }).join('');
+  return '<div class="table-wrap sessions-table"><table><thead><tr><th>Transpondeur / pilote</th><th>Date</th><th>Heure</th><th>Tours</th><th>Best</th><th>Moyenne</th><th>Piste</th><th></th></tr></thead><tbody>'+body+'</tbody></table></div>'+sessionPagerHtml(page,totalPages);
 }
 function sessionPagerHtml(page,totalPages){
   if(totalPages<=1)return '';
@@ -799,13 +855,22 @@ function sessionPagerHtml(page,totalPages){
 function sessionsPage(){
   var page=Number(hashParam('page','1'))||1;
   var all=sessionListRows();
-  app.innerHTML='<section class="card"><div class="panel-title"><h2>Sessions</h2><span class="small">'+all.length+' sessions pilotes</span></div><input class="searchBox" id="sessionSearch" placeholder="Rechercher pilote, puce, date..."><div id="sessionsList">'+sessionListTable(all,page)+'</div></section>';
-  var search=document.getElementById('sessionSearch');
-  if(search)search.oninput=function(e){
-    var q=e.target.value.toLowerCase();
-    var filtered=all.filter(function(r){return r.search.indexOf(q)!==-1;});
+  function applySessionFilters(){
+    var q=(document.getElementById('sessionSearch')&&document.getElementById('sessionSearch').value||'').toLowerCase();
+    var track=document.getElementById('sessionTrack')&&document.getElementById('sessionTrack').value||'all';
+    var date=document.getElementById('sessionDate')&&document.getElementById('sessionDate').value||'';
+    var filtered=all.filter(function(r){
+      return (!q||r.search.indexOf(q)!==-1) && (track==='all'||String(r.track).indexOf(track)!==-1) && (!date||r.dateKey===date);
+    });
+    document.getElementById('sessionsCount').textContent=filtered.length+' sessions pilotes';
     document.getElementById('sessionsList').innerHTML=sessionListTable(filtered,1);
-  };
+  }
+  app.innerHTML='<section class="card"><div class="panel-title"><h2>Sessions</h2><span id="sessionsCount" class="small">'+all.length+' sessions pilotes</span></div><div class="session-filter-bar"><input class="searchBox" id="sessionSearch" placeholder="Rechercher pilote, puce, date..."><select id="sessionTrack"><option value="all">Toutes pistes</option><option value="TT1/8">TT1/8</option><option value="TT1/10">TT1/10</option></select><input id="sessionDate" type="date"><button id="sessionToday" class="btn-secondary">Aujourd hui</button><button id="sessionReset" class="btn-secondary">Reset</button></div><div id="sessionsList">'+sessionListTable(all,page)+'</div></section>';
+  ['sessionSearch','sessionTrack','sessionDate'].forEach(function(id){var el=document.getElementById(id);if(el)el.oninput=applySessionFilters;if(el)el.onchange=applySessionFilters;});
+  var today=document.getElementById('sessionToday');
+  if(today)today.onclick=function(){document.getElementById('sessionDate').value=todayKey();applySessionFilters();};
+  var reset=document.getElementById('sessionReset');
+  if(reset)reset.onclick=function(){document.getElementById('sessionSearch').value='';document.getElementById('sessionTrack').value='all';document.getElementById('sessionDate').value='';applySessionFilters();};
 }
 function podiums(){
   var laps=getAllLaps();
@@ -819,101 +884,7 @@ function podiums(){
   bindFilters(podiums);
 }
 
-function reportTopRows(rows, limit){
-  return rows.slice(0,limit||5).map(function(r,i){
-    return '<tr><td>'+(i+1)+'</td><td><a href="#/pilote/'+encodeURIComponent(r._pilot)+'">'+escapeHtml(r._pilot)+'</a></td><td><strong>'+fmtTimeS(r._time)+'</strong></td><td><span class="badge">'+escapeHtml(r._track)+'</span></td><td>'+escapeHtml(r._date||r.session_name||'-')+'</td></tr>';
-  }).join('');
-}
-function reportActivityRows(activities){
-  if(!activities.length)return '<p class="small">Aucune activite disponible.</p>';
-  return '<div class="report-activity-list">'+activities.map(function(a){
-    return '<div class="report-activity-item"><strong>'+escapeHtml(a.date||a.name)+'</strong><span>'+a.laps+' tours</span><span>'+Object.keys(a.pilots).length+' pilotes</span><span>'+escapeHtml(Object.keys(a.tracks).join(' / ')||'-')+'</span></div>';
-  }).join('')+'</div>';
-}
-function reportPage(){
-  var laps=getAllLaps();
-  var all=getAllLapsRaw(true);
-  var activities=latestActivities();
-  var bestAll=bestByPilot(laps);
-  var best10=bestByPilot(laps.filter(function(l){return l._track==='TT1/10';}));
-  var best18=bestByPilot(laps.filter(function(l){return l._track==='TT1/8';}));
-  var latest=activities[0];
-  var generated=new Date().toLocaleString('fr-FR');
-
-  app.innerHTML=
-    '<section class="report-hero card">' +
-      '<div><h1>Rapport club MRCP</h1><p class="small">Genere le '+escapeHtml(generated)+' depuis les donnees du dashboard.</p></div>' +
-      '<button id="printReport" class="btn-primary">Imprimer</button>' +
-    '</section>' +
-    '<section class="report-grid">' +
-      '<div class="card"><h3>Tours actifs</h3><div class="big">'+laps.length.toLocaleString('fr-FR')+'</div><p class="small">'+all.length.toLocaleString('fr-FR')+' tours lus au total</p></div>' +
-      '<div class="card"><h3>Pilotes classes</h3><div class="big">'+bestAll.length+'</div><p class="small">avec au moins un chrono actif</p></div>' +
-      '<div class="card"><h3>Derniere activite</h3><div class="big">'+escapeHtml(latest?String(latest.laps):'-')+'</div><p class="small">'+escapeHtml(latest?(latest.date||latest.name):'Aucune')+'</p></div>' +
-      '<div class="card"><h3>Qualite</h3><div class="big">'+suspiciousLaps().length+'</div><p class="small">tours suspects restants</p></div>' +
-    '</section>' +
-    '<section class="card"><div class="panel-title"><h2>Records par piste</h2></div>'+podiumTrackSummaryHtml(laps)+'</section>' +
-    '<section class="report-columns">' +
-      '<div class="card"><h2>Top TT1/10</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Date</th></tr></thead><tbody>'+reportTopRows(best10,8)+'</tbody></table></div></div>' +
-      '<div class="card"><h2>Top TT1/8</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Date</th></tr></thead><tbody>'+reportTopRows(best18,8)+'</tbody></table></div></div>' +
-    '</section>' +
-    '<section class="card"><div class="panel-title"><h2>Dernieres activites</h2></div>'+reportActivityRows(activities)+'</section>';
-
-  var print=document.getElementById('printReport');
-  if(print)print.onclick=function(){window.print();};
-}
-
-
 var liveTimer = null;
-
-function latestSessionLaps(){
-  var laps = getAllLaps();
-  if(!laps.length) return {sessionName:'Aucune activité', date:'', laps:[]};
-
-  var groups = {};
-  laps.forEach(function(l){
-    var key = l.session_id || l.session_name || l._date || 'session';
-    if(!groups[key]){
-      groups[key] = {
-        key:key,
-        sessionName:l.session_name || l._date || key,
-        date:l._date || '',
-        laps:[]
-      };
-    }
-    groups[key].laps.push(l);
-  });
-
-  var sessions = Object.values(groups).sort(function(a,b){
-    return (parseDateValue(b.date || b.sessionName)-parseDateValue(a.date || a.sessionName))||String(b.sessionName).localeCompare(String(a.sessionName));
-  });
-
-  return sessions[0] || {sessionName:'Aucune activité', date:'', laps:[]};
-}
-
-function liveRanking(sessionLaps){
-  var map = new Map();
-
-  sessionLaps.forEach(function(l){
-    var item = map.get(l._pilot) || {
-      pilot:l._pilot,
-      best:Infinity,
-      last:null,
-      laps:0,
-      track:l._track,
-      session:l.session_name,
-      date:l._date
-    };
-
-    item.laps += 1;
-    item.last = l;
-    item.track = l._track;
-    if(l._time < item.best) item.best = l._time;
-
-    map.set(l._pilot, item);
-  });
-
-  return Array.from(map.values()).sort(function(a,b){return a.best-b.best;});
-}
 
 function liveTrackCounts(laps){
   var counts={};
@@ -1071,92 +1042,6 @@ function liveDayPage(){
   if(manual)manual.onclick=function(){location.reload();};
   liveTimer=setTimeout(function(){location.reload();},30000);
 }
-
-function renderLiveRows(rows){
-  if(!rows.length){
-    return '<p class="small">Aucun tour live disponible pour le moment.</p>';
-  }
-
-  return rows.map(function(r,i){
-    return '<div class="live-ranking-row">' +
-      '<div class="live-rank '+(i===0?'first':'')+'">'+(i+1)+'</div>' +
-      '<div>' +
-        '<div class="live-pilot">'+escapeHtml(r.pilot)+'</div>' +
-        '<div class="live-last">'+r.laps+' tours · Dernier : '+fmtTimeS(r.last && r.last._time)+'</div>' +
-      '</div>' +
-      '<div><span class="badge">'+escapeHtml(r.track)+'</span></div>' +
-      '<div class="live-time">'+fmtTimeS(r.best)+'</div>' +
-    '</div>';
-  }).join('');
-}
-
-function livePage(){
-  if(liveTimer) clearTimeout(liveTimer);
-
-  var session = latestSessionLaps();
-  var filtered = applyFilters(session.laps);
-  var rows = liveRanking(filtered);
-  var best = rows[0] || null;
-  var trackCounts = liveTrackCounts(session.laps);
-  var lastUpdate = new Date().toLocaleTimeString('fr-FR');
-
-  app.innerHTML =
-    '<section class="live-hero">' +
-      '<div class="card live-card">' +
-        '<div class="live-status"><span class="live-dot"></span> LIVE / quasi-live</div>' +
-        '<h1 class="live-title">Live Timing MRCP</h1>' +
-        '<p class="pilot-sub">Classement automatique basé sur la dernière activité SpeedHive récupérée par le LXC.</p>' +
-        '<div class="goal-box">' +
-          '<div class="goal-pill"><span class="small">Activité</span><strong>'+escapeHtml(session.sessionName)+'</strong></div>' +
-          '<div class="goal-pill"><span class="small">Pilotes</span><strong>'+rows.length+'</strong></div>' +
-          '<div class="goal-pill"><span class="small">Tours total</span><strong>'+session.laps.length+'</strong></div>' +
-          '<div class="goal-pill"><span class="small">TT1/8</span><strong>'+(trackCounts['TT1/8']||0)+'</strong></div>' +
-          '<div class="goal-pill"><span class="small">TT1/10</span><strong>'+(trackCounts['TT1/10']||0)+'</strong></div>' +
-        '</div>' +
-        '<div class="live-refresh">' +
-          '<button id="manualRefreshLive" class="btn-primary">Rafraîchir</button>' +
-          '<button id="toggleTvMode" class="btn-secondary">Mode TV</button>' +
-          '<span class="small">Dernier rafraîchissement : '+lastUpdate+'</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="card">' +
-        '<h3>🏆 Meilleur tour live</h3>' +
-        '<div class="big">'+fmtTimeS(best && best.best)+'</div>' +
-        '<p>'+(best ? escapeHtml(best.pilot) : '-')+'</p>' +
-        '<p class="small">Le classement se met à jour automatiquement toutes les 60 secondes.</p>' +
-      '</div>' +
-    '</section>' +
-
-    '<section class="live-grid">' +
-      '<div class="card">' +
-        '<div class="panel-title"><h2>📡 Classement live</h2></div>' +
-        renderFilters() +
-        '<div id="liveRows">'+renderLiveRows(rows)+'</div>' +
-      '</div>' +
-      '<div class="card">' +
-        '<h2>🚨 Alertes</h2>' +
-        '<p class="small">Cette première version détecte la dernière session. La prochaine pourra signaler automatiquement un nouveau record.</p>' +
-        '<div class="goal-box">' +
-          '<div class="goal-pill"><span class="small">Piste</span><strong>'+escapeHtml(state.track === 'all' ? 'Toutes' : state.track)+'</strong></div>' +
-          '<div class="goal-pill"><span class="small">Source</span><strong>data_v2.json</strong></div>' +
-        '</div>' +
-      '</div>' +
-    '</section>';
-
-  bindFilters(livePage);
-
-  var manual = document.getElementById('manualRefreshLive');
-  if(manual) manual.onclick = function(){ location.reload(); };
-
-  var tv = document.getElementById('toggleTvMode');
-  if(tv) tv.onclick = function(){ document.body.classList.toggle('live-tv'); };
-
-  liveTimer = setTimeout(function(){
-    // Recharge complet pour récupérer un data_v2.json neuf poussé par le LXC
-    location.reload();
-  }, 60000);
-}
-
 
 function adminOnly(title, body){if(!state.isAdmin){app.innerHTML='<section class="card"><h2>Accès admin</h2><p>Page réservée à l’administrateur.</p></section>';return false;}app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2>'+body+'</section>';return true;}
 function lapSuspicionReasons(l){
@@ -1682,7 +1567,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260525-navclean1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260525-dashboardplus1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;
