@@ -354,19 +354,52 @@ function pilotProgressData(stats,track){
     return (a.sortDate-b.sortDate)||String(a.label).localeCompare(String(b.label));
   }).slice(-18);
 }
+function progressDateLabel(point){
+  var key=dateKeyFromValue(point.date||point.label);
+  if(key){
+    var p=key.split('-');
+    return p[2]+'/'+p[1];
+  }
+  return String(point.label||'').slice(0,8);
+}
 function renderProgressSvg(points){
   if(points.length<2)return '<p class="small">Pas encore assez de sessions pour afficher une progression.</p>';
-  var w=720,h=220,pad=28;
+  var w=760,h=250,left=58,right=18,top=18,bottom=48;
   var times=points.map(function(p){return p.time;});
   var min=Math.min.apply(null,times),max=Math.max.apply(null,times);
+  var margin=Math.max((max-min)*0.08,0.2);
+  min=Math.max(0,min-margin);
+  max=max+margin;
   if(max===min)max=min+1;
-  function x(i){return pad+(i/(points.length-1))*(w-pad*2);}
-  function y(v){return pad+((v-min)/(max-min))*(h-pad*2);}
-  // Chrono plus bas = mieux, donc meilleur en haut
-  function yy(v){return h-y(v)+pad;}
-  var d=points.map(function(p,i){return (i?'L':'M')+x(i).toFixed(1)+' '+yy(p.time).toFixed(1);}).join(' ');
-  var dots=points.map(function(p,i){return '<circle class="progress-dot" cx="'+x(i).toFixed(1)+'" cy="'+yy(p.time).toFixed(1)+'" r="5"><title>'+escapeHtml(p.label)+' — '+fmtTimeS(p.time)+'</title></circle>';}).join('');
-  return '<div class="progress-wrap"><svg class="progress-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><line class="progress-axis" x1="'+pad+'" y1="'+(h-pad)+'" x2="'+(w-pad)+'" y2="'+(h-pad)+'"></line><line class="progress-axis" x1="'+pad+'" y1="'+pad+'" x2="'+pad+'" y2="'+(h-pad)+'"></line><path class="progress-line" d="'+d+'"></path>'+dots+'<text class="progress-label" x="'+pad+'" y="16">Meilleur</text><text class="progress-label" x="'+(w-95)+'" y="'+(h-8)+'">Dernières sessions</text></svg></div>';
+  function x(i){return left+(i/(points.length-1))*(w-left-right);}
+  function y(v){return top+((max-v)/(max-min))*(h-top-bottom);}
+  var d=points.map(function(p,i){return (i?'L':'M')+x(i).toFixed(1)+' '+y(p.time).toFixed(1);}).join(' ');
+  var best=Math.min.apply(null,times);
+  var yTicks=[];
+  for(var yi=0;yi<5;yi++){
+    var tv=min+((max-min)/4)*yi;
+    var ty=y(tv);
+    yTicks.push('<line class="progress-grid" x1="'+left+'" y1="'+ty.toFixed(1)+'" x2="'+(w-right)+'" y2="'+ty.toFixed(1)+'"></line><text class="progress-label" x="8" y="'+(ty+4).toFixed(1)+'">'+fmtTime(tv)+'</text>');
+  }
+  var step=Math.max(1,Math.ceil(points.length/6));
+  var xTicks=points.map(function(p,i){
+    if(i!==0&&i!==points.length-1&&(i%step)!==0)return '';
+    var tx=x(i);
+    return '<line class="progress-axis" x1="'+tx.toFixed(1)+'" y1="'+(h-bottom)+'" x2="'+tx.toFixed(1)+'" y2="'+(h-bottom+5)+'"></line><text class="progress-label" text-anchor="middle" x="'+tx.toFixed(1)+'" y="'+(h-20)+'">'+escapeHtml(progressDateLabel(p))+'</text>';
+  }).join('');
+  var dots=points.map(function(p,i){
+    var isBest=Math.abs(p.time-best)<0.0005;
+    return '<circle class="progress-dot '+(isBest?'progress-dot-best':'')+'" cx="'+x(i).toFixed(1)+'" cy="'+y(p.time).toFixed(1)+'" r="'+(isBest?6:4)+'"><title>'+escapeHtml(p.label)+' - '+fmtTimeS(p.time)+(isBest?' - Best':'')+'</title></circle>';
+  }).join('');
+  return '<div class="progress-wrap"><svg class="progress-svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">'+
+    yTicks.join('')+
+    '<line class="progress-axis" x1="'+left+'" y1="'+(h-bottom)+'" x2="'+(w-right)+'" y2="'+(h-bottom)+'"></line>'+
+    '<line class="progress-axis" x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(h-bottom)+'"></line>'+
+    xTicks+
+    '<path class="progress-line" d="'+d+'"></path>'+dots+
+    '<text class="progress-label axis-title" x="'+(left+8)+'" y="12">Secondes</text>'+
+    '<text class="progress-label axis-title" text-anchor="end" x="'+(w-right)+'" y="'+(h-4)+'">Dates des sessions</text>'+
+  '</svg></div>';
 }
 function renderSessionLapSvg(points){
   if(points.length<2)return '<p class="small">Pas encore assez de tours pour afficher une courbe.</p>';
