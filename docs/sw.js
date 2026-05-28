@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mrcp-dashboard-v2026-05-28-logo-1';
+const CACHE_NAME = 'mrcp-dashboard-v2026-05-28-install-1';
 
 const ASSETS = [
   './index_v2.html',

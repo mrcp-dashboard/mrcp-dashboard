@@ -1624,6 +1624,10 @@ function bindAdmin(){
 }
 
 function setupPwa(){
+  var installBtn=document.getElementById('installPwaBtn');
+  var standalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;
+  if(window.navigator&&window.navigator.standalone)standalone=true;
+  if(installBtn&&standalone)installBtn.classList.add('hidden');
   if('serviceWorker' in navigator){
     var refreshing=false;
     navigator.serviceWorker.addEventListener('controllerchange',function(){
@@ -1631,7 +1635,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260528-logo1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260528-install1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;
@@ -1644,9 +1648,24 @@ function setupPwa(){
       });
     }).catch(function(e){console.log('SW non enregistré',e);});
   }
-  var installBtn=document.getElementById('installPwaBtn');
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;if(installBtn)installBtn.classList.remove('hidden');});
-  if(installBtn){installBtn.onclick=async function(){if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.classList.add('hidden');};}
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;if(installBtn){installBtn.classList.remove('hidden');installBtn.textContent="Installer l'app";}});
+  window.addEventListener('appinstalled',function(){deferredPrompt=null;if(installBtn)installBtn.classList.add('hidden');});
+  if(installBtn){installBtn.onclick=async function(){
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt=null;
+      installBtn.classList.add('hidden');
+      return;
+    }
+    var ua=navigator.userAgent||'';
+    var ios=/iphone|ipad|ipod/i.test(ua);
+    if(ios){
+      alert("Sur iPhone : ouvre le bouton Partager de Safari, puis choisis \"Sur l'ecran d'accueil\".");
+    }else{
+      alert("Si le bouton installation ne s'ouvre pas, utilise le menu du navigateur puis \"Installer l'application\" ou \"Ajouter a l'ecran d'accueil\".");
+    }
+  };}
 }
 
 async function init(){
