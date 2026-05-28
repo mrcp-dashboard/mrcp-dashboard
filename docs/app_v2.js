@@ -749,9 +749,9 @@ function pilotFullProfileHtml(name){
         '<div class="goal-pill"><span class="small">Régularité</span><strong>'+fmtTimeS(consistency)+'</strong></div>' +
       '</div>' +
       '<div class="share-row">' +
-        '<button id="setMyProfile">C’est mon profil</button>' +
-        '<button id="copyPilotLink">Copier lien fiche</button>' +
-        '<button id="printPilotProfile">Imprimer fiche</button>' +
+        '<button id="setMyProfile" class="btn-primary">C’est mon profil</button>' +
+        '<button id="copyPilotLink" class="btn-secondary">Copier lien fiche</button>' +
+        '<button id="printPilotProfile" class="btn-secondary">Imprimer fiche</button>' +
       '</div>' +
     '</div>' +
     '<div class="card qr-card">' +
@@ -834,7 +834,7 @@ function myChronos(){
     return;
   }
 
-  app.innerHTML = '<section class="card"><h2>Mes chronos</h2><button id="changePilot">Changer de pilote</button></section>' + pilotFullProfileHtml(saved) + '<div class="mobile-sticky-action"><a href="#/podiums" class="btn-primary">Voir podiums du club</a></div>';
+  app.innerHTML = '<section class="card"><h2>Mes chronos</h2><button id="changePilot" class="btn-secondary">Changer de pilote</button></section>' + pilotFullProfileHtml(saved) + '<div class="mobile-sticky-action"><a href="#/podiums" class="btn-primary">Voir podiums du club</a></div>';
 
   document.getElementById('changePilot').onclick=function(){
     localStorage.removeItem('mrcp_my_pilot');

@@ -93,10 +93,15 @@ main{max-width:1500px;margin:auto}
 .hero-card p{max-width:540px;color:#d7e3f5;font-size:16px;line-height:1.45;margin:0 0 16px}
 .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
 .btn-primary,.btn-secondary,button{
-  border:1px solid rgba(255,255,255,.18);color:#fbfdff;border-radius:12px;padding:11px 16px;font-weight:850;text-decoration:none;cursor:pointer;text-shadow:0 1px 1px rgba(0,0,0,.35)
+  border:1px solid rgba(255,255,255,.18);color:#fbfdff;border-radius:12px;padding:11px 16px;font-weight:850;text-decoration:none;cursor:pointer;text-shadow:0 1px 1px rgba(0,0,0,.35);background:rgba(8,28,58,.92)
 }
 .btn-primary{background:linear-gradient(135deg, #167fff, #0047c8);box-shadow:0 10px 24px rgba(0,117,255,.30)}
 .btn-secondary{background:rgba(8,28,58,.92);border-color:rgba(159,208,255,.34);backdrop-filter:blur(10px)}
+.share-row .btn-primary,.share-row .btn-secondary,#changePilot,#savePilot{
+  color:#fff!important;
+  border-color:rgba(180,220,255,.42);
+  box-shadow:0 10px 24px rgba(0,0,0,.24);
+}
 .kpi-grid,.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .kpi-card{padding:18px}
 .kpi-card h2{font-size:20px;margin-bottom:12px}
