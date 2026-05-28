@@ -1631,7 +1631,7 @@ function setupPwa(){
       refreshing=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20260525-daypilot1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=20260528-logo1').then(function(reg){
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',function(){
         var worker=reg.installing;

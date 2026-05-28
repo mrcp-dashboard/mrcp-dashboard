@@ -1,10 +1,15 @@
-const CACHE_NAME = 'mrcp-dashboard-v2026-05-25-daypilot-1';
+const CACHE_NAME = 'mrcp-dashboard-v2026-05-28-logo-1';
 
 const ASSETS = [
   './index_v2.html',
   './app_v2.js',
   './styles_v2.css',
-  './manifest.webmanifest'
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png',
+  './apple-touch-icon.png',
+  './favicon.png',
+  './favicon-64.png'
 ];
 
 self.addEventListener('install', event => {
