@@ -147,7 +147,19 @@ def main():
         help="Retélécharge les CSV même s'ils existent déjà"
     )
 
+    parser.add_argument(
+        "--force-activity",
+        action="append",
+        default=[],
+        help="Retelecharge une activite precise sans forcer tout l'historique"
+    )
+
     args = parser.parse_args()
+    force_activity_ids = {
+        str(x).strip()
+        for x in args.force_activity
+        if str(x).strip()
+    }
 
     CSV_DIR.mkdir(exist_ok=True)
 
@@ -165,6 +177,9 @@ def main():
         return 1
 
     log(f"Activités récupérées : {len(activities)}")
+
+    if force_activity_ids:
+        log("Retelechargement cible : " + ", ".join(sorted(force_activity_ids)))
 
     meta = load_meta()
     meta.setdefault("location_id", LOCATION_ID)
@@ -194,7 +209,8 @@ def main():
         try:
             before_exists = (CSV_DIR / f"sessions_{activity_id}.csv").exists()
             force_today = bool(date_text and date_text == today_text)
-            force_download = args.force or force_today
+            force_target = activity_id in force_activity_ids
+            force_download = args.force or force_today or force_target
 
             path = download_csv(
                 activity,
@@ -202,7 +218,10 @@ def main():
             )
 
             if path:
-                if before_exists and force_today and not args.force:
+                if before_exists and force_target and not args.force:
+                    downloaded += 1
+                    log(f"Retelecharge activite ciblee : {path.name} | {label}")
+                elif before_exists and force_today and not args.force:
                     downloaded += 1
                     log(f"Retéléchargé activité du jour : {path.name} | {label}")
                 elif before_exists and not args.force:
