@@ -66,7 +66,7 @@ body::before{
 }
 .nav-link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-button{font:inherit;text-align:left}
-.nav-link:hover,.nav-link.active,.mobile-priority{
+.nav-link:hover,.nav-link.active{
   background:linear-gradient(135deg, var(--blue), var(--blue2));
   box-shadow:0 12px 30px rgba(0,117,255,.35);border-color:rgba(255,255,255,.16)
 }
