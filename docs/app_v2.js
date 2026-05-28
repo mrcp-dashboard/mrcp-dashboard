@@ -5,9 +5,12 @@ var DATA = null;
 var app = document.getElementById('app');
 var deferredPrompt = null;
 var ADMIN_CFG_KEY = 'mrcp_admin_api_config';
+var DATA_CACHE_NAME = 'mrcp-dashboard-data-v1';
+var DATA_URL = 'data_v2.json';
 var DEFAULT_LAP_DISTANCE_METERS = 250;
 var TRACK_LAP_DISTANCE_METERS = {'TT1/8':250,'TT1/10':180};
 var state = { track:'all', isAdmin: !!getAdminConfig().token };
+var lapsCache = null;
 
 function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function fmtTime(v){var n=Number(v);return Number.isFinite(n)?n.toFixed(3):'-';}
@@ -18,8 +21,9 @@ function normalizeTransponder(v){return String(v||'').replace('/0','').trim();}
 function lapPilot(l){return l.pilot_name||l.pilot||l.driver||l.name||l.participant_name||l.transponder||'Pilote inconnu';}
 function lapKey(activityId, transponder, lapNo, startTime, lapTime){var n=Number(lapTime);return [activityId||'',normalizeTransponder(transponder),lapNo||'',startTime||'',Number.isFinite(n)?n.toFixed(3):''].join('|');}
 function getOverrides(){try{var raw=JSON.parse(localStorage.getItem('mrcp_lap_overrides')||'{}');return{excluded:raw.excluded&&typeof raw.excluded==='object'?raw.excluded:{},forced_track:raw.forced_track&&typeof raw.forced_track==='object'?raw.forced_track:{}};}catch(e){return{excluded:{},forced_track:{}};}}
-function setOverrides(o){localStorage.setItem('mrcp_lap_overrides',JSON.stringify({excluded:o.excluded||{},forced_track:o.forced_track||{}},null,2));}
-function forcedTrack(lapId){return getOverrides().forced_track[lapId]||null;}
+function clearDerivedCache(){lapsCache=null;}
+function setOverrides(o){localStorage.setItem('mrcp_lap_overrides',JSON.stringify({excluded:o.excluded||{},forced_track:o.forced_track||{}},null,2));clearDerivedCache();}
+function forcedTrack(lapId,o){return (o||getOverrides()).forced_track[lapId]||null;}
 function getAdminConfig(){try{var raw=JSON.parse(localStorage.getItem(ADMIN_CFG_KEY)||'{}');return{apiUrl:String(raw.apiUrl||'').replace(/\/+$/,''),token:String(raw.token||'')};}catch(e){return{apiUrl:'',token:''};}}
 function setAdminConfig(cfg){localStorage.setItem(ADMIN_CFG_KEY,JSON.stringify({apiUrl:String(cfg.apiUrl||'').replace(/\/+$/,''),token:String(cfg.token||'')},null,2));}
 function clearAdminConfig(){localStorage.removeItem(ADMIN_CFG_KEY);}
@@ -229,6 +233,7 @@ async function applyAdminCorrections(statusId, trigger){
 }
 
 function getAllLapsRaw(includeExcluded){
+  if(!includeExcluded&&lapsCache)return lapsCache;
   var rows=[], o=getOverrides();
   function addLap(l,ctx){
     var t=lapSeconds(l); if(!Number.isFinite(t)||t<=0)return;
@@ -237,7 +242,7 @@ function getAllLapsRaw(includeExcluded){
     var excluded=!!o.excluded[lapId]||!!l.exclude_from_records||!!l.excluded;
     if(excluded&&!includeExcluded)return;
     var pilot=ctx.pilot_name||lapPilot(l);
-    rows.push(Object.assign({},l,{lap_id:lapId,activity_id:ctx.activity_id||'',session_id:ctx.session_id||ctx.activity_id||'',session_name:ctx.session_name||'',session_date:ctx.session_date||'',transponder:tp,pilot_name:pilot,_time:t,_track:forcedTrack(lapId)||l.track||ctx.track||normalizeTrack(l),_pilot:pilot,_date:ctx.session_date||l.date||l.session_date||'',_excluded:excluded}));
+    rows.push(Object.assign({},l,{lap_id:lapId,activity_id:ctx.activity_id||'',session_id:ctx.session_id||ctx.activity_id||'',session_name:ctx.session_name||'',session_date:ctx.session_date||'',transponder:tp,pilot_name:pilot,_time:t,_track:forcedTrack(lapId,o)||l.track||ctx.track||normalizeTrack(l),_pilot:pilot,_date:ctx.session_date||l.date||l.session_date||'',_excluded:excluded}));
   }
   if(DATA&&Array.isArray(DATA.activities)){
     DATA.activities.forEach(function(a){
@@ -263,7 +268,10 @@ function getAllLapsRaw(includeExcluded){
   if(DATA&&Array.isArray(DATA.laps)){
     DATA.laps.forEach(function(l){addLap(l,{activity_id:l.activity_id||l.session_id||'',session_id:l.session_id||l.activity_id||'',session_name:l.session_name||'',session_date:l.date||l.session_date||'',pilot_name:lapPilot(l),transponder:l.transponder||'',track:l.track||null});});
   }
-  var seen={}; return rows.filter(function(r){if(seen[r.lap_id])return false;seen[r.lap_id]=true;return true;});
+  var seen={};
+  var result=rows.filter(function(r){if(seen[r.lap_id])return false;seen[r.lap_id]=true;return true;});
+  if(!includeExcluded)lapsCache=result;
+  return result;
 }
 function getAllLaps(){return getAllLapsRaw(false);}
 function applyFilters(laps){return state.track==='all'?laps:laps.filter(function(l){return l._track===state.track;});}
@@ -1701,12 +1709,42 @@ function setupPwa(){
   };}
 }
 
+async function readCachedDashboardData(){
+  if(!('caches' in window))return null;
+  var cache=await caches.open(DATA_CACHE_NAME);
+  var res=await cache.match(DATA_URL);
+  if(!res||!res.ok)return null;
+  return res.json();
+}
+
+async function fetchFreshDashboardData(){
+  var res=await fetch(DATA_URL+'?ts='+Date.now(),{cache:'no-store'});
+  if(!res.ok)throw new Error('Impossible de charger data_v2.json : HTTP '+res.status);
+  var text=await res.text();
+  if('caches' in window){
+    var cache=await caches.open(DATA_CACHE_NAME);
+    await cache.put(DATA_URL,new Response(text,{headers:{'Content-Type':'application/json'}}));
+  }
+  return JSON.parse(text);
+}
+
 async function init(){
   try{
     bindAdmin(); setupPwa(); updateAdminNav();
     var today=document.getElementById('todayLabel');if(today)today.textContent=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-    var res=await fetch('data_v2.json?ts='+Date.now());if(!res.ok)throw new Error('Impossible de charger data_v2.json : HTTP '+res.status);
-    DATA=await res.json();router();
+    var renderedFromCache=false;
+    try{
+      var cached=await readCachedDashboardData();
+      if(cached){DATA=cached;clearDerivedCache();router();renderedFromCache=true;}
+    }catch(cacheError){console.log('Cache data ignore',cacheError);}
+    try{
+      DATA=await fetchFreshDashboardData();
+      clearDerivedCache();
+      router();
+    }catch(fetchError){
+      if(!renderedFromCache)throw fetchError;
+      console.log('Rafraichissement data impossible',fetchError);
+    }
   }catch(e){showError('Erreur de chargement',e);}
 }
 window.addEventListener('hashchange',router);
