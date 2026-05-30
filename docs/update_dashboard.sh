@@ -5,6 +5,7 @@ PROJECT_ROOT="${MRCP_PROJECT_ROOT:-/opt/mrcp-dashboard}"
 PROJECT_DIR="${MRCP_DOCS_DIR:-$PROJECT_ROOT/docs}"
 PYTHON="${MRCP_PYTHON:-$PROJECT_ROOT/venv/bin/python}"
 GIT_BRANCH="${MRCP_GIT_BRANCH:-main}"
+SPEEDHIVE_LIMIT="${MRCP_SPEEDHIVE_LIMIT:-20}"
 
 echo "============================================================"
 echo "MRCP DASHBOARD AUTO UPDATE - $(date)"
@@ -20,7 +21,7 @@ git pull --rebase origin "$GIT_BRANCH"
 
 cd "$PROJECT_DIR"
 echo "[1/5] Synchronisation SpeedHive"
-"$PYTHON" speedhive_sync_linux.py --limit 200
+"$PYTHON" speedhive_sync_linux.py --limit "$SPEEDHIVE_LIMIT"
 
 echo "[2/5] Generation data_v2.json"
 "$PYTHON" build_data_v2.py
