@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-05-31T13:48:07",
+  "generated_at": "2026-05-31T13:51:06",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 171,
     "pilots_count": 69,
-    "laps_count": 8837,
+    "laps_count": 8840,
     "tracks": {
       "TT1/8": {
-        "laps_count": 8684,
+        "laps_count": 8687,
         "activities_count": 171,
         "pilots_count": 69
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7052,
+    "suspicious_laps_count": 7055,
     "unknown_pilots_count": 7,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -8357,6 +8357,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "7865444445",
+        "date_fr": "31/05/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 46,
+        "quality_score": 0,
+        "suspicious_laps_count": 43,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7840684701",
         "date_fr": "25/05/2026",
         "tracks": [
@@ -8387,17 +8398,6 @@
         "laps_count": 47,
         "quality_score": 0,
         "suspicious_laps_count": 41,
-        "unknown_pilots_count": 0
-      },
-      {
-        "id": "7865444445",
-        "date_fr": "31/05/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 43,
-        "quality_score": 0,
-        "suspicious_laps_count": 40,
         "unknown_pilots_count": 0
       },
       {
@@ -9596,34 +9596,34 @@
       "date_fr": "31/05/2026",
       "source_file": "sessions_7865444445.csv",
       "pilot_count": 1,
-      "laps_count": 43,
-      "best_lap": 36.923,
+      "laps_count": 46,
+      "best_lap": 36.106,
       "best_pilot": "LODOIS DE MAROLLES",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 43
+        "TT1/8": 46
       },
       "quality_score": 0,
-      "suspicious_laps_count": 40,
+      "suspicious_laps_count": 43,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "6108107",
           "pilot_name": "LODOIS DE MAROLLES",
           "pilot_slug": "lodois-de-marolles-6108107",
-          "laps_count": 43,
-          "best_lap": 36.923,
-          "avg_lap": 40.663,
-          "consistency": 3.854,
+          "laps_count": 46,
+          "best_lap": 36.106,
+          "avg_lap": 40.514,
+          "consistency": 3.827,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 43
+            "TT1/8": 46
           },
           "laps": [
             {
@@ -10270,11 +10270,57 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7865444445|6108107|4|15:47:02|37.979"
+            },
+            {
+              "activity_id": "7865444445",
+              "transponder": "6108107",
+              "raw_transponder": "6108107",
+              "pilot_name": "LODOIS DE MAROLLES",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "15:47:40",
+              "lap_no": 5,
+              "lap_time": 37.013,
+              "speed": "25.288 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7865444445|6108107|5|15:47:40|37.013"
+            },
+            {
+              "activity_id": "7865444445",
+              "transponder": "6108107",
+              "raw_transponder": "6108107",
+              "pilot_name": "LODOIS DE MAROLLES",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "15:49:32",
+              "lap_no": 1,
+              "lap_time": 36.106,
+              "speed": "25.924 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7865444445|6108107|1|15:49:32|36.106",
+              "personal_record": true
+            },
+            {
+              "activity_id": "7865444445",
+              "transponder": "6108107",
+              "raw_transponder": "6108107",
+              "pilot_name": "LODOIS DE MAROLLES",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "15:50:08",
+              "lap_no": 2,
+              "lap_time": 42.018,
+              "speed": "22.276 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7865444445|6108107|2|15:50:08|42.018"
             }
           ],
           "rank": 1,
-          "personal_records_count": 0,
-          "has_personal_record": false
+          "personal_records_count": 1,
+          "has_personal_record": true
         }
       ]
     },
@@ -152755,6 +152801,74 @@
       "avg_best_lap": 36.394
     },
     {
+      "transponder": "6108107",
+      "name": "LODOIS DE MAROLLES",
+      "slug": "lodois-de-marolles-6108107",
+      "activities": [
+        {
+          "activity_id": "7865444445",
+          "date": "2026-05-31",
+          "date_fr": "31/05/2026",
+          "rank": 1,
+          "laps_count": 46,
+          "best_lap": 36.106,
+          "avg_lap": 40.514,
+          "consistency": 3.827,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 46
+          }
+        },
+        {
+          "activity_id": "7810286136",
+          "date": "2026-05-17",
+          "date_fr": "17/05/2026",
+          "rank": 1,
+          "laps_count": 85,
+          "best_lap": 36.613,
+          "avg_lap": 41.638,
+          "consistency": 4.649,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 85
+          }
+        },
+        {
+          "activity_id": "7681848936",
+          "date": "2026-04-19",
+          "date_fr": "19/04/2026",
+          "rank": 1,
+          "laps_count": 76,
+          "best_lap": 38.468,
+          "avg_lap": 43.45,
+          "consistency": 4.085,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 76
+          }
+        }
+      ],
+      "total_laps": 207,
+      "best_lap": 36.106,
+      "tracks": [
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/8": 207
+      },
+      "activities_count": 3,
+      "avg_best_lap": 37.062
+    },
+    {
       "transponder": "8610318",
       "name": "BENJAMIN TEICH",
       "slug": "benjamin-teich-8610318",
@@ -153076,74 +153190,6 @@
       },
       "activities_count": 1,
       "avg_best_lap": 36.52
-    },
-    {
-      "transponder": "6108107",
-      "name": "LODOIS DE MAROLLES",
-      "slug": "lodois-de-marolles-6108107",
-      "activities": [
-        {
-          "activity_id": "7865444445",
-          "date": "2026-05-31",
-          "date_fr": "31/05/2026",
-          "rank": 1,
-          "laps_count": 43,
-          "best_lap": 36.923,
-          "avg_lap": 40.663,
-          "consistency": 3.854,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 43
-          }
-        },
-        {
-          "activity_id": "7810286136",
-          "date": "2026-05-17",
-          "date_fr": "17/05/2026",
-          "rank": 1,
-          "laps_count": 85,
-          "best_lap": 36.613,
-          "avg_lap": 41.638,
-          "consistency": 4.649,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 85
-          }
-        },
-        {
-          "activity_id": "7681848936",
-          "date": "2026-04-19",
-          "date_fr": "19/04/2026",
-          "rank": 1,
-          "laps_count": 76,
-          "best_lap": 38.468,
-          "avg_lap": 43.45,
-          "consistency": 4.085,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 76
-          }
-        }
-      ],
-      "total_laps": 204,
-      "best_lap": 36.613,
-      "tracks": [
-        "TT1/8"
-      ],
-      "track_counts": {
-        "TT1/8": 204
-      },
-      "activities_count": 3,
-      "avg_best_lap": 37.335
     },
     {
       "transponder": "7612218",
