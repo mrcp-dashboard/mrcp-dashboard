@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-05-31T09:30:07",
+  "generated_at": "2026-05-31T09:33:06",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 168,
+    "activities_count": 169,
     "pilots_count": 69,
-    "laps_count": 8779,
+    "laps_count": 8782,
     "tracks": {
       "TT1/8": {
-        "laps_count": 8626,
-        "activities_count": 168,
+        "laps_count": 8629,
+        "activities_count": 169,
         "pilots_count": 69
       },
       "TT1/10": {
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7001,
+    "suspicious_laps_count": 7003,
     "unknown_pilots_count": 7,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -9189,6 +9189,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "7864053627",
+        "date_fr": "31/05/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 3,
+        "quality_score": 90,
+        "suspicious_laps_count": 2,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7837128192",
         "date_fr": "24/05/2026",
         "tracks": [
@@ -9393,6 +9404,94 @@
     ]
   },
   "activities": [
+    {
+      "id": "7864053627",
+      "date": "2026-05-31",
+      "date_fr": "31/05/2026",
+      "source_file": "sessions_7864053627.csv",
+      "pilot_count": 1,
+      "laps_count": 3,
+      "best_lap": 41.162,
+      "best_pilot": "Gwenael Marques",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 3
+      },
+      "quality_score": 90,
+      "suspicious_laps_count": 2,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "8209271",
+          "pilot_name": "Gwenael Marques",
+          "pilot_slug": "gwenael-marques-8209271",
+          "laps_count": 3,
+          "best_lap": 41.162,
+          "avg_lap": 44.365,
+          "consistency": 3.328,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 3
+          },
+          "laps": [
+            {
+              "activity_id": "7864053627",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "11:30:14",
+              "lap_no": 1,
+              "lap_time": 42.98,
+              "speed": "21.778 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7864053627|8209271|1|11:30:14|42.980"
+            },
+            {
+              "activity_id": "7864053627",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "11:30:57",
+              "lap_no": 2,
+              "lap_time": 48.952,
+              "speed": "19.121 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7864053627|8209271|2|11:30:57|48.952"
+            },
+            {
+              "activity_id": "7864053627",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "11:31:46",
+              "lap_no": 3,
+              "lap_time": 41.162,
+              "speed": "22.739 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7864053627|8209271|3|11:31:46|41.162"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "7856261772",
       "date": "2026-05-30",
@@ -152695,6 +152794,23 @@
       "slug": "gwenael-marques-8209271",
       "activities": [
         {
+          "activity_id": "7864053627",
+          "date": "2026-05-31",
+          "date_fr": "31/05/2026",
+          "rank": 1,
+          "laps_count": 3,
+          "best_lap": 41.162,
+          "avg_lap": 44.365,
+          "consistency": 3.328,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 3
+          }
+        },
+        {
           "activity_id": "7839175581",
           "date": "2026-05-25",
           "date_fr": "25/05/2026",
@@ -152729,16 +152845,16 @@
           }
         }
       ],
-      "total_laps": 35,
+      "total_laps": 38,
       "best_lap": 40.825,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 35
+        "TT1/8": 38
       },
-      "activities_count": 2,
-      "avg_best_lap": 42.442
+      "activities_count": 3,
+      "avg_best_lap": 42.015
     },
     {
       "transponder": "6375754",
