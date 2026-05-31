@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-05-31T09:36:06",
+  "generated_at": "2026-05-31T09:39:06",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 169,
     "pilots_count": 69,
-    "laps_count": 8784,
+    "laps_count": 8786,
     "tracks": {
       "TT1/8": {
-        "laps_count": 8631,
+        "laps_count": 8633,
         "activities_count": 169,
         "pilots_count": 69
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7004,
+    "suspicious_laps_count": 7005,
     "unknown_pilots_count": 7,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -9056,6 +9056,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "7864053627",
+        "date_fr": "31/05/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 7,
+        "quality_score": 80,
+        "suspicious_laps_count": 4,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7839995154",
         "date_fr": "25/05/2026",
         "tracks": [
@@ -9121,17 +9132,6 @@
         "quality_score": 82,
         "suspicious_laps_count": 3,
         "unknown_pilots_count": 1
-      },
-      {
-        "id": "7864053627",
-        "date_fr": "31/05/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 5,
-        "quality_score": 85,
-        "suspicious_laps_count": 3,
-        "unknown_pilots_count": 0
       },
       {
         "id": "7810498179",
@@ -9410,7 +9410,7 @@
       "date_fr": "31/05/2026",
       "source_file": "sessions_7864053627.csv",
       "pilot_count": 1,
-      "laps_count": 5,
+      "laps_count": 7,
       "best_lap": 40.508,
       "best_pilot": "Gwenael Marques",
       "tracks": [
@@ -9418,26 +9418,26 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 5
+        "TT1/8": 7
       },
-      "quality_score": 85,
-      "suspicious_laps_count": 3,
+      "quality_score": 80,
+      "suspicious_laps_count": 4,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "8209271",
           "pilot_name": "Gwenael Marques",
           "pilot_slug": "gwenael-marques-8209271",
-          "laps_count": 5,
+          "laps_count": 7,
           "best_lap": 40.508,
-          "avg_lap": 44.982,
-          "consistency": 4.346,
+          "avg_lap": 44.498,
+          "consistency": 3.954,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 5
+            "TT1/8": 7
           },
           "laps": [
             {
@@ -9515,6 +9515,36 @@
               "base_track": "TT1/8",
               "lap_id": "7864053627|8209271|1|11:35:24|40.508",
               "personal_record": true
+            },
+            {
+              "activity_id": "7864053627",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "11:36:04",
+              "lap_no": 2,
+              "lap_time": 45.627,
+              "speed": "20.514 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7864053627|8209271|2|11:36:04|45.627"
+            },
+            {
+              "activity_id": "7864053627",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-05-31",
+              "date_fr": "31/05/2026",
+              "start_time": "11:36:50",
+              "lap_no": 3,
+              "lap_time": 40.95,
+              "speed": "22.857 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7864053627|8209271|3|11:36:50|40.950"
             }
           ],
           "rank": 1,
@@ -152829,16 +152859,16 @@
           "date": "2026-05-31",
           "date_fr": "31/05/2026",
           "rank": 1,
-          "laps_count": 5,
+          "laps_count": 7,
           "best_lap": 40.508,
-          "avg_lap": 44.982,
-          "consistency": 4.346,
+          "avg_lap": 44.498,
+          "consistency": 3.954,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 5
+            "TT1/8": 7
           }
         },
         {
@@ -152876,13 +152906,13 @@
           }
         }
       ],
-      "total_laps": 40,
+      "total_laps": 42,
       "best_lap": 40.508,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 40
+        "TT1/8": 42
       },
       "activities_count": 3,
       "avg_best_lap": 41.797
