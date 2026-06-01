@@ -9,7 +9,7 @@ var DATA_CACHE_NAME = 'mrcp-dashboard-data-v1';
 var DATA_URL = 'data_v2.json';
 var DEFAULT_LAP_DISTANCE_METERS = 250;
 var TRACK_LAP_DISTANCE_METERS = {'TT1/8':250,'TT1/10':180};
-var state = { track:'all', isAdmin: !!getAdminConfig().token };
+var state = { track:'all', recordPeriod:'total', isAdmin: !!getAdminConfig().token };
 var lapsCache = null;
 
 function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
@@ -286,6 +286,36 @@ function getAllLapsRaw(includeExcluded){
 }
 function getAllLaps(){return getAllLapsRaw(false);}
 function applyFilters(laps){return state.track==='all'?laps:laps.filter(function(l){return l._track===state.track;});}
+function lapDateMs(l){
+  var key=dateKeyFromValue(l._date||l.session_date||l.date||l.session_name);
+  if(!key)return null;
+  var p=key.split('-');
+  return new Date(Number(p[0]),Number(p[1])-1,Number(p[2])).getTime();
+}
+function recordPeriodRange(period){
+  if(period==='total')return null;
+  var now=new Date();
+  var start=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  if(period==='week'){
+    var day=start.getDay()||7;
+    start.setDate(start.getDate()-day+1);
+  }else if(period==='month'){
+    start=new Date(now.getFullYear(),now.getMonth(),1);
+  }else if(period==='year'){
+    start=new Date(now.getFullYear(),0,1);
+  }
+  var end=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1).getTime();
+  return {start:start.getTime(),end:end};
+}
+function applyRecordFilters(laps){
+  var filtered=applyFilters(laps);
+  var range=recordPeriodRange(state.recordPeriod);
+  if(!range)return filtered;
+  return filtered.filter(function(l){
+    var t=lapDateMs(l);
+    return t!=null&&t>=range.start&&t<range.end;
+  });
+}
 function bestByPilot(laps){var m=new Map();laps.forEach(function(l){if(!m.has(l._pilot)||l._time<m.get(l._pilot)._time)m.set(l._pilot,l);});return Array.from(m.values()).sort(function(a,b){return a._time-b._time;});}
 function allPilots(){return bestByPilot(getAllLaps()).map(function(l){return l._pilot;}).sort(function(a,b){return a.localeCompare(b);});}
 function lapDistanceMeters(track){
@@ -463,8 +493,15 @@ function renderSessionLapSvg(points){
 
 function updateAdminNav(){var nav=document.getElementById('adminNav');if(nav)nav.classList.toggle('hidden',!state.isAdmin);}
 function setActiveNav(){var hash=location.hash||'#/';document.querySelectorAll('.nav-link').forEach(function(el){el.classList.remove('active');});document.querySelectorAll('.nav-link[href]').forEach(function(el){var href=el.getAttribute('href');if(href===hash||(hash.startsWith(href)&&href!=='#/'))el.classList.add('active');});if(hash==='#/'){var home=document.querySelector('.nav-link[href="#/"]');if(home)home.classList.add('active');}}
-function renderFilters(){return '<div class="filters"><select id="trackFilter"><option value="all">Toutes pistes</option><option value="TT1/8">TT1/8</option><option value="TT1/10">TT1/10</option></select></div>';}
-function bindFilters(cb){var t=document.getElementById('trackFilter');if(t){t.value=state.track;t.onchange=function(e){state.track=e.target.value;cb();};}}
+function renderFilters(includePeriod){
+  return '<div class="filters"><select id="trackFilter"><option value="all">Toutes pistes</option><option value="TT1/8">TT1/8</option><option value="TT1/10">TT1/10</option></select>' +
+    (includePeriod?'<select id="recordPeriodFilter"><option value="day">Journalier</option><option value="week">Semaine</option><option value="month">Mois</option><option value="year">Année</option><option value="total">Total</option></select>':'') +
+  '</div>';
+}
+function bindFilters(cb,includePeriod){
+  var t=document.getElementById('trackFilter');if(t){t.value=state.track;t.onchange=function(e){state.track=e.target.value;cb();};}
+  var p=document.getElementById('recordPeriodFilter');if(p){p.value=state.recordPeriod;p.onchange=function(e){state.recordPeriod=e.target.value;cb();};}
+}
 function podiumHtml(rows){var top=rows.slice(0,3);if(!top.length)return'<p class="small">Aucun chrono trouvé.</p>';var order=[1,0,2];return'<div class="podium">'+order.map(function(i){var r=top[i];if(!r)return'<div></div>';var cls=i===0?'first':i===1?'second':'third';var med=i===0?'🥇':i===1?'🥈':'🥉';return'<div class="step '+cls+'"><span class="medal">'+med+'</span><strong>'+escapeHtml(r._pilot)+'</strong><div class="time">'+fmtTime(r._time)+'</div><div class="small">'+escapeHtml(r._track)+'</div></div>';}).join('')+'</div>';}
 function recordsTable(rows,limit){limit=limit||20;return'<div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Session</th></tr></thead><tbody>'+rows.slice(0,limit).map(function(r,i){return'<tr><td>'+(i+1)+'</td><td><a href="#/pilote/'+encodeURIComponent(r._pilot)+'">'+escapeHtml(r._pilot)+'</a></td><td><strong>'+fmtTimeS(r._time)+'</strong></td><td><span class="badge">'+escapeHtml(displayTrack(r._track))+'</span></td><td>'+escapeHtml(r.session_name||r._date||'-')+'</td></tr>';}).join('')+'</tbody></table></div>';}
 function podiumHtml(rows,compact){var top=rows.slice(0,3);if(!top.length)return'<p class="small">Aucun chrono trouvé.</p>';var order=[1,0,2];return'<div class="podium '+(compact?'podium-compact':'')+'">'+order.map(function(i){var r=top[i];if(!r)return'<div></div>';var cls=i===0?'first':i===1?'second':'third';var med=i===0?'🥇':i===1?'🥈':'🥉';return'<div class="step '+cls+'"><span class="medal">'+med+'</span><strong>'+escapeHtml(r._pilot)+'</strong><div class="time">'+fmtTime(r._time)+'</div><div class="small">'+escapeHtml(r._track)+'</div></div>';}).join('')+'</div>';}
@@ -990,14 +1027,14 @@ function dayViewPage(){
 }
 function podiums(){
   var laps=getAllLaps();
-  var filtered=applyFilters(laps);
+  var filtered=applyRecordFilters(laps);
   var best=bestByPilot(filtered);
   app.innerHTML=
-    '<section class="card"><h2>Podiums</h2>'+renderFilters()+podiumHtml(best)+'</section>' +
+    '<section class="card"><h2>Podiums</h2>'+renderFilters(true)+podiumHtml(best)+'</section>' +
     '<section class="card"><div class="panel-title"><h2>Resume par piste</h2></div>'+podiumTrackSummaryHtml(laps)+'</section>' +
     '<section class="card"><div class="panel-title"><h2>Hall of fame podiums</h2></div>'+podiumHallOfFameHtml(laps)+'</section>' +
     '<section class="card"><h2>Classement</h2>'+recordsTable(best,100)+'</section>';
-  bindFilters(podiums);
+  bindFilters(podiums,true);
 }
 
 var liveTimer = null;
