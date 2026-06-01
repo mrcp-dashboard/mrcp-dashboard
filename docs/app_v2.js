@@ -1032,7 +1032,6 @@ function podiums(){
   app.innerHTML=
     '<section class="card"><h2>Podiums</h2>'+renderFilters(true)+podiumHtml(best)+'</section>' +
     '<section class="card"><div class="panel-title"><h2>Resume par piste</h2></div>'+podiumTrackSummaryHtml(laps)+'</section>' +
-    '<section class="card"><div class="panel-title"><h2>Hall of fame podiums</h2></div>'+podiumHallOfFameHtml(laps)+'</section>' +
     '<section class="card"><h2>Classement</h2>'+recordsTable(best,100)+'</section>';
   bindFilters(podiums,true);
 }
