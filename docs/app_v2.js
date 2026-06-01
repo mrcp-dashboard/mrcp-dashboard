@@ -5,6 +5,7 @@ var DATA = null;
 var app = document.getElementById('app');
 var deferredPrompt = null;
 var ADMIN_CFG_KEY = 'mrcp_admin_api_config';
+var NOTIFY_CFG_KEY = 'mrcp_notify_api_url';
 var DATA_CACHE_NAME = 'mrcp-dashboard-data-v1';
 var DATA_URL = 'data_v2.json';
 var DEFAULT_LAP_DISTANCE_METERS = 250;
@@ -38,6 +39,19 @@ function forcedTrack(lapId,o){return (o||getOverrides()).forced_track[lapId]||nu
 function getAdminConfig(){try{var raw=JSON.parse(localStorage.getItem(ADMIN_CFG_KEY)||'{}');return{apiUrl:String(raw.apiUrl||'').replace(/\/+$/,''),token:String(raw.token||'')};}catch(e){return{apiUrl:'',token:''};}}
 function setAdminConfig(cfg){localStorage.setItem(ADMIN_CFG_KEY,JSON.stringify({apiUrl:String(cfg.apiUrl||'').replace(/\/+$/,''),token:String(cfg.token||'')},null,2));}
 function clearAdminConfig(){localStorage.removeItem(ADMIN_CFG_KEY);}
+function getNotifyApiUrl(){return String(localStorage.getItem(NOTIFY_CFG_KEY)||'').replace(/\/+$/,'');}
+function setNotifyApiUrl(url){localStorage.setItem(NOTIFY_CFG_KEY,String(url||'').replace(/\/+$/,''));}
+async function notifyFetch(path, options){
+  var apiUrl=getNotifyApiUrl();
+  if(!apiUrl) throw new Error('URL API notifications non configuree');
+  options=options||{};
+  var headers=Object.assign({},options.headers||{});
+  if(options.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
+  var res=await fetch(apiUrl+path,Object.assign({},options,{headers:headers}));
+  var data=await res.json().catch(function(){return{};});
+  if(!res.ok||data.ok===false)throw new Error(data.error||('Erreur API HTTP '+res.status));
+  return data;
+}
 async function adminFetch(path, options){
   var cfg=getAdminConfig();
   if(!cfg.apiUrl||!cfg.token) throw new Error('Configuration API admin manquante');
@@ -809,6 +823,16 @@ function pilotFullProfileHtml(name){
         '<button id="copyPilotLink" class="btn-secondary">Copier lien fiche</button>' +
         '<button id="printPilotProfile" class="btn-secondary">Imprimer fiche</button>' +
       '</div>' +
+      '<div class="email-optin-box">' +
+        '<h3>Resume par email</h3>' +
+        '<p class="small">Recevoir un resume quand une journee de roulage est detectee pour ce profil.</p>' +
+        '<div class="email-optin-row">' +
+          '<input id="pilotEmailInput" type="email" placeholder="adresse@email.fr" autocomplete="email">' +
+          '<button id="savePilotEmail" class="btn-secondary">Activer</button>' +
+        '</div>' +
+        '<button id="configNotifyApi" class="mini-button" type="button">Configurer API notifications</button>' +
+        '<div id="pilotEmailStatus" class="small"></div>' +
+      '</div>' +
     '</div>' +
     '<div class="card qr-card">' +
       '<h3>📱 QR code pilote</h3>' +
@@ -876,6 +900,42 @@ function bindPilotProfileButtons(name){
 
   var print = document.getElementById('printPilotProfile');
   if(print) print.onclick=function(){window.print();};
+
+  var emailKey='mrcp_pilot_email_'+name;
+  var emailInput=document.getElementById('pilotEmailInput');
+  var emailStatus=document.getElementById('pilotEmailStatus');
+  if(emailInput)emailInput.value=localStorage.getItem(emailKey)||'';
+
+  var config=document.getElementById('configNotifyApi');
+  if(config)config.onclick=function(){
+    var current=getNotifyApiUrl()||'http://127.0.0.1:5055';
+    var value=prompt('URL API notifications',current);
+    if(value){setNotifyApiUrl(value);if(emailStatus)emailStatus.textContent='API notifications configuree.';}
+  };
+
+  var saveEmail=document.getElementById('savePilotEmail');
+  if(saveEmail)saveEmail.onclick=async function(){
+    var email=String(emailInput&&emailInput.value||'').trim();
+    if(!email||email.indexOf('@')<1){if(emailStatus)emailStatus.textContent='Adresse email invalide.';return;}
+    localStorage.setItem(emailKey,email);
+    saveEmail.disabled=true;
+    if(emailStatus)emailStatus.textContent='Enregistrement en cours...';
+    try{
+      await notifyFetch('/notification-optin',{
+        method:'POST',
+        body:JSON.stringify({
+          pilot:name,
+          email:email,
+          profile_url:location.origin+location.pathname+'#/pilote/'+encodeURIComponent(name)
+        })
+      });
+      if(emailStatus)emailStatus.textContent='Resume email active pour ce profil.';
+    }catch(e){
+      if(emailStatus)emailStatus.textContent='Impossible d enregistrer : '+e.message;
+    }finally{
+      saveEmail.disabled=false;
+    }
+  };
 }
 
 function myChronos(){
