@@ -36,7 +36,6 @@ HOST = os.environ.get("MRCP_ADMIN_API_HOST", "0.0.0.0")
 PORT = int(os.environ.get("MRCP_ADMIN_API_PORT", "5055"))
 HISTORY_FILE = DOCS_DIR / "admin_history.json"
 BACKUP_DIR = DOCS_DIR / "backups" / "admin"
-NOTIFICATIONS_FILE = DOCS_DIR / "pilot_notifications.json"
 MANAGED_JSON_FILES = ("lap_overrides.json", "corrections.json", "data_v2.json")
 
 if not TOKEN:
@@ -92,28 +91,6 @@ def load_json_file(path, default):
     except Exception:
         return default
     return data if isinstance(data, dict) else default
-
-
-def public_base_url():
-    return os.environ.get("MRCP_PUBLIC_BASE_URL", "").strip()
-
-
-def normalize_email(value):
-    email = str(value or "").strip().lower()
-    if len(email) > 254 or "@" not in email or "." not in email.rsplit("@", 1)[-1]:
-        return ""
-    return email
-
-
-def load_notifications():
-    return load_json_file(NOTIFICATIONS_FILE, {"pilots": {}})
-
-
-def save_notifications(data):
-    NOTIFICATIONS_FILE.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
 
 
 def normalize_lap_overrides(data):
@@ -324,33 +301,6 @@ def health():
         "token_configured": bool(TOKEN),
         "time": datetime.now().isoformat(timespec="seconds"),
     })
-
-
-@app.route("/notification-optin", methods=["POST"])
-def notification_optin():
-    payload = request.get_json(silent=True) or {}
-    pilot = str(payload.get("pilot") or "").strip()
-    email = normalize_email(payload.get("email"))
-    profile_url = str(payload.get("profile_url") or "").strip()
-
-    if not pilot:
-        return jsonify({"ok": False, "error": "pilote manquant"}), 400
-    if not email:
-        return jsonify({"ok": False, "error": "email invalide"}), 400
-
-    notifications = load_notifications()
-    pilots = notifications.setdefault("pilots", {})
-    existing = pilots.get(pilot) if isinstance(pilots.get(pilot), dict) else {}
-    pilots[pilot] = {
-        "pilot": pilot,
-        "email": email,
-        "enabled": True,
-        "profile_url": profile_url or existing.get("profile_url") or public_base_url(),
-        "updated_at": datetime.now().isoformat(timespec="seconds"),
-    }
-    save_notifications(notifications)
-
-    return jsonify({"ok": True, "pilot": pilot, "email": email})
 
 
 @app.route("/check-auth", methods=["POST"])
