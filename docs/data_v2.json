@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-06T14:12:05",
+  "generated_at": "2026-06-06T14:15:04",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 180,
     "pilots_count": 70,
-    "laps_count": 9130,
+    "laps_count": 9133,
     "tracks": {
       "TT1/8": {
-        "laps_count": 8955,
+        "laps_count": 8958,
         "activities_count": 180,
         "pilots_count": 70
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7274,
+    "suspicious_laps_count": 7276,
     "unknown_pilots_count": 7,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -8620,6 +8620,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "7885661869",
+        "date_fr": "06/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 34,
+        "quality_score": 0,
+        "suspicious_laps_count": 31,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7870142712",
         "date_fr": "01/06/2026",
         "tracks": [
@@ -8650,17 +8661,6 @@
         "laps_count": 45,
         "quality_score": 0,
         "suspicious_laps_count": 30,
-        "unknown_pilots_count": 0
-      },
-      {
-        "id": "7885661869",
-        "date_fr": "06/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 31,
-        "quality_score": 0,
-        "suspicious_laps_count": 29,
         "unknown_pilots_count": 0
       },
       {
@@ -9620,7 +9620,7 @@
       "date_fr": "06/06/2026",
       "source_file": "sessions_7885661869.csv",
       "pilot_count": 1,
-      "laps_count": 31,
+      "laps_count": 34,
       "best_lap": 34.808,
       "best_pilot": "MICHEL FATOUX",
       "tracks": [
@@ -9628,26 +9628,26 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 31
+        "TT1/8": 34
       },
       "quality_score": 0,
-      "suspicious_laps_count": 29,
+      "suspicious_laps_count": 31,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "3185669",
           "pilot_name": "MICHEL FATOUX",
           "pilot_slug": "michel-fatoux-3185669",
-          "laps_count": 31,
+          "laps_count": 34,
           "best_lap": 34.808,
-          "avg_lap": 37.642,
-          "consistency": 3.377,
+          "avg_lap": 38.113,
+          "consistency": 4.289,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 31
+            "TT1/8": 34
           },
           "laps": [
             {
@@ -10114,6 +10114,51 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7885661869|3185669|11|16:11:29|35.374"
+            },
+            {
+              "activity_id": "7885661869",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-06-06",
+              "date_fr": "06/06/2026",
+              "start_time": "16:12:05",
+              "lap_no": 12,
+              "lap_time": 54.154,
+              "speed": "17.284 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7885661869|3185669|12|16:12:05|54.154"
+            },
+            {
+              "activity_id": "7885661869",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-06-06",
+              "date_fr": "06/06/2026",
+              "start_time": "16:12:59",
+              "lap_no": 13,
+              "lap_time": 39.247,
+              "speed": "23.849 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7885661869|3185669|13|16:12:59|39.247"
+            },
+            {
+              "activity_id": "7885661869",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-06-06",
+              "date_fr": "06/06/2026",
+              "start_time": "16:13:38",
+              "lap_no": 14,
+              "lap_time": 35.57,
+              "speed": "26.314 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7885661869|3185669|14|16:13:38|35.570"
             }
           ],
           "rank": 1,
@@ -157085,16 +157130,16 @@
           "date": "2026-06-06",
           "date_fr": "06/06/2026",
           "rank": 1,
-          "laps_count": 31,
+          "laps_count": 34,
           "best_lap": 34.808,
-          "avg_lap": 37.642,
-          "consistency": 3.377,
+          "avg_lap": 38.113,
+          "consistency": 4.289,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 31
+            "TT1/8": 34
           }
         },
         {
@@ -157149,13 +157194,13 @@
           }
         }
       ],
-      "total_laps": 243,
+      "total_laps": 246,
       "best_lap": 34.499,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 243
+        "TT1/8": 246
       },
       "activities_count": 4,
       "avg_best_lap": 34.751
