@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-07T07:24:05",
+  "generated_at": "2026-06-07T07:27:04",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 181,
     "pilots_count": 70,
-    "laps_count": 9162,
+    "laps_count": 9167,
     "tracks": {
       "TT1/8": {
-        "laps_count": 8987,
+        "laps_count": 8992,
         "activities_count": 181,
         "pilots_count": 70
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7303,
+    "suspicious_laps_count": 7308,
     "unknown_pilots_count": 7,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -9074,6 +9074,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "7891584586",
+        "date_fr": "07/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 11,
+        "quality_score": 55,
+        "suspicious_laps_count": 9,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7717835745",
         "date_fr": "26/04/2026",
         "tracks": [
@@ -9263,17 +9274,6 @@
         "quality_score": 77,
         "suspicious_laps_count": 4,
         "unknown_pilots_count": 1
-      },
-      {
-        "id": "7891584586",
-        "date_fr": "07/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 6,
-        "quality_score": 80,
-        "suspicious_laps_count": 4,
-        "unknown_pilots_count": 0
       },
       {
         "id": "7839995154",
@@ -9631,34 +9631,34 @@
       "date_fr": "07/06/2026",
       "source_file": "sessions_7891584586.csv",
       "pilot_count": 1,
-      "laps_count": 6,
-      "best_lap": 39.475,
+      "laps_count": 11,
+      "best_lap": 39.282,
       "best_pilot": "Nicolas Castets",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 6
+        "TT1/8": 11
       },
-      "quality_score": 80,
-      "suspicious_laps_count": 4,
+      "quality_score": 55,
+      "suspicious_laps_count": 9,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "3472141",
           "pilot_name": "Nicolas Castets",
           "pilot_slug": "nicolas-castets-3472141",
-          "laps_count": 6,
-          "best_lap": 39.475,
-          "avg_lap": 44.331,
-          "consistency": 5.218,
+          "laps_count": 11,
+          "best_lap": 39.282,
+          "avg_lap": 42.906,
+          "consistency": 4.32,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 6
+            "TT1/8": 11
           },
           "laps": [
             {
@@ -9750,6 +9750,81 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7891584586|3472141|3|09:22:52|41.017"
+            },
+            {
+              "activity_id": "7891584586",
+              "transponder": "3472141",
+              "raw_transponder": "3472141",
+              "pilot_name": "Nicolas Castets",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "09:23:33",
+              "lap_no": 4,
+              "lap_time": 39.822,
+              "speed": "23.505 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7891584586|3472141|4|09:23:33|39.822"
+            },
+            {
+              "activity_id": "7891584586",
+              "transponder": "3472141",
+              "raw_transponder": "3472141",
+              "pilot_name": "Nicolas Castets",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "09:24:13",
+              "lap_no": 5,
+              "lap_time": 42.977,
+              "speed": "21.779 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7891584586|3472141|5|09:24:13|42.977"
+            },
+            {
+              "activity_id": "7891584586",
+              "transponder": "3472141",
+              "raw_transponder": "3472141",
+              "pilot_name": "Nicolas Castets",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "09:24:56",
+              "lap_no": 6,
+              "lap_time": 40.334,
+              "speed": "23.206 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7891584586|3472141|6|09:24:56|40.334"
+            },
+            {
+              "activity_id": "7891584586",
+              "transponder": "3472141",
+              "raw_transponder": "3472141",
+              "pilot_name": "Nicolas Castets",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "09:25:36",
+              "lap_no": 7,
+              "lap_time": 39.282,
+              "speed": "23.828 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7891584586|3472141|7|09:25:36|39.282"
+            },
+            {
+              "activity_id": "7891584586",
+              "transponder": "3472141",
+              "raw_transponder": "3472141",
+              "pilot_name": "Nicolas Castets",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "09:26:16",
+              "lap_no": 8,
+              "lap_time": 43.564,
+              "speed": "21.486 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7891584586|3472141|8|09:26:16|43.564"
             }
           ],
           "rank": 1,
@@ -159251,16 +159326,16 @@
           "date": "2026-06-07",
           "date_fr": "07/06/2026",
           "rank": 1,
-          "laps_count": 6,
-          "best_lap": 39.475,
-          "avg_lap": 44.331,
-          "consistency": 5.218,
+          "laps_count": 11,
+          "best_lap": 39.282,
+          "avg_lap": 42.906,
+          "consistency": 4.32,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 6
+            "TT1/8": 11
           }
         },
         {
@@ -159298,16 +159373,16 @@
           }
         }
       ],
-      "total_laps": 52,
+      "total_laps": 57,
       "best_lap": 38.545,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 52
+        "TT1/8": 57
       },
       "activities_count": 3,
-      "avg_best_lap": 39.263
+      "avg_best_lap": 39.199
     },
     {
       "transponder": "5340142",
