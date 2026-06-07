@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-07T14:27:05",
+  "generated_at": "2026-06-07T14:30:06",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 183,
     "pilots_count": 70,
-    "laps_count": 9257,
+    "laps_count": 9259,
     "tracks": {
       "TT1/8": {
-        "laps_count": 9082,
+        "laps_count": 9084,
         "activities_count": 183,
         "pilots_count": 70
       },
@@ -9595,7 +9595,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 1,
+        "laps_count": 3,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -9653,15 +9653,15 @@
       "date_fr": "07/06/2026",
       "source_file": "sessions_7894890772.csv",
       "pilot_count": 1,
-      "laps_count": 1,
-      "best_lap": 54.608,
+      "laps_count": 3,
+      "best_lap": 47.283,
       "best_pilot": "Gwenael Marques",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 1
+        "TT1/8": 3
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -9671,16 +9671,16 @@
           "transponder": "8209271",
           "pilot_name": "Gwenael Marques",
           "pilot_slug": "gwenael-marques-8209271",
-          "laps_count": 1,
-          "best_lap": 54.608,
-          "avg_lap": 54.608,
-          "consistency": 0,
+          "laps_count": 3,
+          "best_lap": 47.283,
+          "avg_lap": 53.801,
+          "consistency": 5.025,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 3
           },
           "laps": [
             {
@@ -9697,6 +9697,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7894890772|8209271|1|16:14:24|54.608"
+            },
+            {
+              "activity_id": "7894890772",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "16:27:57",
+              "lap_no": 1,
+              "lap_time": 47.283,
+              "speed": "19.796 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7894890772|8209271|1|16:27:57|47.283"
+            },
+            {
+              "activity_id": "7894890772",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "16:28:44",
+              "lap_no": 2,
+              "lap_time": 59.511,
+              "speed": "15.728 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7894890772|8209271|2|16:28:44|59.511"
             }
           ],
           "rank": 1,
@@ -161028,16 +161058,16 @@
           "date": "2026-06-07",
           "date_fr": "07/06/2026",
           "rank": 1,
-          "laps_count": 1,
-          "best_lap": 54.608,
-          "avg_lap": 54.608,
-          "consistency": 0,
+          "laps_count": 3,
+          "best_lap": 47.283,
+          "avg_lap": 53.801,
+          "consistency": 5.025,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 3
           }
         },
         {
@@ -161092,16 +161122,16 @@
           }
         }
       ],
-      "total_laps": 60,
+      "total_laps": 62,
       "best_lap": 39.356,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 60
+        "TT1/8": 62
       },
       "activities_count": 4,
-      "avg_best_lap": 44.712
+      "avg_best_lap": 42.881
     },
     {
       "transponder": "6375754",
