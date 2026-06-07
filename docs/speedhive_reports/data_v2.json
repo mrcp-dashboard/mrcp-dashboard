@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-07T15:24:06",
+  "generated_at": "2026-06-07T15:27:06",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 183,
+    "activities_count": 184,
     "pilots_count": 70,
-    "laps_count": 9273,
+    "laps_count": 9274,
     "tracks": {
       "TT1/8": {
-        "laps_count": 9098,
-        "activities_count": 183,
+        "laps_count": 9099,
+        "activities_count": 184,
         "pilots_count": 70
       },
       "TT1/10": {
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7387,
+    "suspicious_laps_count": 7388,
     "unknown_pilots_count": 7,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -9487,6 +9487,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "7895433769",
+        "date_fr": "07/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 1,
+        "quality_score": 95,
+        "suspicious_laps_count": 1,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7840143138",
         "date_fr": "25/05/2026",
         "tracks": [
@@ -9647,6 +9658,64 @@
     ]
   },
   "activities": [
+    {
+      "id": "7895433769",
+      "date": "2026-06-07",
+      "date_fr": "07/06/2026",
+      "source_file": "sessions_7895433769.csv",
+      "pilot_count": 1,
+      "laps_count": 1,
+      "best_lap": 43.634,
+      "best_pilot": "MATTHIEU GREGOIRE",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 1
+      },
+      "quality_score": 95,
+      "suspicious_laps_count": 1,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "7064819",
+          "pilot_name": "MATTHIEU GREGOIRE",
+          "pilot_slug": "matthieu-gregoire-7064819",
+          "laps_count": 1,
+          "best_lap": 43.634,
+          "avg_lap": 43.634,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          },
+          "laps": [
+            {
+              "activity_id": "7895433769",
+              "transponder": "7064819",
+              "raw_transponder": "7064819",
+              "pilot_name": "MATTHIEU GREGOIRE",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "17:25:31",
+              "lap_no": 1,
+              "lap_time": 43.634,
+              "speed": "21.451 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7895433769|7064819|1|17:25:31|43.634"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "7894890772",
       "date": "2026-06-07",
@@ -157587,6 +157656,23 @@
       "slug": "matthieu-gregoire-7064819",
       "activities": [
         {
+          "activity_id": "7895433769",
+          "date": "2026-06-07",
+          "date_fr": "07/06/2026",
+          "rank": 1,
+          "laps_count": 1,
+          "best_lap": 43.634,
+          "avg_lap": 43.634,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          }
+        },
+        {
           "activity_id": "7836578892",
           "date": "2026-05-24",
           "date_fr": "24/05/2026",
@@ -157640,7 +157726,7 @@
           }
         }
       ],
-      "total_laps": 54,
+      "total_laps": 55,
       "best_lap": 23.94,
       "tracks": [
         "TT1/10",
@@ -157648,10 +157734,10 @@
       ],
       "track_counts": {
         "TT1/10": 9,
-        "TT1/8": 45
+        "TT1/8": 46
       },
-      "activities_count": 3,
-      "avg_best_lap": 36.078
+      "activities_count": 4,
+      "avg_best_lap": 37.967
     },
     {
       "transponder": "8079667",
