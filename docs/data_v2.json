@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-07T15:57:06",
+  "generated_at": "2026-06-07T16:00:06",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 185,
     "pilots_count": 70,
-    "laps_count": 9285,
+    "laps_count": 9287,
     "tracks": {
       "TT1/8": {
-        "laps_count": 9110,
+        "laps_count": 9112,
         "activities_count": 185,
         "pilots_count": 70
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7395,
+    "suspicious_laps_count": 7397,
     "unknown_pilots_count": 7,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -9376,6 +9376,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "7895569693",
+        "date_fr": "07/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 3,
+        "quality_score": 85,
+        "suspicious_laps_count": 3,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7810498179",
         "date_fr": "17/05/2026",
         "tracks": [
@@ -9496,17 +9507,6 @@
         "quality_score": 92,
         "suspicious_laps_count": 1,
         "unknown_pilots_count": 1
-      },
-      {
-        "id": "7895569693",
-        "date_fr": "07/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 1,
-        "quality_score": 95,
-        "suspicious_laps_count": 1,
-        "unknown_pilots_count": 0
       },
       {
         "id": "7840143138",
@@ -9675,34 +9675,34 @@
       "date_fr": "07/06/2026",
       "source_file": "sessions_7895569693.csv",
       "pilot_count": 1,
-      "laps_count": 1,
-      "best_lap": 40.43,
+      "laps_count": 3,
+      "best_lap": 36.691,
       "best_pilot": "LOUIS FOURNIOLS",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 1
+        "TT1/8": 3
       },
-      "quality_score": 95,
-      "suspicious_laps_count": 1,
+      "quality_score": 85,
+      "suspicious_laps_count": 3,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "3754809",
           "pilot_name": "LOUIS FOURNIOLS",
           "pilot_slug": "louis-fourniols-3754809",
-          "laps_count": 1,
-          "best_lap": 40.43,
-          "avg_lap": 40.43,
-          "consistency": 0,
+          "laps_count": 3,
+          "best_lap": 36.691,
+          "avg_lap": 38.81,
+          "consistency": 1.567,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 3
           },
           "laps": [
             {
@@ -9719,6 +9719,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7895569693|3754809|1|17:54:37|40.430"
+            },
+            {
+              "activity_id": "7895569693",
+              "transponder": "3754809",
+              "raw_transponder": "3754809",
+              "pilot_name": "LOUIS FOURNIOLS",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "17:56:31",
+              "lap_no": 1,
+              "lap_time": 39.31,
+              "speed": "23.811 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7895569693|3754809|1|17:56:31|39.310"
+            },
+            {
+              "activity_id": "7895569693",
+              "transponder": "3754809",
+              "raw_transponder": "3754809",
+              "pilot_name": "LOUIS FOURNIOLS",
+              "date": "2026-06-07",
+              "date_fr": "07/06/2026",
+              "start_time": "17:57:11",
+              "lap_no": 2,
+              "lap_time": 36.691,
+              "speed": "25.510 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7895569693|3754809|2|17:57:11|36.691"
             }
           ],
           "rank": 1,
@@ -160757,16 +160787,16 @@
           "date": "2026-06-07",
           "date_fr": "07/06/2026",
           "rank": 1,
-          "laps_count": 1,
-          "best_lap": 40.43,
-          "avg_lap": 40.43,
-          "consistency": 0,
+          "laps_count": 3,
+          "best_lap": 36.691,
+          "avg_lap": 38.81,
+          "consistency": 1.567,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 3
           }
         },
         {
@@ -160855,16 +160885,16 @@
           }
         }
       ],
-      "total_laps": 172,
+      "total_laps": 174,
       "best_lap": 36.428,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 172
+        "TT1/8": 174
       },
       "activities_count": 6,
-      "avg_best_lap": 38.831
+      "avg_best_lap": 38.207
     },
     {
       "transponder": "7841457",
