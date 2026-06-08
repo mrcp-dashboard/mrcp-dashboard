@@ -29,6 +29,20 @@ function createCard(title, content) {
     `;
 }
 
+function normalizeTrack(track, lapTime) {
+    const value = String(track || "").trim();
+
+    if (value === "TT1/8" || value === "TT1/10") {
+        return value;
+    }
+
+    if (Number.isFinite(lapTime) && lapTime > 5) {
+        return lapTime < 30 ? "TT1/10" : "TT1/8";
+    }
+
+    return "Inconnu";
+}
+
 function getPilotStats(data) {
 
     const pilots = {};
@@ -42,6 +56,7 @@ function getPilotStats(data) {
             if (!pilots[name]) {
                 pilots[name] = {
                     laps: [],
+                    tracks: {},
                     totalLaps: 0,
                     sessions: 0
                 };
@@ -54,7 +69,13 @@ function getPilotStats(data) {
                 const t = parseFloat(lap.lap_time || lap.time || 0);
 
                 if (t > 5 && t < 200) {
+                    const track = normalizeTrack(lap.track || pilot.track || activity.track, t);
+
                     pilots[name].laps.push(t);
+                    if (!pilots[name].tracks[track]) {
+                        pilots[name].tracks[track] = [];
+                    }
+                    pilots[name].tracks[track].push(t);
                     pilots[name].totalLaps++;
                 }
 
@@ -73,21 +94,29 @@ function buildRegularityWidget(pilots) {
 
     Object.entries(pilots).forEach(([name, p]) => {
 
-        if (p.laps.length < 5) return;
+        ["TT1/8", "TT1/10"].forEach(track => {
 
-        const deviation = stdDeviation(p.laps);
+            const laps = (p.tracks && p.tracks[track]) || [];
 
-        let badge = "";
+            if (laps.length < 5) return;
 
-        if (deviation < 0.3)
-            badge = "🔥 Très régulier";
-        else if (deviation < 0.6)
-            badge = "✅ Régulier";
+            const deviation = stdDeviation(laps);
 
-        rows.push({
-            name,
-            deviation,
-            badge
+            let badge = "";
+
+            if (deviation < 0.3)
+                badge = "🔥 Très régulier";
+            else if (deviation < 0.6)
+                badge = "✅ Régulier";
+
+            rows.push({
+                name,
+                track,
+                laps: laps.length,
+                deviation,
+                badge
+            });
+
         });
 
     });
@@ -98,6 +127,8 @@ function buildRegularityWidget(pilots) {
     <table class="mrcp-table">
         <tr>
             <th>Pilote</th>
+            <th>Piste</th>
+            <th>Tours</th>
             <th>Écart type</th>
             <th>Badge</th>
         </tr>
@@ -108,6 +139,8 @@ function buildRegularityWidget(pilots) {
         html += `
         <tr>
             <td>${r.name}</td>
+            <td>${r.track}</td>
+            <td>${r.laps}</td>
             <td>${r.deviation.toFixed(3)}</td>
             <td>${r.badge}</td>
         </tr>
