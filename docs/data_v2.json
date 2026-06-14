@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-14T09:42:06",
+  "generated_at": "2026-06-14T09:45:06",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 195,
     "pilots_count": 72,
-    "laps_count": 9679,
+    "laps_count": 9683,
     "tracks": {
       "TT1/8": {
-        "laps_count": 9504,
+        "laps_count": 9508,
         "activities_count": 195,
         "pilots_count": 72
       },
@@ -35,13 +35,13 @@
     "most_active": {
       "pilot": "GREGOIRE BARROSO",
       "transponder": "8046737",
-      "laps": 795,
+      "laps": 797,
       "slug": "gregoire-barroso-8046737"
     }
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 7763,
+    "suspicious_laps_count": 7767,
     "unknown_pilots_count": 5,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -1026,6 +1026,19 @@
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
       },
       {
+        "lap_id": "7922894539|5893236|3|11:41:53|31.924",
+        "activity_id": "7922894539",
+        "date_fr": "14/06/2026",
+        "pilot_name": "DORIAN GIANNETTA",
+        "pilot_slug": "dorian-giannetta-5893236",
+        "transponder": "5893236",
+        "lap_no": 3,
+        "start_time": "11:41:53",
+        "lap_time": 31.924,
+        "track": "TT1/8",
+        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
+      },
+      {
         "lap_id": "7818970974|6510573|4|15:20:04|31.927",
         "activity_id": "7818970974",
         "date_fr": "21/05/2026",
@@ -1854,6 +1867,19 @@
         "lap_no": 1,
         "start_time": "19:00:43",
         "lap_time": 32.205,
+        "track": "TT1/8",
+        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
+      },
+      {
+        "lap_id": "7922894539|5893236|4|11:42:25|32.208",
+        "activity_id": "7922894539",
+        "date_fr": "14/06/2026",
+        "pilot_name": "DORIAN GIANNETTA",
+        "pilot_slug": "dorian-giannetta-5893236",
+        "transponder": "5893236",
+        "lap_no": 4,
+        "start_time": "11:42:25",
+        "lap_time": 32.208,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
       },
@@ -6523,32 +6549,6 @@
         "lap_time": 33.378,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
-      },
-      {
-        "lap_id": "7682242866|6510573|7|10:18:26|33.383",
-        "activity_id": "7682242866",
-        "date_fr": "19/04/2026",
-        "pilot_name": "ALEXIS DUFAU CAZENAVE",
-        "pilot_slug": "alexis-dufau-cazenave-6510573",
-        "transponder": "6510573",
-        "lap_no": 7,
-        "start_time": "10:18:26",
-        "lap_time": 33.383,
-        "track": "TT1/8",
-        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
-      },
-      {
-        "lap_id": "7682242866|6510573|9|09:24:04|33.385",
-        "activity_id": "7682242866",
-        "date_fr": "19/04/2026",
-        "pilot_name": "ALEXIS DUFAU CAZENAVE",
-        "pilot_slug": "alexis-dufau-cazenave-6510573",
-        "transponder": "6510573",
-        "lap_no": 9,
-        "start_time": "09:24:04",
-        "lap_time": 33.385,
-        "track": "TT1/8",
-        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
       }
     ],
     "unknown_pilots": [
@@ -9141,6 +9141,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "7922894539",
+        "date_fr": "14/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 11,
+        "quality_score": 50,
+        "suspicious_laps_count": 10,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7781544330",
         "date_fr": "10/05/2026",
         "tracks": [
@@ -9215,17 +9226,6 @@
         "laps_count": 16,
         "quality_score": 55,
         "suspicious_laps_count": 9,
-        "unknown_pilots_count": 0
-      },
-      {
-        "id": "7922894539",
-        "date_fr": "14/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 9,
-        "quality_score": 60,
-        "suspicious_laps_count": 8,
         "unknown_pilots_count": 0
       },
       {
@@ -9398,6 +9398,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "7922949553",
+        "date_fr": "14/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 4,
+        "quality_score": 80,
+        "suspicious_laps_count": 4,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7922748910",
         "date_fr": "14/06/2026",
         "tracks": [
@@ -9540,17 +9551,6 @@
         "quality_score": 87,
         "suspicious_laps_count": 2,
         "unknown_pilots_count": 1
-      },
-      {
-        "id": "7922949553",
-        "date_fr": "14/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 2,
-        "quality_score": 90,
-        "suspicious_laps_count": 2,
-        "unknown_pilots_count": 0
       },
       {
         "id": "7837128192",
@@ -9775,7 +9775,7 @@
       "date_fr": "14/06/2026",
       "source_file": "sessions_7922949553.csv",
       "pilot_count": 1,
-      "laps_count": 2,
+      "laps_count": 4,
       "best_lap": 33.21,
       "best_pilot": "GREGOIRE BARROSO",
       "tracks": [
@@ -9783,26 +9783,26 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 4
       },
-      "quality_score": 90,
-      "suspicious_laps_count": 2,
+      "quality_score": 80,
+      "suspicious_laps_count": 4,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "8046737",
           "pilot_name": "GREGOIRE BARROSO",
           "pilot_slug": "gregoire-barroso-8046737",
-          "laps_count": 2,
+          "laps_count": 4,
           "best_lap": 33.21,
-          "avg_lap": 35.627,
-          "consistency": 2.416,
+          "avg_lap": 35.059,
+          "consistency": 1.912,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 4
           },
           "laps": [
             {
@@ -9834,6 +9834,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7922949553|8046737|1|11:39:36|33.210"
+            },
+            {
+              "activity_id": "7922949553",
+              "transponder": "8046737",
+              "raw_transponder": "8046737",
+              "pilot_name": "GREGOIRE BARROSO",
+              "date": "2026-06-14",
+              "date_fr": "14/06/2026",
+              "start_time": "11:43:50",
+              "lap_no": 1,
+              "lap_time": 35.404,
+              "speed": "26.438 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7922949553|8046737|1|11:43:50|35.404"
+            },
+            {
+              "activity_id": "7922949553",
+              "transponder": "8046737",
+              "raw_transponder": "8046737",
+              "pilot_name": "GREGOIRE BARROSO",
+              "date": "2026-06-14",
+              "date_fr": "14/06/2026",
+              "start_time": "11:44:25",
+              "lap_no": 2,
+              "lap_time": 33.581,
+              "speed": "27.873 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7922949553|8046737|2|11:44:25|33.581"
             }
           ],
           "rank": 1,
@@ -9848,34 +9878,34 @@
       "date_fr": "14/06/2026",
       "source_file": "sessions_7922894539.csv",
       "pilot_count": 1,
-      "laps_count": 9,
-      "best_lap": 31.945,
+      "laps_count": 11,
+      "best_lap": 31.924,
       "best_pilot": "DORIAN GIANNETTA",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 9
+        "TT1/8": 11
       },
-      "quality_score": 60,
-      "suspicious_laps_count": 8,
+      "quality_score": 50,
+      "suspicious_laps_count": 10,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "5893236",
           "pilot_name": "DORIAN GIANNETTA",
           "pilot_slug": "dorian-giannetta-5893236",
-          "laps_count": 9,
-          "best_lap": 31.945,
-          "avg_lap": 35.186,
-          "consistency": 6.947,
+          "laps_count": 11,
+          "best_lap": 31.924,
+          "avg_lap": 34.619,
+          "consistency": 6.399,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 9
+            "TT1/8": 11
           },
           "laps": [
             {
@@ -10012,6 +10042,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7922894539|5893236|2|11:41:21|31.970"
+            },
+            {
+              "activity_id": "7922894539",
+              "transponder": "5893236",
+              "raw_transponder": "5893236",
+              "pilot_name": "DORIAN GIANNETTA",
+              "date": "2026-06-14",
+              "date_fr": "14/06/2026",
+              "start_time": "11:41:53",
+              "lap_no": 3,
+              "lap_time": 31.924,
+              "speed": "29.320 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7922894539|5893236|3|11:41:53|31.924"
+            },
+            {
+              "activity_id": "7922894539",
+              "transponder": "5893236",
+              "raw_transponder": "5893236",
+              "pilot_name": "DORIAN GIANNETTA",
+              "date": "2026-06-14",
+              "date_fr": "14/06/2026",
+              "start_time": "11:42:25",
+              "lap_no": 4,
+              "lap_time": 32.208,
+              "speed": "29.061 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7922894539|5893236|4|11:42:25|32.208"
             }
           ],
           "rank": 1,
@@ -164962,16 +165022,16 @@
           "date": "2026-06-14",
           "date_fr": "14/06/2026",
           "rank": 1,
-          "laps_count": 9,
-          "best_lap": 31.945,
-          "avg_lap": 35.186,
-          "consistency": 6.947,
+          "laps_count": 11,
+          "best_lap": 31.924,
+          "avg_lap": 34.619,
+          "consistency": 6.399,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 9
+            "TT1/8": 11
           }
         },
         {
@@ -165009,16 +165069,16 @@
           }
         }
       ],
-      "total_laps": 243,
+      "total_laps": 245,
       "best_lap": 31.401,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 243
+        "TT1/8": 245
       },
       "activities_count": 3,
-      "avg_best_lap": 31.642
+      "avg_best_lap": 31.635
     },
     {
       "transponder": "9415016",
@@ -165183,16 +165243,16 @@
           "date": "2026-06-14",
           "date_fr": "14/06/2026",
           "rank": 1,
-          "laps_count": 2,
+          "laps_count": 4,
           "best_lap": 33.21,
-          "avg_lap": 35.627,
-          "consistency": 2.416,
+          "avg_lap": 35.059,
+          "consistency": 1.912,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 4
           }
         },
         {
@@ -165502,13 +165562,13 @@
           }
         }
       ],
-      "total_laps": 795,
+      "total_laps": 797,
       "best_lap": 32.282,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 795
+        "TT1/8": 797
       },
       "activities_count": 19,
       "avg_best_lap": 33.488
