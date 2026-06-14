@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-14T18:24:36",
+  "generated_at": "2026-06-14T18:25:27",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 199,
     "pilots_count": 73,
-    "laps_count": 9973,
+    "laps_count": 9972,
     "tracks": {
       "TT1/8": {
-        "laps_count": 9797,
+        "laps_count": 9796,
         "activities_count": 199,
         "pilots_count": 73
       },
@@ -41,13 +41,13 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 8018,
+    "suspicious_laps_count": 8017,
     "unknown_pilots_count": 5,
     "ignored_raw_laps_count": 0,
     "overrides": {
-      "excluded_count": 128,
+      "excluded_count": 129,
       "forced_track_count": 127,
-      "excluded_applied_count": 128
+      "excluded_applied_count": 129
     },
     "suspicious_laps": [
       {
@@ -930,19 +930,6 @@
         "transponder": "4120178",
         "lap_no": 1,
         "start_time": "15:02:24",
-        "lap_time": 31.795,
-        "track": "TT1/8",
-        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
-      },
-      {
-        "lap_id": "7924219441|6944083|3|15:04:48|31.795",
-        "activity_id": "7924219441",
-        "date_fr": "14/06/2026",
-        "pilot_name": "Jerome vaquero",
-        "pilot_slug": "jerome-vaquero-6944083",
-        "transponder": "6944083",
-        "lap_no": 3,
-        "start_time": "15:04:48",
         "lap_time": 31.795,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
@@ -6549,6 +6536,19 @@
         "lap_time": 33.211,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
+      },
+      {
+        "lap_id": "7682386302|9415016|2|13:33:57|33.211",
+        "activity_id": "7682386302",
+        "date_fr": "19/04/2026",
+        "pilot_name": "DORIAN GIANNETTA",
+        "pilot_slug": "dorian-giannetta-9415016",
+        "transponder": "9415016",
+        "lap_no": 2,
+        "start_time": "13:33:57",
+        "lap_time": 33.211,
+        "track": "TT1/8",
+        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
       }
     ],
     "unknown_pilots": [
@@ -7602,6 +7602,14 @@
         "date_fr": "01/06/2026",
         "transponder": "8046737",
         "lap_time": 15.268,
+        "reason": "Exclu admin"
+      },
+      {
+        "lap_id": "7924219441|6944083|3|15:04:48|31.795",
+        "activity_id": "7924219441",
+        "date_fr": "14/06/2026",
+        "transponder": "6944083",
+        "lap_time": 31.795,
         "reason": "Exclu admin"
       }
     ],
@@ -9131,17 +9139,6 @@
         "unknown_pilots_count": 0
       },
       {
-        "id": "7924219441",
-        "date_fr": "14/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 16,
-        "quality_score": 35,
-        "suspicious_laps_count": 13,
-        "unknown_pilots_count": 0
-      },
-      {
         "id": "7864053627",
         "date_fr": "31/05/2026",
         "tracks": [
@@ -9181,6 +9178,17 @@
           "TT1/8"
         ],
         "laps_count": 16,
+        "quality_score": 40,
+        "suspicious_laps_count": 12,
+        "unknown_pilots_count": 0
+      },
+      {
+        "id": "7924219441",
+        "date_fr": "14/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 15,
         "quality_score": 40,
         "suspicious_laps_count": 12,
         "unknown_pilots_count": 0
@@ -11587,34 +11595,34 @@
       "date_fr": "14/06/2026",
       "source_file": "sessions_7924219441.csv",
       "pilot_count": 1,
-      "laps_count": 16,
-      "best_lap": 31.795,
+      "laps_count": 15,
+      "best_lap": 37.372,
       "best_pilot": "Jerome vaquero",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 16
+        "TT1/8": 15
       },
-      "quality_score": 35,
-      "suspicious_laps_count": 13,
+      "quality_score": 40,
+      "suspicious_laps_count": 12,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "6944083",
           "pilot_name": "Jerome vaquero",
           "pilot_slug": "jerome-vaquero-6944083",
-          "laps_count": 16,
-          "best_lap": 31.795,
-          "avg_lap": 41.697,
-          "consistency": 5.055,
+          "laps_count": 15,
+          "best_lap": 37.372,
+          "avg_lap": 42.357,
+          "consistency": 4.504,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 16
+            "TT1/8": 15
           },
           "laps": [
             {
@@ -11776,22 +11784,6 @@
               "pilot_name": "Jerome vaquero",
               "date": "2026-06-14",
               "date_fr": "14/06/2026",
-              "start_time": "15:04:48",
-              "lap_no": 3,
-              "lap_time": 31.795,
-              "speed": "29.439 km/h",
-              "track": "TT1/8",
-              "base_track": "TT1/8",
-              "lap_id": "7924219441|6944083|3|15:04:48|31.795",
-              "personal_record": true
-            },
-            {
-              "activity_id": "7924219441",
-              "transponder": "6944083",
-              "raw_transponder": "6944083",
-              "pilot_name": "Jerome vaquero",
-              "date": "2026-06-14",
-              "date_fr": "14/06/2026",
               "start_time": "15:08:18",
               "lap_no": 1,
               "lap_time": 38.442,
@@ -11862,7 +11854,7 @@
             }
           ],
           "rank": 1,
-          "personal_records_count": 3,
+          "personal_records_count": 2,
           "has_personal_record": true
         }
       ]
@@ -170020,57 +170012,6 @@
       "avg_best_lap": 31.605
     },
     {
-      "transponder": "6944083",
-      "name": "Jerome vaquero",
-      "slug": "jerome-vaquero-6944083",
-      "activities": [
-        {
-          "activity_id": "7924219441",
-          "date": "2026-06-14",
-          "date_fr": "14/06/2026",
-          "rank": 1,
-          "laps_count": 16,
-          "best_lap": 31.795,
-          "avg_lap": 41.697,
-          "consistency": 5.055,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 16
-          }
-        },
-        {
-          "activity_id": "7763646378",
-          "date": "2026-05-08",
-          "date_fr": "08/05/2026",
-          "rank": 1,
-          "laps_count": 22,
-          "best_lap": 41.941,
-          "avg_lap": 47.155,
-          "consistency": 5.103,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 22
-          }
-        }
-      ],
-      "total_laps": 38,
-      "best_lap": 31.795,
-      "tracks": [
-        "TT1/8"
-      ],
-      "track_counts": {
-        "TT1/8": 38
-      },
-      "activities_count": 2,
-      "avg_best_lap": 36.868
-    },
-    {
       "transponder": "9415016",
       "name": "DORIAN GIANNETTA",
       "slug": "dorian-giannetta-9415016",
@@ -172704,6 +172645,57 @@
       },
       "activities_count": 2,
       "avg_best_lap": 37.688
+    },
+    {
+      "transponder": "6944083",
+      "name": "Jerome vaquero",
+      "slug": "jerome-vaquero-6944083",
+      "activities": [
+        {
+          "activity_id": "7924219441",
+          "date": "2026-06-14",
+          "date_fr": "14/06/2026",
+          "rank": 1,
+          "laps_count": 15,
+          "best_lap": 37.372,
+          "avg_lap": 42.357,
+          "consistency": 4.504,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 15
+          }
+        },
+        {
+          "activity_id": "7763646378",
+          "date": "2026-05-08",
+          "date_fr": "08/05/2026",
+          "rank": 1,
+          "laps_count": 22,
+          "best_lap": 41.941,
+          "avg_lap": 47.155,
+          "consistency": 5.103,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 22
+          }
+        }
+      ],
+      "total_laps": 37,
+      "best_lap": 37.372,
+      "tracks": [
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/8": 37
+      },
+      "activities_count": 2,
+      "avg_best_lap": 39.657
     },
     {
       "transponder": "4609463",
