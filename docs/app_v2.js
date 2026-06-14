@@ -506,23 +506,27 @@ function recordsTable(rows,limit){limit=limit||20;return'<div class="table-wrap"
 function podiumHtml(rows,compact){
   var top=rows.slice(0,3);
   if(!top.length)return'<p class="small">Aucun chrono trouve.</p>';
-  var order=[1,0,2], medals=['Or','Argent','Bronze'];
-  return'<div class="podium '+(compact?'podium-compact':'podium-showcase')+'">'+order.map(function(i){
+  var order=[1,0,2], labels=['Champion','Deuxieme','Troisieme'], tones=['gold','silver','bronze'];
+  var cards='<div class="podium '+(compact?'podium-compact':'podium-showcase')+'">'+order.map(function(i){
     var r=top[i];
     if(!r)return'<div></div>';
     var cls=i===0?'first':i===1?'second':'third';
     var rank=i+1;
     var gap=top[0]&&i!==0 ? r._time-top[0]._time : 0;
-    var meta=compact ? escapeHtml(r._track) : '<span>'+escapeHtml(displayTrack(r._track))+'</span><span>'+escapeHtml(r.session_name||r._date||'-')+'</span>';
+    var meta=compact ? escapeHtml(r._track) : '<span class="podium-track-pill">'+escapeHtml(displayTrack(r._track))+'</span><span>'+escapeHtml(r.session_name||r._date||'-')+'</span>';
     return'<a class="step '+cls+'" href="#/pilote/'+encodeURIComponent(r._pilot)+'">'+
-      '<span class="podium-rank">'+rank+'</span>'+
-      '<span class="medal">'+medals[i]+'</span>'+
-      '<strong>'+escapeHtml(r._pilot)+'</strong>'+
+      '<span class="podium-rank podium-rank-'+tones[i]+'">'+rank+'</span>'+
+      '<span class="podium-logo-wrap"><img class="podium-logo" src="icon-192.png" alt=""></span>'+
+      '<span class="medal">'+labels[i]+'</span>'+
+      '<strong class="podium-driver">'+escapeHtml(r._pilot)+'</strong>'+
       '<div class="time">'+fmtTime(r._time)+'</div>'+
       '<div class="podium-meta">'+meta+'</div>'+
       (!compact?'<div class="podium-gap">'+(i===0?'Leader actuel':'+'+fmtTimeS(gap)+' sur P1')+'</div>':'')+
+      (!compact?'<div class="podium-plinth">'+rank+'</div>':'')+
     '</a>';
   }).join('')+'</div>';
+  if(compact)return cards;
+  return '<div class="podium-arena"><div class="podium-arena-bg"><img src="icon-512.png" alt=""><span>MRCP</span></div><div class="podium-arena-head"><div><div class="podium-kicker">Top 3 MRCP</div><h3>Podium officiel</h3></div><div class="podium-cup">🏆</div></div>'+cards+'</div>';
 }
 function homePodiumsHtml(){var laps=getAllLaps();return '<div class="podium-stack">'+['TT1/10','TT1/8'].map(function(track){var rows=bestByPilot(laps.filter(function(l){return l._track===track;}));return '<div class="podium-block"><div class="podium-block-title">'+escapeHtml(track)+'</div>'+podiumHtml(rows,true)+'</div>';}).join('')+'</div>';}
 function podiumTrackSummaryHtml(laps){
