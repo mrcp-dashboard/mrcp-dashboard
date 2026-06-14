@@ -515,6 +515,7 @@ function podiumHtml(rows,compact){
     var gap=top[0]&&i!==0 ? r._time-top[0]._time : 0;
     var meta=compact ? escapeHtml(r._track) : '<span class="podium-track-pill">'+escapeHtml(displayTrack(r._track))+'</span><span>'+escapeHtml(r.session_name||r._date||'-')+'</span>';
     return'<a class="step '+cls+'" href="#/pilote/'+encodeURIComponent(r._pilot)+'">'+
+      (!compact?'<span class="podium-giant-rank">'+rank+'</span>':'')+
       '<span class="podium-rank podium-rank-'+tones[i]+'">'+rank+'</span>'+
       '<span class="podium-logo-wrap"><img class="podium-logo" src="icon-192.png" alt=""></span>'+
       '<span class="medal">'+labels[i]+'</span>'+
@@ -522,6 +523,7 @@ function podiumHtml(rows,compact){
       '<div class="time">'+fmtTime(r._time)+'</div>'+
       '<div class="podium-meta">'+meta+'</div>'+
       (!compact?'<div class="podium-gap">'+(i===0?'Leader actuel':'+'+fmtTimeS(gap)+' sur P1')+'</div>':'')+
+      (!compact?'<div class="podium-profile">Profil</div>':'')+
       (!compact?'<div class="podium-plinth">'+rank+'</div>':'')+
     '</a>';
   }).join('')+'</div>';

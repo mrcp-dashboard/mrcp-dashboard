@@ -149,6 +149,8 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
 .step.first{min-height:330px;border-color:rgba(255,218,88,.86);background:linear-gradient(180deg,rgba(255,218,88,.24),rgba(13,24,38,.92) 48%,rgba(3,9,20,.98));box-shadow:0 0 0 1px rgba(255,218,88,.14),0 30px 80px rgba(255,178,29,.16)}
 .step.second{min-height:282px;border-color:rgba(213,226,242,.58);background:linear-gradient(180deg,rgba(213,226,242,.20),rgba(13,24,38,.92) 50%,rgba(3,9,20,.98))}
 .step.third{min-height:252px;border-color:rgba(230,146,88,.58);background:linear-gradient(180deg,rgba(230,146,88,.22),rgba(13,24,38,.92) 50%,rgba(3,9,20,.98))}
+.podium-giant-rank{position:absolute;top:-42px;left:50%;transform:translateX(-50%);font-size:118px;line-height:1;font-weight:1000;color:rgba(255,255,255,.18);text-shadow:0 8px 0 rgba(0,0,0,.22),0 0 34px rgba(255,255,255,.16);z-index:0}
+.step.first .podium-giant-rank{font-size:142px;color:rgba(255,218,88,.34);top:-54px}.step.second .podium-giant-rank{color:rgba(218,234,255,.32)}.step.third .podium-giant-rank{color:rgba(255,176,120,.32)}
 .podium-rank{position:relative;z-index:1;width:54px;height:54px;display:grid;place-items:center;border-radius:50%;border:3px solid rgba(255,255,255,.45);font-size:24px;font-weight:1000;color:#07101f;box-shadow:0 12px 28px rgba(0,0,0,.28)}
 .podium-rank-gold{background:linear-gradient(145deg,#fff2a8,#ffbf21)}.podium-rank-silver{background:linear-gradient(145deg,#fff,#b7c8dc)}.podium-rank-bronze{background:linear-gradient(145deg,#ffd0a8,#c9763c)}
 .podium-logo-wrap{position:relative;z-index:1;width:72px;height:72px;margin-top:14px;display:grid;place-items:center;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
@@ -161,6 +163,7 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
 .podium-meta span,.podium-gap{border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.20);border-radius:999px;padding:5px 9px}
 .podium-track-pill{color:#fff;background:rgba(15,133,255,.24)!important;border-color:rgba(159,208,255,.28)!important}
 .podium-gap{position:relative;z-index:1;align-self:center;margin-top:12px;color:#e7eefc;font-weight:850}
+.podium-profile{position:relative;z-index:1;margin-top:12px;width:min(230px,82%);height:36px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(180deg,rgba(84,187,255,.32),rgba(16,95,160,.28));border:1px solid rgba(159,208,255,.38);color:#cfeeff;font-size:13px;font-weight:1000;box-shadow:inset 0 1px 0 rgba(255,255,255,.20)}
 .podium-plinth{position:absolute;left:0;right:0;bottom:0;height:58px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.26));border-top:1px solid rgba(255,255,255,.10);font-size:42px;font-weight:1000;color:rgba(255,255,255,.16)}
 .podium-compact .step{min-height:118px;padding:12px 8px;border-radius:14px}
 .podium-compact .step.first{min-height:142px}
