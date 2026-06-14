@@ -132,16 +132,29 @@ select,input,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line);co
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;white-space:nowrap}th{color:#89a4d1}a{color:#9fd0ff}
 .podium-stack{display:grid;gap:14px}
 .podium-block-title{display:inline-flex;margin:2px 0 8px;padding:4px 10px;border-radius:999px;background:rgba(15,133,255,.16);border:1px solid rgba(159,208,255,.22);font-size:13px;font-weight:900;color:#dff0ff}
-.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:end;min-height:250px;margin-top:10px}
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:12px;align-items:end;min-height:250px;margin-top:10px}
+.podium-showcase{position:relative;gap:18px;min-height:360px;padding:18px 6px 4px}
+.podium-showcase:after{content:"";position:absolute;left:6%;right:6%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(159,208,255,.42),transparent)}
 .podium-compact{min-height:0;margin-top:0;gap:8px}
-.step{min-height:180px;padding:18px 12px;border-radius:18px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:center}
-.step.first{min-height:230px;border-color:rgba(255,210,63,.62);background:linear-gradient(180deg, rgba(255,210,63,.25), rgba(255,210,63,.06));box-shadow:0 0 40px rgba(255,210,63,.16)}
-.medal{font-size:45px;display:block}.time{font-size:28px;font-weight:1000;margin-top:10px}
+.step{position:relative;min-height:180px;padding:18px 12px;border-radius:18px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:center;color:var(--text);text-decoration:none;overflow:hidden}
+.step:hover{transform:translateY(-2px);border-color:rgba(159,208,255,.42);box-shadow:0 18px 40px rgba(0,0,0,.22)}
+.step.first{min-height:260px;border-color:rgba(255,210,63,.72);background:linear-gradient(180deg,rgba(255,210,63,.28),rgba(70,82,48,.30) 55%,rgba(5,14,28,.55));box-shadow:0 22px 55px rgba(255,210,63,.14)}
+.step.second{min-height:218px;border-color:rgba(198,213,232,.42);background:linear-gradient(180deg,rgba(198,213,232,.18),rgba(5,14,28,.52))}
+.step.third{min-height:196px;border-color:rgba(226,143,81,.42);background:linear-gradient(180deg,rgba(226,143,81,.18),rgba(5,14,28,.52))}
+.podium-rank{position:absolute;top:12px;left:12px;min-width:34px;height:30px;padding:0 10px;display:grid;place-items:center;border-radius:10px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14);font-weight:1000;color:#fff}
+.medal{font-size:34px;line-height:1;display:block;text-transform:uppercase;letter-spacing:.08em;color:#9fd0ff;font-weight:1000}
+.step.first .medal{color:#ffe680}.step.second .medal{color:#dbe7f7}.step.third .medal{color:#ffb078}
+.time{font-size:32px;font-weight:1000;margin-top:10px;line-height:1}
+.podium-showcase strong{display:block;margin-top:14px;font-size:18px;line-height:1.15;overflow-wrap:anywhere}
+.podium-meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:12px}
+.podium-meta span,.podium-gap{border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.20);border-radius:999px;padding:5px 9px}
+.podium-gap{align-self:center;margin-top:12px;color:#e7eefc;font-weight:850}
 .podium-compact .step{min-height:118px;padding:12px 8px;border-radius:14px}
 .podium-compact .step.first{min-height:142px}
 .podium-compact .medal{font-size:26px}
 .podium-compact .time{font-size:22px;margin-top:6px}
 .podium-compact strong{font-size:13px;line-height:1.2}
+.podium-compact .podium-rank,.podium-compact .podium-meta{display:none}
 .podium-summary-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -393,6 +406,9 @@ textarea.admin-json{width:100%;min-height:220px}
   .dashboard-grid{gap:14px}
   .podium{grid-template-columns:1fr;min-height:auto}
   .step,.step.first{min-height:150px}
+  .podium-showcase{gap:10px;padding:4px 0;min-height:0}
+  .podium-showcase strong{font-size:16px}
+  .podium-showcase .time{font-size:28px}
   .footer{display:none}
   .pilot-name{font-size:28px}
   .progress-wrap{height:190px}

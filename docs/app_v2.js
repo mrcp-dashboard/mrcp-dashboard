@@ -502,9 +502,28 @@ function bindFilters(cb,includePeriod){
   var t=document.getElementById('trackFilter');if(t){t.value=state.track;t.onchange=function(e){state.track=e.target.value;cb();};}
   var p=document.getElementById('recordPeriodFilter');if(p){p.value=state.recordPeriod;p.onchange=function(e){state.recordPeriod=e.target.value;cb();};}
 }
-function podiumHtml(rows){var top=rows.slice(0,3);if(!top.length)return'<p class="small">Aucun chrono trouvé.</p>';var order=[1,0,2];return'<div class="podium">'+order.map(function(i){var r=top[i];if(!r)return'<div></div>';var cls=i===0?'first':i===1?'second':'third';var med=i===0?'🥇':i===1?'🥈':'🥉';return'<div class="step '+cls+'"><span class="medal">'+med+'</span><strong>'+escapeHtml(r._pilot)+'</strong><div class="time">'+fmtTime(r._time)+'</div><div class="small">'+escapeHtml(r._track)+'</div></div>';}).join('')+'</div>';}
 function recordsTable(rows,limit){limit=limit||20;return'<div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Temps</th><th>Piste</th><th>Session</th></tr></thead><tbody>'+rows.slice(0,limit).map(function(r,i){return'<tr><td>'+(i+1)+'</td><td><a href="#/pilote/'+encodeURIComponent(r._pilot)+'">'+escapeHtml(r._pilot)+'</a></td><td><strong>'+fmtTimeS(r._time)+'</strong></td><td><span class="badge">'+escapeHtml(displayTrack(r._track))+'</span></td><td>'+escapeHtml(r.session_name||r._date||'-')+'</td></tr>';}).join('')+'</tbody></table></div>';}
-function podiumHtml(rows,compact){var top=rows.slice(0,3);if(!top.length)return'<p class="small">Aucun chrono trouvé.</p>';var order=[1,0,2];return'<div class="podium '+(compact?'podium-compact':'')+'">'+order.map(function(i){var r=top[i];if(!r)return'<div></div>';var cls=i===0?'first':i===1?'second':'third';var med=i===0?'🥇':i===1?'🥈':'🥉';return'<div class="step '+cls+'"><span class="medal">'+med+'</span><strong>'+escapeHtml(r._pilot)+'</strong><div class="time">'+fmtTime(r._time)+'</div><div class="small">'+escapeHtml(r._track)+'</div></div>';}).join('')+'</div>';}
+function podiumHtml(rows,compact){
+  var top=rows.slice(0,3);
+  if(!top.length)return'<p class="small">Aucun chrono trouve.</p>';
+  var order=[1,0,2], medals=['Or','Argent','Bronze'];
+  return'<div class="podium '+(compact?'podium-compact':'podium-showcase')+'">'+order.map(function(i){
+    var r=top[i];
+    if(!r)return'<div></div>';
+    var cls=i===0?'first':i===1?'second':'third';
+    var rank=i+1;
+    var gap=top[0]&&i!==0 ? r._time-top[0]._time : 0;
+    var meta=compact ? escapeHtml(r._track) : '<span>'+escapeHtml(displayTrack(r._track))+'</span><span>'+escapeHtml(r.session_name||r._date||'-')+'</span>';
+    return'<a class="step '+cls+'" href="#/pilote/'+encodeURIComponent(r._pilot)+'">'+
+      '<span class="podium-rank">'+rank+'</span>'+
+      '<span class="medal">'+medals[i]+'</span>'+
+      '<strong>'+escapeHtml(r._pilot)+'</strong>'+
+      '<div class="time">'+fmtTime(r._time)+'</div>'+
+      '<div class="podium-meta">'+meta+'</div>'+
+      (!compact?'<div class="podium-gap">'+(i===0?'Leader actuel':'+'+fmtTimeS(gap)+' sur P1')+'</div>':'')+
+    '</a>';
+  }).join('')+'</div>';
+}
 function homePodiumsHtml(){var laps=getAllLaps();return '<div class="podium-stack">'+['TT1/10','TT1/8'].map(function(track){var rows=bestByPilot(laps.filter(function(l){return l._track===track;}));return '<div class="podium-block"><div class="podium-block-title">'+escapeHtml(track)+'</div>'+podiumHtml(rows,true)+'</div>';}).join('')+'</div>';}
 function podiumTrackSummaryHtml(laps){
   return '<div class="podium-summary-grid">'+['TT1/10','TT1/8'].map(function(track){
@@ -1031,7 +1050,7 @@ function podiums(){
   var filtered=applyRecordFilters(laps);
   var best=bestByPilot(filtered);
   app.innerHTML=
-    '<section class="card"><h2>Podiums</h2>'+renderFilters(true)+podiumHtml(best)+'</section>' +
+    '<section class="card podium-page-card"><div class="panel-title"><div><h2>Podiums</h2><p class="small">Les trois meilleurs chronos selon la piste et la periode selectionnees.</p></div></div>'+renderFilters(true)+podiumHtml(best)+'</section>' +
     '<section class="card"><div class="panel-title"><h2>Resume par piste</h2></div>'+podiumTrackSummaryHtml(laps)+'</section>' +
     '<section class="card"><h2>Classement</h2>'+recordsTable(best,100)+'</section>';
   bindFilters(podiums,true);
