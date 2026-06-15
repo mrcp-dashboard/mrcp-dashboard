@@ -13,10 +13,13 @@ import datetime as dt
 import json
 import os
 import socket
+import sys
 import tempfile
 import time
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from live_decoder_test import P3ParseError, parse_record, split_records
 
@@ -32,6 +35,10 @@ def utc_now() -> str:
 
 def local_now() -> str:
     return dt.datetime.now().replace(microsecond=0).isoformat()
+
+
+def local_date() -> str:
+    return dt.date.today().isoformat()
 
 
 def normalize_transponder(value: Any) -> str:
@@ -56,6 +63,7 @@ def atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
         f.write("\n")
         tmp_name = f.name
     os.replace(tmp_name, path)
+    os.chmod(path, 0o644)
 
 
 def empty_state(host: str, port: int, track: str, status: str, message: str) -> Dict[str, Any]:
@@ -66,6 +74,7 @@ def empty_state(host: str, port: int, track: str, status: str, message: str) -> 
         "host": host,
         "port": port,
         "track": track,
+        "session_date": local_date(),
         "generated_at": utc_now(),
         "local_time": local_now(),
         "message": message,
@@ -89,8 +98,19 @@ class LiveState:
         self.latest_passing: Optional[Dict[str, Any]] = None
         self.passings_count = 0
         self.decoder: Dict[str, Any] = {}
+        self.session_date = local_date()
         self.pilot_map = load_pilot_map()
         self._last_corrections_mtime = CORRECTIONS_FILE.stat().st_mtime if CORRECTIONS_FILE.exists() else None
+
+    def reset_if_new_day(self) -> bool:
+        current = local_date()
+        if current == self.session_date:
+            return False
+        self.session_date = current
+        self.pilots.clear()
+        self.latest_passing = None
+        self.passings_count = 0
+        return True
 
     def refresh_pilot_map_if_needed(self) -> None:
         mtime = CORRECTIONS_FILE.stat().st_mtime if CORRECTIONS_FILE.exists() else None
@@ -102,6 +122,7 @@ class LiveState:
         return self.pilot_map.get(transponder) or f"Inconnu #{transponder}"
 
     def handle_status(self, fields: Dict[str, int]) -> None:
+        self.reset_if_new_day()
         self.decoder = {
             "decoder_id": fields.get("decoder_id"),
             "noise": fields.get("noise"),
@@ -112,6 +133,7 @@ class LiveState:
         }
 
     def handle_passing(self, fields: Dict[str, int]) -> None:
+        self.reset_if_new_day()
         self.refresh_pilot_map_if_needed()
         transponder = normalize_transponder(fields.get("transponder"))
         if not transponder:
@@ -189,6 +211,7 @@ class LiveState:
             "host": self.host,
             "port": self.port,
             "track": self.track,
+            "session_date": self.session_date,
             "generated_at": utc_now(),
             "local_time": local_now(),
             "message": message,

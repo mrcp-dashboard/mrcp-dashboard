@@ -91,8 +91,10 @@ systemctl enable --now mrcp-live-decoder
 systemctl status mrcp-live-decoder --no-pager
 ```
 
-Le service ecrit `docs/live_decoder_state.json`, ignore par Git. La page de test
-existe mais n'est pas visible dans le menu utilisateur :
+Le service ecrit `docs/live_decoder_state.json`, ignore par Git et lisible par
+le serveur web. Les compteurs live sont remis a zero automatiquement quand la
+date locale change. La page de test existe mais n'est pas visible dans le menu
+utilisateur :
 
 ```text
 http://ADRESSE_DASHBOARD/#/live-reel

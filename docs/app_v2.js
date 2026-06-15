@@ -1224,7 +1224,7 @@ function liveDecoderPage(){
       '<div class="grid">'+
         '<div class="card"><h3>Connexion</h3><div class="big">'+(state.connected?'OK':'-')+'</div><p class="small">'+escapeHtml(state.message||'')+'</p></div>'+
         '<div class="card"><h3>Passages</h3><div class="big">'+Number(state.passings_count||0)+'</div><p class="small">'+escapeHtml(state.local_time||state.generated_at||'')+'</p></div>'+
-        '<div class="card"><h3>Tours</h3><div class="big">'+Number(state.laps_count||0)+'</div><p class="small">'+Number(state.pilots_count||0)+' pilotes / puces</p></div>'+
+        '<div class="card"><h3>Tours</h3><div class="big">'+Number(state.laps_count||0)+'</div><p class="small">'+Number(state.pilots_count||0)+' pilotes / puces · '+escapeHtml(state.session_date||'-')+'</p></div>'+
         '<div class="card"><h3>Dernier passage</h3><div class="big">'+escapeHtml(latest.transponder||'-')+'</div><p class="small">'+escapeHtml(latest.pilot||'')+' '+liveDecoderTime(latest.lap_time)+'</p></div>'+
       '</div>'+
       '<section class="card"><div class="panel-title"><h2>Classement decodeur</h2><span class="small">'+escapeHtml(state.track||'-')+'</span></div>'+liveDecoderTable(rows)+'</section>';
