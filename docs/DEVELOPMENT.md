@@ -108,6 +108,14 @@ http://ADRESSE_DASHBOARD/index_v2.html#/live-tv
 
 Cette route est aussi cachee du menu utilisateur.
 
+Synthese vocale optionnelle pour un ecran HDMI avec son :
+
+```text
+http://ADRESSE_DASHBOARD/index_v2.html#/live-tv?voice=1
+```
+
+Sans `?voice=1`, la page reste silencieuse.
+
 ## Flux admin API
 
 Le front ne contient plus de code admin fixe. Au clic sur Admin, il demande l'URL

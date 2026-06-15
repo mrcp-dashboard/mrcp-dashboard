@@ -689,6 +689,22 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   font-weight:1000;
   color:#fff;
 }
+.live-tv-head-right{
+  display:grid;
+  justify-items:end;
+  gap:8px;
+}
+.live-tv-voice{
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.22);
+  color:#cfe8ff;
+  font-size:13px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
 .live-tv-content{
   display:grid;
   grid-template-columns:minmax(320px,.75fr) minmax(0,1.25fr);

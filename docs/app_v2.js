@@ -13,6 +13,8 @@ var DEFAULT_LAP_DISTANCE_METERS = 250;
 var TRACK_LAP_DISTANCE_METERS = {'TT1/8':250,'TT1/10':180};
 var state = { track:'all', recordPeriod:'total', isAdmin: !!getAdminConfig().token };
 var lapsCache = null;
+var liveVoiceLastKey = '';
+var liveVoiceLastAt = 0;
 
 function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function fmtTime(v){var n=Number(v);return Number.isFinite(n)?n.toFixed(3):'-';}
@@ -1248,13 +1250,42 @@ function liveTvRows(rows){
   }).join('');
 }
 
+function liveTvVoiceEnabled(){return hashParam('voice','0')==='1';}
+function liveTvVoiceLabel(){return liveTvVoiceEnabled()?'Synthese vocale ON':'Synthese vocale OFF';}
+function liveTvVoiceText(latest){
+  var pilot=latest.pilot||latest.transponder||'Puce inconnue';
+  var lap=Number(latest.lap_time);
+  if(Number.isFinite(lap)&&lap>0)return pilot+', '+lap.toFixed(3).replace('.',',')+' secondes';
+  return pilot+', passage detecte';
+}
+function announceLivePassing(state){
+  if(!liveTvVoiceEnabled())return;
+  if(!('speechSynthesis' in window)||!window.SpeechSynthesisUtterance)return;
+  var latest=state&&state.latest_passing;
+  if(!latest||!latest.seen_at)return;
+  var key=[latest.seen_at,latest.transponder,latest.lap_time,state.passings_count].join('|');
+  if(key===liveVoiceLastKey)return;
+  var seenAt=Date.parse(latest.seen_at);
+  if(Number.isFinite(seenAt)&&Date.now()-seenAt>20000){liveVoiceLastKey=key;return;}
+  var now=Date.now();
+  if(now-liveVoiceLastAt<1200)return;
+  liveVoiceLastKey=key;
+  liveVoiceLastAt=now;
+  var utterance=new window.SpeechSynthesisUtterance(liveTvVoiceText(latest));
+  utterance.lang='fr-FR';
+  utterance.rate=1;
+  utterance.pitch=1;
+  try{window.speechSynthesis.cancel();window.speechSynthesis.speak(utterance);}catch(e){}
+}
+
 function liveDecoderTvPage(){
   if(liveTimer) clearTimeout(liveTimer);
   document.body.classList.add('live-tv');
-  app.innerHTML='<section class="live-tv-board"><div class="live-tv-header"><div><div class="live-status"><span class="live-dot"></span> LIVE REEL MRCP</div><h1>Live timing</h1></div><div class="live-tv-clock">'+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</div></div><div id="liveTvContent" class="live-tv-content"><div class="live-tv-empty">Chargement du decodeur...</div></div></section>';
+  app.innerHTML='<section class="live-tv-board"><div class="live-tv-header"><div><div class="live-status"><span class="live-dot"></span> LIVE REEL MRCP</div><h1>Live timing</h1></div><div class="live-tv-head-right"><div class="live-tv-voice">'+liveTvVoiceLabel()+'</div><div class="live-tv-clock">'+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</div></div></div><div id="liveTvContent" class="live-tv-content"><div class="live-tv-empty">Chargement du decodeur...</div></div></section>';
   fetchLiveDecoderState().then(function(state){
     var latest=state.latest_passing||{};
     var rows=state.ranking||[];
+    announceLivePassing(state);
     document.getElementById('liveTvContent').innerHTML=
       '<div class="live-tv-hero">'+
         '<div><span class="small">Connexion</span><strong>'+(state.connected?'OK':'Hors ligne')+'</strong><em>'+escapeHtml(state.message||'')+'</em></div>'+
