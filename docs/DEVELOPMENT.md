@@ -116,6 +116,12 @@ http://ADRESSE_DASHBOARD/index_v2.html#/live-tv?voice=1
 
 Sans `?voice=1`, la page reste silencieuse.
 
+Guide d'installation Raspberry Pi kiosque :
+
+```text
+docs/RASPBERRY_KIOSK.md
+```
+
 ## Flux admin API
 
 Le front ne contient plus de code admin fixe. Au clic sur Admin, il demande l'URL
