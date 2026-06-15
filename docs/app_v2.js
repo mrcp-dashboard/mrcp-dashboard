@@ -8,6 +8,7 @@ var ADMIN_CFG_KEY = 'mrcp_admin_api_config';
 var DATA_CACHE_NAME = 'mrcp-dashboard-data-v1';
 var DATA_URL = 'data_v2.json';
 var THEME_KEY = 'mrcp_dashboard_theme';
+var LIVE_DECODER_URL = 'live_decoder_state.json';
 var DEFAULT_LAP_DISTANCE_METERS = 250;
 var TRACK_LAP_DISTANCE_METERS = {'TT1/8':250,'TT1/10':180};
 var state = { track:'all', recordPeriod:'total', isAdmin: !!getAdminConfig().token };
@@ -1189,6 +1190,51 @@ function liveDayTable(rows){
     }).join('')+'</tbody></table></div>';
 }
 
+function liveDecoderTime(v){return Number.isFinite(Number(v))?Number(v).toFixed(3)+' s':'-';}
+function liveDecoderTable(rows){
+  if(!rows||!rows.length)return '<p class="small">Aucun passage live decodeur pour le moment.</p>';
+  return '<div class="table-wrap live-day-table"><table><thead><tr><th>#</th><th>Pilote / puce</th><th>Tours</th><th>Meilleur</th><th>Dernier tour</th><th>Moyenne</th><th>Passages</th><th>Piste</th></tr></thead><tbody>'+
+    rows.map(function(r,i){
+      return '<tr>'+
+        '<td>'+(r.position||i+1)+'</td>'+
+        '<td><strong>'+escapeHtml(r.pilot||r.transponder||'-')+'</strong><div class="small">'+escapeHtml(r.transponder||'')+'</div></td>'+
+        '<td>'+Number(r.laps||0)+'</td>'+
+        '<td><strong>'+liveDecoderTime(r.best_lap)+'</strong></td>'+
+        '<td>'+liveDecoderTime(r.last_lap)+'</td>'+
+        '<td>'+liveDecoderTime(r.avg_lap)+'</td>'+
+        '<td>'+Number(r.passings||0)+'</td>'+
+        '<td><span class="badge">'+escapeHtml(r.track||'-')+'</span></td>'+
+      '</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+async function fetchLiveDecoderState(){
+  var res=await fetch(LIVE_DECODER_URL+'?ts='+Date.now(),{cache:'no-store'});
+  if(!res.ok)throw new Error('Etat live decodeur indisponible : HTTP '+res.status);
+  return res.json();
+}
+
+function liveDecoderPage(){
+  if(liveTimer) clearTimeout(liveTimer);
+  app.innerHTML='<section class="card"><div class="panel-title"><h2>Live timing reel</h2><span class="badge">route test cachee</span></div><p class="small">Lecture directe du decodeur AMB/P3. Cette page n est pas encore visible dans le menu utilisateur.</p><div id="liveDecoderContent"><p class="small">Chargement...</p></div></section>';
+  fetchLiveDecoderState().then(function(state){
+    var latest=state.latest_passing||{};
+    var rows=state.ranking||[];
+    document.getElementById('liveDecoderContent').innerHTML=
+      '<div class="grid">'+
+        '<div class="card"><h3>Connexion</h3><div class="big">'+(state.connected?'OK':'-')+'</div><p class="small">'+escapeHtml(state.message||'')+'</p></div>'+
+        '<div class="card"><h3>Passages</h3><div class="big">'+Number(state.passings_count||0)+'</div><p class="small">'+escapeHtml(state.local_time||state.generated_at||'')+'</p></div>'+
+        '<div class="card"><h3>Tours</h3><div class="big">'+Number(state.laps_count||0)+'</div><p class="small">'+Number(state.pilots_count||0)+' pilotes / puces</p></div>'+
+        '<div class="card"><h3>Dernier passage</h3><div class="big">'+escapeHtml(latest.transponder||'-')+'</div><p class="small">'+escapeHtml(latest.pilot||'')+' '+liveDecoderTime(latest.lap_time)+'</p></div>'+
+      '</div>'+
+      '<section class="card"><div class="panel-title"><h2>Classement decodeur</h2><span class="small">'+escapeHtml(state.track||'-')+'</span></div>'+liveDecoderTable(rows)+'</section>';
+  }).catch(function(e){
+    document.getElementById('liveDecoderContent').innerHTML='<p class="small">Live decodeur non actif : '+escapeHtml(e.message)+'</p>';
+  }).finally(function(){
+    liveTimer=setTimeout(liveDecoderPage,3000);
+  });
+}
+
 function liveDayPage(){
   if(liveTimer) clearTimeout(liveTimer);
   var key=todayKey();
@@ -1730,7 +1776,7 @@ function adminPage(){
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
-function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return liveDayPage();
+function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return liveDayPage();
     if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){

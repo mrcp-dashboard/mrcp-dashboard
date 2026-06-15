@@ -1,0 +1,20 @@
+[Unit]
+Description=MRCP AMB P3 Live Decoder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/mrcp-dashboard/docs
+Environment=MRCP_DOCS_DIR=/opt/mrcp-dashboard/docs
+Environment=MRCP_DECODER_HOST=192.168.1.100
+Environment=MRCP_DECODER_PORT=5403
+Environment=MRCP_DECODER_TRACK=TT1/8
+Environment=MRCP_DECODER_MIN_LAP_SECONDS=5
+Environment=MRCP_DECODER_STATE_FILE=/opt/mrcp-dashboard/docs/live_decoder_state.json
+ExecStart=/opt/mrcp-dashboard/venv/bin/python /opt/mrcp-dashboard/docs/live_decoder_service.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

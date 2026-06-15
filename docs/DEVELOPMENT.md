@@ -49,6 +49,7 @@ dans `corrections.json` et `lap_overrides.json`.
 | Live timing Socket.IO | `live_server.py` | `5056` |
 | Serveur statique local | `python -m http.server` depuis `docs/` | `8000` |
 | Test decodeur AMB/P3 | `docs/live_decoder_test.py` | `5403` |
+| Decodeur AMB/P3 live reel | `docs/live_decoder_service.py` | `5403` |
 
 Les ports et chemins peuvent etre surcharges avec :
 
@@ -79,6 +80,23 @@ cd /opt/mrcp-dashboard/docs
 
 Faire passer une voiture sur la boucle. Les passages doivent afficher au moins
 `PASSING transponder=... rtc=... strength=... hits=...`.
+
+Integration live reel non publique :
+
+```bash
+cd /opt/mrcp-dashboard
+cp docs/mrcp-live-decoder.service /etc/systemd/system/mrcp-live-decoder.service
+systemctl daemon-reload
+systemctl enable --now mrcp-live-decoder
+systemctl status mrcp-live-decoder --no-pager
+```
+
+Le service ecrit `docs/live_decoder_state.json`, ignore par Git. La page de test
+existe mais n'est pas visible dans le menu utilisateur :
+
+```text
+http://ADRESSE_DASHBOARD/#/live-reel
+```
 
 ## Flux admin API
 
