@@ -7,6 +7,7 @@ var deferredPrompt = null;
 var ADMIN_CFG_KEY = 'mrcp_admin_api_config';
 var DATA_CACHE_NAME = 'mrcp-dashboard-data-v1';
 var DATA_URL = 'data_v2.json';
+var THEME_KEY = 'mrcp_dashboard_theme';
 var DEFAULT_LAP_DISTANCE_METERS = 250;
 var TRACK_LAP_DISTANCE_METERS = {'TT1/8':250,'TT1/10':180};
 var state = { track:'all', recordPeriod:'total', isAdmin: !!getAdminConfig().token };
@@ -38,6 +39,20 @@ function forcedTrack(lapId,o){return (o||getOverrides()).forced_track[lapId]||nu
 function getAdminConfig(){try{var raw=JSON.parse(localStorage.getItem(ADMIN_CFG_KEY)||'{}');return{apiUrl:String(raw.apiUrl||'').replace(/\/+$/,''),token:String(raw.token||'')};}catch(e){return{apiUrl:'',token:''};}}
 function setAdminConfig(cfg){localStorage.setItem(ADMIN_CFG_KEY,JSON.stringify({apiUrl:String(cfg.apiUrl||'').replace(/\/+$/,''),token:String(cfg.token||'')},null,2));}
 function clearAdminConfig(){localStorage.removeItem(ADMIN_CFG_KEY);}
+function applyTheme(theme){
+  theme = theme === 'warm' ? 'warm' : 'green';
+  document.body.classList.toggle('theme-warm', theme === 'warm');
+  document.body.classList.toggle('theme-green', theme !== 'warm');
+  try{localStorage.setItem(THEME_KEY, theme);}catch(e){}
+  var select=document.getElementById('themeSelect');if(select)select.value=theme;
+}
+function setupTheme(){
+  var theme='green';
+  try{theme=localStorage.getItem(THEME_KEY)||'green';}catch(e){}
+  applyTheme(theme);
+  var select=document.getElementById('themeSelect');
+  if(select)select.onchange=function(){applyTheme(select.value);};
+}
 async function adminFetch(path, options){
   var cfg=getAdminConfig();
   if(!cfg.apiUrl||!cfg.token) throw new Error('Configuration API admin manquante');
@@ -1803,7 +1818,7 @@ async function fetchFreshDashboardData(){
 
 async function init(){
   try{
-    bindAdmin(); setupPwa(); updateAdminNav();
+    setupTheme(); bindAdmin(); setupPwa(); updateAdminNav();
     var today=document.getElementById('todayLabel');if(today)today.textContent=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
     var renderedFromCache=false;
     try{
