@@ -1235,6 +1235,41 @@ function liveDecoderPage(){
   });
 }
 
+function liveTvRows(rows){
+  if(!rows||!rows.length)return '<div class="live-tv-empty">En attente des premiers passages</div>';
+  return rows.slice(0,8).map(function(r,i){
+    return '<div class="live-tv-row">'+
+      '<div class="live-tv-pos">'+(r.position||i+1)+'</div>'+
+      '<div class="live-tv-pilot"><strong>'+escapeHtml(r.pilot||r.transponder||'-')+'</strong><span>'+escapeHtml(r.transponder||'')+'</span></div>'+
+      '<div class="live-tv-stat"><span>Tours</span><strong>'+Number(r.laps||0)+'</strong></div>'+
+      '<div class="live-tv-stat"><span>Best</span><strong>'+liveDecoderTime(r.best_lap)+'</strong></div>'+
+      '<div class="live-tv-stat"><span>Dernier</span><strong>'+liveDecoderTime(r.last_lap)+'</strong></div>'+
+    '</div>';
+  }).join('');
+}
+
+function liveDecoderTvPage(){
+  if(liveTimer) clearTimeout(liveTimer);
+  document.body.classList.add('live-tv');
+  app.innerHTML='<section class="live-tv-board"><div class="live-tv-header"><div><div class="live-status"><span class="live-dot"></span> LIVE REEL MRCP</div><h1>Live timing</h1></div><div class="live-tv-clock">'+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</div></div><div id="liveTvContent" class="live-tv-content"><div class="live-tv-empty">Chargement du decodeur...</div></div></section>';
+  fetchLiveDecoderState().then(function(state){
+    var latest=state.latest_passing||{};
+    var rows=state.ranking||[];
+    document.getElementById('liveTvContent').innerHTML=
+      '<div class="live-tv-hero">'+
+        '<div><span class="small">Connexion</span><strong>'+(state.connected?'OK':'Hors ligne')+'</strong><em>'+escapeHtml(state.message||'')+'</em></div>'+
+        '<div><span class="small">Passages</span><strong>'+Number(state.passings_count||0)+'</strong><em>'+escapeHtml(state.session_date||'-')+'</em></div>'+
+        '<div><span class="small">Tours</span><strong>'+Number(state.laps_count||0)+'</strong><em>'+Number(state.pilots_count||0)+' pilotes / puces</em></div>'+
+        '<div class="live-tv-last"><span class="small">Dernier passage</span><strong>'+escapeHtml(latest.pilot||latest.transponder||'-')+'</strong><em>'+liveDecoderTime(latest.lap_time)+' · '+escapeHtml(latest.track||state.track||'-')+'</em></div>'+
+      '</div>'+
+      '<div class="live-tv-ranking">'+liveTvRows(rows)+'</div>';
+  }).catch(function(e){
+    document.getElementById('liveTvContent').innerHTML='<div class="live-tv-empty">Live decodeur non actif<br><span>'+escapeHtml(e.message)+'</span></div>';
+  }).finally(function(){
+    liveTimer=setTimeout(liveDecoderTvPage,3000);
+  });
+}
+
 function liveDayPage(){
   if(liveTimer) clearTimeout(liveTimer);
   var key=todayKey();
@@ -1776,7 +1811,7 @@ function adminPage(){
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
-function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return liveDayPage();
+function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';document.body.classList.toggle('live-tv',h.indexOf('#/live-tv')===0);if(h.indexOf('#/live-tv')===0)return liveDecoderTvPage();if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return liveDayPage();
     if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){

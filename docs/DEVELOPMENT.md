@@ -100,6 +100,14 @@ utilisateur :
 http://ADRESSE_DASHBOARD/#/live-reel
 ```
 
+Route kiosque plein ecran pour futur Raspberry Pi :
+
+```text
+http://ADRESSE_DASHBOARD/index_v2.html#/live-tv
+```
+
+Cette route est aussi cachee du menu utilisateur.
+
 ## Flux admin API
 
 Le front ne contient plus de code admin fixe. Au clic sur Admin, il demande l'URL
