@@ -528,7 +528,7 @@ function podiumHtml(rows,compact){
     '</a>';
   }).join('')+'</div>';
   if(compact)return cards;
-  return '<div class="podium-arena"><div class="podium-arena-bg"><img src="icon-512.png" alt=""><span>MRCP</span></div><div class="podium-arena-head"><div><div class="podium-kicker">Top 3 MRCP</div><h3>Podium officiel</h3></div><div class="podium-cup">🏆</div></div>'+cards+'</div>';
+  return '<div class="podium-arena"><div class="podium-arena-bg"><img src="mrcp-logo-bg.png" alt=""></div><div class="podium-arena-head"><div><div class="podium-kicker">Top 3 MRCP</div><h3>Podium officiel</h3></div><div class="podium-cup">🏆</div></div>'+cards+'</div>';
 }
 function homePodiumsHtml(){var laps=getAllLaps();return '<div class="podium-stack">'+['TT1/10','TT1/8'].map(function(track){var rows=bestByPilot(laps.filter(function(l){return l._track===track;}));return '<div class="podium-block"><div class="podium-block-title">'+escapeHtml(track)+'</div>'+podiumHtml(rows,true)+'</div>';}).join('')+'</div>';}
 function podiumTrackSummaryHtml(laps){
