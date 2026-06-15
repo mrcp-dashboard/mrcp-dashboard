@@ -48,6 +48,7 @@ dans `corrections.json` et `lap_overrides.json`.
 | Admin API | `docs/admin_api.py` | `5055` |
 | Live timing Socket.IO | `live_server.py` | `5056` |
 | Serveur statique local | `python -m http.server` depuis `docs/` | `8000` |
+| Test decodeur AMB/P3 | `docs/live_decoder_test.py` | `5403` |
 
 Les ports et chemins peuvent etre surcharges avec :
 
@@ -59,6 +60,25 @@ Les ports et chemins peuvent etre surcharges avec :
 - `MRCP_LIVE_HOST`
 - `MRCP_LIVE_PORT`
 - `MRCP_LIVE_CORS_ORIGINS`
+
+## Test live decodeur AMB/P3
+
+Le decodeur MyLaps/AMB expose le protocole P3 en TCP, generalement sur le port
+`5403`. Premier test depuis le serveur :
+
+```bash
+nc -vz 192.168.1.100 5403
+```
+
+Puis lancer le lecteur de test :
+
+```bash
+cd /opt/mrcp-dashboard/docs
+../venv/bin/python live_decoder_test.py --host 192.168.1.100 --all
+```
+
+Faire passer une voiture sur la boucle. Les passages doivent afficher au moins
+`PASSING transponder=... rtc=... strength=... hits=...`.
 
 ## Flux admin API
 
