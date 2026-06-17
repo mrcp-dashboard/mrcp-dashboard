@@ -1216,16 +1216,40 @@ function compareSummaryCards(items){
   }).join('')+'</section>';
 }
 function compareBarChart(title, items, valueFn, labelFn, lowerBetter){
-  var values=items.map(function(x){return Number(valueFn(x));}).filter(function(v){return Number.isFinite(v)&&v>0;});
+  var ranked=items.slice().sort(function(a,b){
+    var av=Number(valueFn(a)), bv=Number(valueFn(b));
+    var aok=Number.isFinite(av)&&av>0, bok=Number.isFinite(bv)&&bv>0;
+    if(aok&&!bok)return -1;
+    if(!aok&&bok)return 1;
+    if(!aok&&!bok)return a.name.localeCompare(b.name);
+    return lowerBetter?av-bv:bv-av;
+  });
+  var values=ranked.map(function(x){return Number(valueFn(x));}).filter(function(v){return Number.isFinite(v)&&v>0;});
   if(!values.length)return '<section class="card compare-chart-card"><h3>'+escapeHtml(title)+'</h3><p class="small">Pas assez de donnees pour ce graphique.</p></section>';
   var max=Math.max.apply(null,values), min=Math.min.apply(null,values);
-  return '<section class="card compare-chart-card"><h3>'+escapeHtml(title)+'</h3><div class="compare-bars">'+items.map(function(x){
+  return '<section class="card compare-chart-card"><h3>'+escapeHtml(title)+'</h3><div class="compare-bars">'+ranked.map(function(x,i){
     var v=Number(valueFn(x));
     var ok=Number.isFinite(v)&&v>0;
     var pct=ok?(lowerBetter?(min/v)*100:(v/max)*100):0;
     pct=Math.max(4,Math.min(100,pct));
-    return '<div class="compare-bar-row"><div class="compare-bar-label">'+escapeHtml(x.name)+'</div><div class="compare-bar-track"><div class="compare-bar-fill" style="width:'+pct.toFixed(1)+'%"></div></div><div class="compare-bar-value">'+escapeHtml(ok?labelFn(v,x):'-')+'</div></div>';
+    return '<div class="compare-bar-row"><div class="compare-bar-label"><span class="compare-rank">'+(i+1)+'</span>'+escapeHtml(x.name)+'</div><div class="compare-bar-track"><div class="compare-bar-fill" style="width:'+pct.toFixed(1)+'%"></div></div><div class="compare-bar-value">'+escapeHtml(ok?labelFn(v,x):'-')+'</div></div>';
   }).join('')+'</div></section>';
+}
+function comparePieChart(title, items, valueFn, labelFn){
+  var colors=['#3ee66f','#12a4ff','#ffd23f','#ff9f31'];
+  var ranked=items.map(function(x){return {item:x,value:Number(valueFn(x))};}).filter(function(x){return Number.isFinite(x.value)&&x.value>0;}).sort(function(a,b){return b.value-a.value;});
+  var total=ranked.reduce(function(sum,x){return sum+x.value;},0);
+  if(!total)return '<section class="card compare-chart-card"><h3>'+escapeHtml(title)+'</h3><p class="small">Pas assez de donnees pour ce graphique.</p></section>';
+  var cursor=0;
+  var gradient=ranked.map(function(x,i){
+    var start=cursor;
+    cursor+=x.value/total*100;
+    return colors[i%colors.length]+' '+start.toFixed(2)+'% '+cursor.toFixed(2)+'%';
+  }).join(',');
+  return '<section class="card compare-chart-card compare-pie-card"><h3>'+escapeHtml(title)+'</h3><div class="compare-pie-layout"><div class="compare-pie" style="background:conic-gradient('+gradient+')"></div><div class="compare-pie-legend">'+ranked.map(function(x,i){
+    var pct=x.value/total*100;
+    return '<div class="compare-pie-row"><span style="background:'+colors[i%colors.length]+'"></span><strong>#'+(i+1)+' '+escapeHtml(x.item.name)+'</strong><em>'+escapeHtml(labelFn(x.value,x.item))+' · '+pct.toFixed(1).replace('.',',')+'%</em></div>';
+  }).join('')+'</div></div></section>';
 }
 function comparePage(){
   var pilots=allPilots();
@@ -1242,10 +1266,10 @@ function comparePage(){
     '<section class="compare-chart-grid">'+
       compareBarChart('Best TT1/8',items,function(x){return x.b18&&x.b18._time;},function(v){return fmtTimeS(v);},true)+
       compareBarChart('Best TT1/10',items,function(x){return x.b10&&x.b10._time;},function(v){return fmtTimeS(v);},true)+
-      compareBarChart('Tours enregistres',items,function(x){return x.stats.laps.length;},function(v){return Math.round(v).toLocaleString('fr-FR')+' tours';},false)+
-      compareBarChart('Kilometres estimes',items,function(x){return x.km;},function(v){return fmtKm(v)+' km';},false)+
+      comparePieChart('Tours enregistres',items,function(x){return x.stats.laps.length;},function(v){return Math.round(v).toLocaleString('fr-FR')+' tours';})+
+      comparePieChart('Kilometres estimes',items,function(x){return x.km;},function(v){return fmtKm(v)+' km';})+
       compareBarChart('Regularite',items,function(x){return x.consistency;},function(v){return fmtTimeS(v);},true)+
-      compareBarChart('Nombre de sessions',items,function(x){return x.stats.sessions;},function(v){return Math.round(v).toLocaleString('fr-FR')+' sessions';},false)+
+      comparePieChart('Nombre de sessions',items,function(x){return x.stats.sessions;},function(v){return Math.round(v).toLocaleString('fr-FR')+' sessions';})+
     '</section>'+
     '<section class="card"><div class="panel-title"><h2>Tableau detaille</h2></div><div class="table-wrap"><table><thead><tr><th>Pilote</th><th>Tours</th><th>Sessions</th><th>Best TT1/8</th><th>Best TT1/10</th><th>Moyenne</th><th>Regularite</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
   document.querySelectorAll('.compare-select').forEach(function(el){
