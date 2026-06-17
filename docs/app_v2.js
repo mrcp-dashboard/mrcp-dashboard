@@ -1204,6 +1204,29 @@ function comparePilotRow(name){
   var s=pilotStats(name), b18=pilotBestByTrack(s,'TT1/8'), b10=pilotBestByTrack(s,'TT1/10'), cons=pilotConsistency(s);
   return '<tr><td><a href="#/pilote/'+encodeURIComponent(name)+'"><strong>'+escapeHtml(name)+'</strong></a></td><td>'+s.laps.length+'</td><td>'+s.sessions+'</td><td><strong>'+fmtTimeS(b18&&b18._time)+'</strong></td><td><strong>'+fmtTimeS(b10&&b10._time)+'</strong></td><td>'+fmtTimeS(s.avg)+'</td><td>'+fmtTimeS(cons)+'</td></tr>';
 }
+function comparePilotData(name){
+  var s=pilotStats(name), b18=pilotBestByTrack(s,'TT1/8'), b10=pilotBestByTrack(s,'TT1/10'), cons=pilotConsistency(s);
+  return {name:name,stats:s,b18:b18,b10:b10,consistency:cons,km:totalDistanceKm(s.laps)};
+}
+function compareSummaryCards(items){
+  return '<section class="compare-summary-grid">'+items.map(function(x){
+    var fav=x.b18?'TT1/8':(x.b10?'TT1/10':'-');
+    var best=x.b18&&x.b10?(x.b18._time<x.b10._time?x.b18:x.b10):(x.b18||x.b10);
+    return '<a class="compare-driver-card" href="#/pilote/'+encodeURIComponent(x.name)+'"><span>Pilote</span><strong>'+escapeHtml(x.name)+'</strong><div class="compare-card-stats"><div><small>Best</small><b>'+fmtTimeS(best&&best._time)+'</b></div><div><small>Tours</small><b>'+x.stats.laps.length.toLocaleString('fr-FR')+'</b></div><div><small>Km</small><b>'+fmtKm(x.km)+'</b></div><div><small>Piste</small><b>'+escapeHtml(fav)+'</b></div></div></a>';
+  }).join('')+'</section>';
+}
+function compareBarChart(title, items, valueFn, labelFn, lowerBetter){
+  var values=items.map(function(x){return Number(valueFn(x));}).filter(function(v){return Number.isFinite(v)&&v>0;});
+  if(!values.length)return '<section class="card compare-chart-card"><h3>'+escapeHtml(title)+'</h3><p class="small">Pas assez de donnees pour ce graphique.</p></section>';
+  var max=Math.max.apply(null,values), min=Math.min.apply(null,values);
+  return '<section class="card compare-chart-card"><h3>'+escapeHtml(title)+'</h3><div class="compare-bars">'+items.map(function(x){
+    var v=Number(valueFn(x));
+    var ok=Number.isFinite(v)&&v>0;
+    var pct=ok?(lowerBetter?(min/v)*100:(v/max)*100):0;
+    pct=Math.max(4,Math.min(100,pct));
+    return '<div class="compare-bar-row"><div class="compare-bar-label">'+escapeHtml(x.name)+'</div><div class="compare-bar-track"><div class="compare-bar-fill" style="width:'+pct.toFixed(1)+'%"></div></div><div class="compare-bar-value">'+escapeHtml(ok?labelFn(v,x):'-')+'</div></div>';
+  }).join('')+'</div></section>';
+}
 function comparePage(){
   var pilots=allPilots();
   var selected=(hashParam('pilots','')||'').split('|').filter(Boolean).slice(0,4);
@@ -1211,8 +1234,20 @@ function comparePage(){
   var selects=[0,1,2,3].map(function(i){
     return '<select class="compare-select" data-index="'+i+'"><option value="">Pilote '+(i+1)+'</option>'+pilots.map(function(p){return '<option value="'+escapeHtml(p)+'" '+(selected[i]===p?'selected':'')+'>'+escapeHtml(p)+'</option>';}).join('')+'</select>';
   }).join('');
-  var rows=selected.filter(Boolean).map(comparePilotRow).join('');
-  app.innerHTML='<section class="card"><div class="panel-title"><div><h2>Comparatif pilotes</h2><p class="small">Compare jusqu a 4 pilotes sur leurs meilleurs tours, volume et regularite.</p></div></div><div class="compare-controls">'+selects+'</div></section><section class="card"><div class="table-wrap"><table><thead><tr><th>Pilote</th><th>Tours</th><th>Sessions</th><th>Best TT1/8</th><th>Best TT1/10</th><th>Moyenne</th><th>Regularite</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
+  var names=selected.filter(Boolean);
+  var items=names.map(comparePilotData);
+  var rows=names.map(comparePilotRow).join('');
+  app.innerHTML='<section class="card compare-hero"><div class="panel-title"><div><h2>Comparatif pilotes</h2><p class="small">Compare jusqu a 4 pilotes sur leurs meilleurs tours, volume, distance et regularite.</p></div></div><div class="compare-controls">'+selects+'</div></section>'+
+    compareSummaryCards(items)+
+    '<section class="compare-chart-grid">'+
+      compareBarChart('Best TT1/8',items,function(x){return x.b18&&x.b18._time;},function(v){return fmtTimeS(v);},true)+
+      compareBarChart('Best TT1/10',items,function(x){return x.b10&&x.b10._time;},function(v){return fmtTimeS(v);},true)+
+      compareBarChart('Tours enregistres',items,function(x){return x.stats.laps.length;},function(v){return Math.round(v).toLocaleString('fr-FR')+' tours';},false)+
+      compareBarChart('Kilometres estimes',items,function(x){return x.km;},function(v){return fmtKm(v)+' km';},false)+
+      compareBarChart('Regularite',items,function(x){return x.consistency;},function(v){return fmtTimeS(v);},true)+
+      compareBarChart('Nombre de sessions',items,function(x){return x.stats.sessions;},function(v){return Math.round(v).toLocaleString('fr-FR')+' sessions';},false)+
+    '</section>'+
+    '<section class="card"><div class="panel-title"><h2>Tableau detaille</h2></div><div class="table-wrap"><table><thead><tr><th>Pilote</th><th>Tours</th><th>Sessions</th><th>Best TT1/8</th><th>Best TT1/10</th><th>Moyenne</th><th>Regularite</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
   document.querySelectorAll('.compare-select').forEach(function(el){
     el.onchange=function(){
       var values=Array.from(document.querySelectorAll('.compare-select')).map(function(s){return s.value;}).filter(Boolean);
