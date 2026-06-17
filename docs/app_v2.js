@@ -345,6 +345,15 @@ function totalDistanceKm(laps){
   var meters=laps.reduce(function(sum,l){return sum+lapDistanceMeters(l._track);},0);
   return meters/1000;
 }
+function periodFilteredLaps(period){
+  var range=recordPeriodRange(period||'total');
+  var laps=getAllLaps();
+  if(!range)return laps;
+  return laps.filter(function(l){
+    var t=lapDateMs(l);
+    return t!=null&&t>=range.start&&t<range.end;
+  });
+}
 function fmtKm(v){
   var n=Number(v);
   if(!Number.isFinite(n))return '-';
@@ -385,6 +394,21 @@ function pilotBadges(stats){
   if(pilotConsistency(stats)!=null&&pilotConsistency(stats)<2)badges.push('Regulier');
   if(liveDayRows(liveDaySourceLaps(dayKey)).slice(0,3).some(function(r){return r.pilot===stats.name;}))badges.push('Top 3 du jour');
   return badges.slice(0,5);
+}
+function pilotRankByTrack(name,track){
+  var rows=bestByPilot(getAllLaps().filter(function(l){return l._track===track;}));
+  for(var i=0;i<rows.length;i++)if(rows[i]._pilot===name)return i+1;
+  return null;
+}
+function pilotSocialCardHtml(name,stats,best18,best10){
+  var rank18=pilotRankByTrack(name,'TT1/8'), rank10=pilotRankByTrack(name,'TT1/10');
+  var last=stats.laps.slice().sort(function(a,b){return parseDateValue(b._date)-parseDateValue(a._date);})[0]||null;
+  return '<section class="card pilot-social-card"><div><span class="badge">Carte pilote</span><h3>'+escapeHtml(name)+'</h3><p class="small">Résumé rapide à montrer ou partager au club.</p></div><div class="pilot-social-grid">'+
+    '<div><span>Rang TT1/8</span><strong>'+(rank18?'#'+rank18:'-')+'</strong><small>'+fmtTimeS(best18&&best18._time)+'</small></div>'+
+    '<div><span>Rang TT1/10</span><strong>'+(rank10?'#'+rank10:'-')+'</strong><small>'+fmtTimeS(best10&&best10._time)+'</small></div>'+
+    '<div><span>Tours total</span><strong>'+stats.laps.length.toLocaleString('fr-FR')+'</strong><small>'+fmtKm(totalDistanceKm(stats.laps))+' km</small></div>'+
+    '<div><span>Dernière session</span><strong>'+escapeHtml(last?dateInputValue(last._date)||last._date:'-')+'</strong><small>'+escapeHtml(last?last._track:'-')+'</small></div>'+
+  '</div></section>';
 }
 
 function badgesHtml(badges){
@@ -872,6 +896,8 @@ function pilotFullProfileHtml(name){
     '<div class="card"><h3>Écart record TT1/10</h3><div class="big">'+(gap10!=null?fmtTimeS(gap10):'-')+'</div></div>' +
   '</section>' +
 
+  pilotSocialCardHtml(name,s,best18,best10) +
+
   '<section class="card">' +
     '<div class="panel-title"><h3>Objectifs pilote</h3></div>' +
     pilotTargetsHtml(s) +
@@ -1086,6 +1112,67 @@ function podiums(){
     '<section class="card"><div class="panel-title"><h2>Resume par piste</h2></div>'+podiumTrackSummaryHtml(laps)+'</section>' +
     '<section class="card"><h2>Classement</h2>'+recordsTable(best,100)+'</section>';
   bindFilters(podiums,true);
+}
+
+function clubRecordBox(title, value, detail, href){
+  var tag=href?'a':'div';
+  var attr=href?' href="'+href+'"':'';
+  return '<'+tag+' class="club-record-box"'+attr+'><span>'+escapeHtml(title)+'</span><strong>'+escapeHtml(value||'-')+'</strong><small>'+escapeHtml(detail||'')+'</small></'+tag+'>';
+}
+function biggestRider(laps){
+  var rows=riderRows(laps);
+  return rows[0]||null;
+}
+function bestProgression(period){
+  var laps=periodFilteredLaps(period||'month'), rows=[];
+  bestByPilot(laps).forEach(function(current){
+    var previous=getAllLaps().filter(function(l){return l._pilot===current._pilot&&l._track===current._track&&lapDateMs(l)!=null&&lapDateMs(l)<lapDateMs(current);}).sort(function(a,b){return a._time-b._time;})[0]||null;
+    if(previous&&previous._time>current._time)rows.push({pilot:current._pilot,track:current._track,gain:previous._time-current._time,best:current._time});
+  });
+  return rows.sort(function(a,b){return b.gain-a.gain;})[0]||null;
+}
+function clubRecordsPage(){
+  var all=getAllLaps(), month=periodFilteredLaps('month');
+  var best18=bestByPilot(all.filter(function(l){return l._track==='TT1/8';}))[0]||null;
+  var best10=bestByPilot(all.filter(function(l){return l._track==='TT1/10';}))[0]||null;
+  var month18=bestByPilot(month.filter(function(l){return l._track==='TT1/8';}))[0]||null;
+  var month10=bestByPilot(month.filter(function(l){return l._track==='TT1/10';}))[0]||null;
+  var rider=biggestRider(month), progress=bestProgression('month');
+  app.innerHTML='<section class="card club-record-hero"><div><span class="badge">Tableau officiel</span><h1>Records club MRCP</h1><p class="pilot-sub">Les références du club : records absolus, records du mois et pilotes les plus actifs.</p></div><a class="mini-button" href="#/historique-records">Historique records</a></section>'+
+    '<section class="club-record-grid">'+
+      clubRecordBox('Record absolu TT1/8',fmtTimeS(best18&&best18._time),best18?best18._pilot+' · '+(best18._date||''):'',best18?'#/pilote/'+encodeURIComponent(best18._pilot):'')+
+      clubRecordBox('Record absolu TT1/10',fmtTimeS(best10&&best10._time),best10?best10._pilot+' · '+(best10._date||''):'',best10?'#/pilote/'+encodeURIComponent(best10._pilot):'')+
+      clubRecordBox('Record du mois TT1/8',fmtTimeS(month18&&month18._time),month18?month18._pilot+' · '+(month18._date||''):'',month18?'#/pilote/'+encodeURIComponent(month18._pilot):'')+
+      clubRecordBox('Record du mois TT1/10',fmtTimeS(month10&&month10._time),month10?month10._pilot+' · '+(month10._date||''):'',month10?'#/pilote/'+encodeURIComponent(month10._pilot):'')+
+      clubRecordBox('Gros rouleur du mois',rider?rider.laps+' tours':'-',rider?rider.pilot+' · '+fmtKm(rider.km)+' km':'',rider?'#/pilote/'+encodeURIComponent(rider.pilot):'')+
+      clubRecordBox('Progression du mois',progress?'+'+progress.gain.toFixed(3)+' s':'-',progress?progress.pilot+' · '+progress.track+' · '+fmtTimeS(progress.best):'')+
+    '</section>'+
+    '<section class="report-columns"><div class="card"><h2>Top TT1/8</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/8';})),10)+'</div><div class="card"><h2>Top TT1/10</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/10';})),10)+'</div></section>';
+}
+
+function riderRows(laps){
+  var map={};
+  laps.forEach(function(l){
+    var key=l._pilot;
+    if(!map[key])map[key]={pilot:key,laps:0,km:0,best:null,tracks:{}};
+    map[key].laps++;
+    map[key].km+=lapDistanceMeters(l._track)/1000;
+    map[key].tracks[l._track]=true;
+    if(!map[key].best||l._time<map[key].best._time)map[key].best=l;
+  });
+  return Object.values(map).sort(function(a,b){return b.laps-a.laps||b.km-a.km||a.pilot.localeCompare(b.pilot);});
+}
+function ridersPage(){
+  var period=hashParam('period','month');
+  var laps=periodFilteredLaps(period);
+  var rows=riderRows(laps);
+  var options=[['day','Jour'],['week','Semaine'],['month','Mois'],['year','Année'],['total','Total']].map(function(o){return '<option value="'+o[0]+'" '+(period===o[0]?'selected':'')+'>'+o[1]+'</option>';}).join('');
+  app.innerHTML='<section class="card"><div class="panel-title"><div><h2>Qui roule le plus ?</h2><p class="small">Classement par nombre de tours, avec distance estimee selon les longueurs TT1/8 et TT1/10.</p></div><select id="riderPeriod">'+options+'</select></div></section>'+
+    '<section class="card"><div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Tours</th><th>Km</th><th>Meilleur tour</th><th>Pistes</th></tr></thead><tbody>'+
+    rows.slice(0,80).map(function(r,i){return '<tr><td>'+(i+1)+'</td><td><a href="#/pilote/'+encodeURIComponent(r.pilot)+'"><strong>'+escapeHtml(r.pilot)+'</strong></a></td><td>'+r.laps.toLocaleString('fr-FR')+'</td><td>'+fmtKm(r.km)+'</td><td>'+fmtTimeS(r.best&&r.best._time)+'</td><td><span class="badge">'+escapeHtml(Object.keys(r.tracks).join(' / ')||'-')+'</span></td></tr>';}).join('')+
+    '</tbody></table></div></section>';
+  var select=document.getElementById('riderPeriod');
+  if(select)select.onchange=function(){location.hash='#/rouleurs?period='+select.value;};
 }
 
 function clubTodayPage(){
@@ -1944,7 +2031,7 @@ function adminPage(){
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';document.body.classList.toggle('live-tv',h.indexOf('#/live-tv')===0);if(h.indexOf('#/live-tv')===0)return liveDecoderTvPage();if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return clubTodayPage();
-    if(h.indexOf('#/club-today')===0)return clubTodayPage();if(h.indexOf('#/comparatif')===0)return comparePage();if(h.indexOf('#/qr-profil')===0)return qrProfilePage();if(h.indexOf('#/historique-records')===0)return recordHistoryPage();if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
+    if(h.indexOf('#/club-today')===0)return clubTodayPage();if(h.indexOf('#/records-club')===0)return clubRecordsPage();if(h.indexOf('#/rouleurs')===0)return ridersPage();if(h.indexOf('#/comparatif')===0)return comparePage();if(h.indexOf('#/qr-profil')===0)return qrProfilePage();if(h.indexOf('#/historique-records')===0)return recordHistoryPage();if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
     var current=getAdminConfig();
