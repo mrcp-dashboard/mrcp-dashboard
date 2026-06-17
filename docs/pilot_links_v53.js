@@ -108,7 +108,7 @@
 
     cells.forEach(el => {
       if (el.dataset.profileChecked === "1") return;
-      if (el.closest("a, button, .session-home-link")) return;
+      if (el.closest("a, button, .session-home-link, .compare-hero, .compare-summary-grid, .compare-chart-grid")) return;
       if (el.querySelector(".activity-track")) return;
       if (el.querySelector(".pilot-profile-btn-v53")) return;
 
