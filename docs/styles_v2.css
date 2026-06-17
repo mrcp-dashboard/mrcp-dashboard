@@ -174,6 +174,10 @@ select,input,textarea{background:rgba(2,21,28,.58);border:1px solid var(--line);
 .pilot-social-grid>div{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.18)}
 .pilot-social-grid strong{display:block;margin-top:5px;font-size:26px;line-height:1}
 .pilot-social-grid small{display:block;margin-top:5px;color:var(--muted)}
+.admin-print-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.print-report-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
+.print-report-head h1{font-size:42px;line-height:1;margin:8px 0}
+.admin-print-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .podium-stack{display:grid;gap:14px}
 .podium-block-title{display:inline-flex;margin:2px 0 8px;padding:4px 10px;border-radius:999px;background:rgba(62,230,111,.16);border:1px solid rgba(121,229,180,.24);font-size:13px;font-weight:900;color:#dfffee}
 .podium-arena{position:relative;overflow:hidden;border:1px solid rgba(121,229,180,.20);border-radius:22px;padding:22px;background:radial-gradient(circle at 50% 0,rgba(62,230,111,.24),transparent 34%),radial-gradient(circle at 84% 12%,rgba(36,240,255,.15),transparent 26%),linear-gradient(145deg,rgba(5,31,38,.94),rgba(3,10,20,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 70px rgba(0,0,0,.30)}
@@ -516,6 +520,7 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   .compare-pie-layout{grid-template-columns:1fr;justify-items:center}
   .compare-pie-legend{width:100%}
   .club-record-grid,.pilot-social-grid{grid-template-columns:1fr}
+  .admin-print-grid{grid-template-columns:1fr}
   .qr-img-large{width:220px;height:220px}
   .target-grid{grid-template-columns:1fr}
   .target-meta{grid-template-columns:1fr}
@@ -1213,6 +1218,14 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   body{
     background:#fff!important;
     color:#000!important;
+  }
+  .admin-print-actions{display:none!important}
+  .admin-print-report .card,
+  .admin-print-report .club-record-box{
+    background:#fff!important;
+    color:#111!important;
+    box-shadow:none!important;
+    border:1px solid #ccc!important;
   }
   .sidebar,.top-pills,.footer,.share-row,.mobile-sticky-action{
     display:none!important;

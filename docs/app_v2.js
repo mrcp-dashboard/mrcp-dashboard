@@ -2058,10 +2058,97 @@ function adminPilots(){
     });
   };
 }
+function adminSummaryPage(){
+  var all=getAllLaps(), month=periodFilteredLaps('month'), today=liveDaySourceLaps(todayKey());
+  var best18=bestByPilot(all.filter(function(l){return l._track==='TT1/8';}))[0]||null;
+  var best10=bestByPilot(all.filter(function(l){return l._track==='TT1/10';}))[0]||null;
+  var riders=riderRows(month).slice(0,8);
+  var todayRows=liveDayRows(today).slice(0,8);
+  var progress=bestProgression('month');
+  var body=
+    '<div class="admin-print-actions"><button id="printAdminSummary" class="btn-primary">Imprimer / PDF</button><a class="btn-secondary" href="#/records-club">Voir records club</a></div>' +
+    '<section class="admin-print-report">' +
+      '<div class="print-report-head"><div><span class="badge">MRCP</span><h1>Résumé club</h1><p class="small">Document admin imprimable - '+escapeHtml(new Date().toLocaleDateString('fr-FR'))+'</p></div><strong>Dashboard MRCP</strong></div>' +
+      '<div class="club-record-grid admin-print-grid">' +
+        clubRecordBox('Record TT1/8',fmtTimeS(best18&&best18._time),best18?best18._pilot+' · '+(best18._date||''):'')+
+        clubRecordBox('Record TT1/10',fmtTimeS(best10&&best10._time),best10?best10._pilot+' · '+(best10._date||''):'')+
+        clubRecordBox('Tours ce mois',month.length.toLocaleString('fr-FR'),fmtKm(totalDistanceKm(month))+' km estimes')+
+        clubRecordBox('Progression du mois',progress?'+'+progress.gain.toFixed(3)+' s':'-',progress?progress.pilot+' · '+progress.track:'')+
+      '</div>' +
+      '<div class="report-columns">' +
+        '<div class="card"><h2>Top rouleurs du mois</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Tours</th><th>Km</th></tr></thead><tbody>'+riders.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+escapeHtml(r.pilot)+'</td><td>'+r.laps+'</td><td>'+fmtKm(r.km)+'</td></tr>';}).join('')+'</tbody></table></div></div>' +
+        '<div class="card"><h2>Aujourd hui</h2>'+liveDayTable(todayRows)+'</div>' +
+      '</div>' +
+    '</section>';
+  if(!adminOnly('Résumé club imprimable', body))return;
+  var btn=document.getElementById('printAdminSummary');
+  if(btn)btn.onclick=function(){window.print();};
+}
+function isUnknownPilotName(name){
+  var s=String(name||'').trim();
+  return !s||s==='Pilote inconnu'||s.indexOf('Inconnu')>=0||/^[0-9]+/.test(s);
+}
+function unknownTransponders(){
+  var corrections=getPilotCorrections();
+  return transponderSummary().map(function(r){
+    r.namesList=Object.keys(r.names);
+    r.currentName=corrections.transponders[r.transponder]||'';
+    r.unknown=!r.currentName&&(r.namesList.some(isUnknownPilotName)||r.namesList.length>1);
+    return r;
+  }).filter(function(r){return r.unknown;}).sort(function(a,b){
+    return (a.currentName?1:0)-(b.currentName?1:0)||b.laps-a.laps;
+  });
+}
+function adminUnknownPilotsPage(){
+  var corrections=getPilotCorrections();
+  var rows=unknownTransponders();
+  var htmlRows=rows.map(function(r){
+    var names=r.namesList.join(' / ');
+    var tracks=Object.keys(r.tracks).join(' / ');
+    return '<tr data-search="'+escapeHtml((r.transponder+' '+names+' '+r.currentName).toLowerCase())+'">' +
+      '<td data-label="Puce"><strong>'+escapeHtml(r.transponder)+'</strong></td>' +
+      '<td data-label="Noms vus">'+escapeHtml(names||'-')+'</td>' +
+      '<td data-label="Tours">'+r.laps+'</td>' +
+      '<td data-label="Best">'+fmtTimeS(r.best)+'</td>' +
+      '<td data-label="Piste"><span class="badge">'+escapeHtml(tracks||'-')+'</span></td>' +
+      '<td data-label="Nom officiel"><input class="pilot-name-input" data-tp="'+escapeHtml(r.transponder)+'" value="'+escapeHtml(r.currentName)+'" placeholder="Nom pilote officiel"></td>' +
+      '<td data-label="Action"><button class="save-unknown-pilot btn-primary" data-tp="'+escapeHtml(r.transponder)+'">Sauver</button></td>' +
+    '</tr>';
+  }).join('');
+  if(!adminOnly('Puces inconnues',
+    '<p class="small">Vue ciblée pour identifier les nouveaux pilotes ou transpondeurs encore affichés comme inconnus. Les corrections restent locales jusqu au bouton Appliquer via API.</p>' +
+    '<div class="grid"><div class="card"><h3>À identifier</h3><div class="big">'+rows.length+'</div></div><div class="card"><h3>Associations locales</h3><div class="big">'+Object.keys(corrections.transponders).length+'</div></div></div>' +
+    '<p><button id="applyUnknownPilotsApi" class="btn-good">Appliquer via API</button> <button id="copyUnknownPilots" class="btn-secondary">Copier corrections JSON</button> <a class="btn-secondary" href="#/admin-pilotes">Pilotes admin complet</a></p>' +
+    '<div id="adminUnknownStatus" class="admin-status hidden"></div>' +
+    '<input class="searchBox" id="unknownPilotSearch" placeholder="Rechercher puce ou nom...">' +
+    '<div class="table-wrap admin-table-wrap"><table><thead><tr><th>Puce</th><th>Noms vus</th><th>Tours</th><th>Best</th><th>Piste</th><th>Nom officiel</th><th>Action</th></tr></thead><tbody id="unknownPilotRows">'+(htmlRows||'<tr><td colspan="7">Aucune puce inconnue.</td></tr>')+'</tbody></table></div>'
+  ))return;
+  document.querySelectorAll('.save-unknown-pilot').forEach(function(btn){
+    btn.onclick=function(){
+      var tp=btn.getAttribute('data-tp');
+      var input=null; document.querySelectorAll('.pilot-name-input').forEach(function(el){if(el.getAttribute('data-tp')===tp)input=el;});
+      var name=input?input.value.trim():'';
+      var c=getPilotCorrections();
+      if(name)c.transponders[tp]=name;else delete c.transponders[tp];
+      setPilotCorrections(c);
+      alert('Association enregistrée localement pour '+tp);
+      adminUnknownPilotsPage();
+    };
+  });
+  var apply=document.getElementById('applyUnknownPilotsApi');
+  if(apply)apply.onclick=function(){applyAdminCorrections('adminUnknownStatus',this).catch(function(e){alert('API admin : '+e.message);});};
+  var copy=document.getElementById('copyUnknownPilots');
+  if(copy)copy.onclick=function(){navigator.clipboard.writeText(JSON.stringify(getPilotCorrections(),null,2));alert('JSON copié');};
+  var search=document.getElementById('unknownPilotSearch');
+  if(search)search.oninput=function(e){
+    var query=e.target.value.toLowerCase();
+    document.querySelectorAll('#unknownPilotRows tr').forEach(function(tr){tr.style.display=(tr.getAttribute('data-search')||'').indexOf(query)!==-1?'':'none';});
+  };
+}
 function adminPage(){
   var cfg=getAdminConfig();
   adminOnly('Admin',
-    '<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/quality" class="btn-secondary">Qualite</a></p>' +
+    '<p><a href="#/admin-records" class="btn-primary">Records admin</a> <a href="#/admin-pilotes" class="btn-primary">Pilotes admin</a> <a href="#/admin-unknown-pilots" class="btn-primary">Puces inconnues</a> <a href="#/admin-summary" class="btn-secondary">Résumé club</a> <a href="#/quality" class="btn-secondary">Qualite</a></p>' +
     '<div class="grid">' +
       '<div class="card"><h3>API admin</h3><p class="small">Les corrections peuvent etre exportees en JSON ou appliquees directement via l API locale.</p><div class="goal-box"><div class="goal-pill"><span class="small">URL</span><strong>'+escapeHtml(cfg.apiUrl||'Non configuree')+'</strong></div><div class="goal-pill"><span class="small">Token</span><strong>'+(cfg.token?'Configure':'Manquant')+'</strong></div></div><p><button id="testAdminApi" class="btn-secondary">Tester API</button> <button id="applyAllCorrections" class="btn-good">Appliquer corrections + push</button> <button id="resetAdminApi" class="btn-danger">Oublier acces admin</button></p></div>' +
       '<div class="card"><h3>Corrections locales</h3>'+adminPreviewHtml()+'</div>' +
@@ -2090,7 +2177,7 @@ function adminPage(){
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';document.body.classList.toggle('live-tv',h.indexOf('#/live-tv')===0);if(h.indexOf('#/live-tv')===0)return liveDecoderTvPage();if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return clubTodayPage();
-    if(h.indexOf('#/club-today')===0)return clubTodayPage();if(h.indexOf('#/records-club')===0)return clubRecordsPage();if(h.indexOf('#/rouleurs')===0)return ridersPage();if(h.indexOf('#/comparatif')===0)return comparePage();if(h.indexOf('#/qr-profil')===0)return qrProfilePage();if(h.indexOf('#/historique-records')===0)return recordHistoryPage();if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return clubRecordsPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
+    if(h.indexOf('#/club-today')===0)return clubTodayPage();if(h.indexOf('#/records-club')===0)return clubRecordsPage();if(h.indexOf('#/rouleurs')===0)return ridersPage();if(h.indexOf('#/comparatif')===0)return comparePage();if(h.indexOf('#/qr-profil')===0)return qrProfilePage();if(h.indexOf('#/historique-records')===0)return recordHistoryPage();if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return clubRecordsPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-summary')===0)return adminSummaryPage();if(h.indexOf('#/admin-unknown-pilots')===0)return adminUnknownPilotsPage();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
     var current=getAdminConfig();
