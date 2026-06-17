@@ -132,6 +132,12 @@ main{max-width:1500px;margin:auto}
 select,input,textarea{background:rgba(2,21,28,.58);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:12px}
 .searchBox{width:100%;max-width:560px;margin:8px 0 14px}
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;white-space:nowrap}th{color:#89a4d1}a{color:#9fd0ff}
+.club-today-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(110deg,rgba(255,159,49,.16),rgba(62,230,111,.12),rgba(18,164,255,.10))}
+.club-today-hero h1{font-size:clamp(30px,4vw,56px);line-height:1;margin:10px 0}
+.today-kpis{margin-bottom:18px}
+.compare-controls{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px}
+.compare-select{width:100%}
+.qr-img-large{width:260px;height:260px}
 .podium-stack{display:grid;gap:14px}
 .podium-block-title{display:inline-flex;margin:2px 0 8px;padding:4px 10px;border-radius:999px;background:rgba(62,230,111,.16);border:1px solid rgba(121,229,180,.24);font-size:13px;font-weight:900;color:#dfffee}
 .podium-arena{position:relative;overflow:hidden;border:1px solid rgba(121,229,180,.20);border-radius:22px;padding:22px;background:radial-gradient(circle at 50% 0,rgba(62,230,111,.24),transparent 34%),radial-gradient(circle at 84% 12%,rgba(36,240,255,.15),transparent 26%),linear-gradient(145deg,rgba(5,31,38,.94),rgba(3,10,20,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 70px rgba(0,0,0,.30)}
@@ -463,6 +469,10 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   .hero-card{padding:18px;min-height:0}
   .hero-card h1{font-size:26px}.hero-card p{font-size:14px}
   .kpi-grid,.grid{grid-template-columns:1fr 1fr;gap:10px}
+  .club-today-hero{align-items:stretch;flex-direction:column}
+  .club-today-hero h1{font-size:32px}
+  .compare-controls{grid-template-columns:1fr}
+  .qr-img-large{width:220px;height:220px}
   .target-grid{grid-template-columns:1fr}
   .target-meta{grid-template-columns:1fr}
   .session-home-row{grid-template-columns:1fr;gap:6px}
@@ -492,7 +502,10 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   .pilot-name{font-size:28px}
   .progress-wrap{height:190px}
   .table-wrap table{font-size:12px}
+  .table-wrap{margin-left:-6px;margin-right:-6px}
   th,td{padding:9px}
+  .share-row{gap:8px}
+  .share-row .btn-primary,.share-row .btn-secondary{width:100%;text-align:center}
   .mobile-sticky-action{
     position:fixed;left:12px;right:12px;bottom:12px;z-index:20;display:block
   }

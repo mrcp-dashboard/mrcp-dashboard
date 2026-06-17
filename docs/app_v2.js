@@ -818,6 +818,10 @@ function qrUrlForPilot(name){
   var url = location.origin + location.pathname + '#/pilote/' + encodeURIComponent(name);
   return 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(url);
 }
+function qrUrlForProfileChoice(){
+  var url = location.origin + location.pathname + '#/mes-chronos';
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(url);
+}
 
 function pilotFullProfileHtml(name){
   var s = pilotStats(name);
@@ -850,6 +854,7 @@ function pilotFullProfileHtml(name){
       '<div class="share-row">' +
         '<button id="setMyProfile" class="btn-primary">C’est mon profil</button>' +
         '<button id="copyPilotLink" class="btn-secondary">Copier lien fiche</button>' +
+        '<button id="sharePilotImage" class="btn-secondary">Image partageable</button>' +
         '<button id="printPilotProfile" class="btn-secondary">Imprimer fiche</button>' +
       '</div>' +
     '</div>' +
@@ -920,13 +925,16 @@ function bindPilotProfileButtons(name){
   var print = document.getElementById('printPilotProfile');
   if(print) print.onclick=function(){window.print();};
 
+  var share = document.getElementById('sharePilotImage');
+  if(share) share.onclick=function(){downloadPilotShareImage(name);};
+
 }
 
 function myChronos(){
   var saved=localStorage.getItem('mrcp_my_pilot'), pilots=allPilots();
 
   if(!saved){
-    app.innerHTML='<section class="card pilot-main-card"><h2>Mes chronos</h2><p>Choisis ton profil une fois. Il sera mémorisé sur ce téléphone.</p><select id="pilotSelect"><option value="">Choisir un pilote</option>'+pilots.map(function(p){return'<option value="'+escapeHtml(p)+'">'+escapeHtml(p)+'</option>';}).join('')+'</select><div class="share-row"><button id="savePilot" class="btn-primary">C’est mon profil</button></div></section><section class="card"><h3>Pourquoi choisir mon profil ?</h3><p>Ensuite, tu retrouves directement tes meilleurs temps, ta moyenne, ta progression, ton QR code et ton analyse automatique.</p></section>';
+    app.innerHTML='<section class="card pilot-main-card"><h2>Mes chronos</h2><p>Choisis ton profil une fois. Il sera mémorisé sur ce téléphone.</p><select id="pilotSelect"><option value="">Choisir un pilote</option>'+pilots.map(function(p){return'<option value="'+escapeHtml(p)+'">'+escapeHtml(p)+'</option>';}).join('')+'</select><div class="share-row"><button id="savePilot" class="btn-primary">C’est mon profil</button><a class="btn-secondary" href="#/qr-profil">QR choisir profil</a></div></section><section class="card"><h3>Pourquoi choisir mon profil ?</h3><p>Ensuite, tu retrouves directement tes meilleurs temps, ta moyenne, ta progression, ton QR code et ton analyse automatique.</p></section>';
     document.getElementById('savePilot').onclick=function(){
       var v=document.getElementById('pilotSelect').value;
       if(v){localStorage.setItem('mrcp_my_pilot',v);myChronos();}
@@ -1074,10 +1082,103 @@ function podiums(){
   var filtered=applyRecordFilters(laps);
   var best=bestByPilot(filtered);
   app.innerHTML=
-    '<section class="card podium-page-card"><div class="panel-title"><div><h2>Podiums</h2><p class="small">Les trois meilleurs chronos selon la piste et la periode selectionnees.</p></div></div>'+renderFilters(true)+podiumHtml(best)+'</section>' +
+    '<section class="card podium-page-card"><div class="panel-title"><div><h2>Podiums</h2><p class="small">Les trois meilleurs chronos selon la piste et la periode selectionnees.</p></div><a class="mini-button" href="#/historique-records">Historique records</a></div>'+renderFilters(true)+podiumHtml(best)+'</section>' +
     '<section class="card"><div class="panel-title"><h2>Resume par piste</h2></div>'+podiumTrackSummaryHtml(laps)+'</section>' +
     '<section class="card"><h2>Classement</h2>'+recordsTable(best,100)+'</section>';
   bindFilters(podiums,true);
+}
+
+function clubTodayPage(){
+  if(liveTimer) clearTimeout(liveTimer);
+  var date=hashParam('date',todayKey());
+  var dayLaps=liveDaySourceLaps(date);
+  var rows=liveDayRows(dayLaps);
+  var sessions=latestActivities(300).filter(function(s){return dateInputValue(s.date)===date;});
+  var counts=liveTrackCounts(dayLaps);
+  var pilots=rows.map(function(r){return r.pilot;});
+  var progress=rows.map(function(r){
+    var previous=getAllLaps().filter(function(l){return l._pilot===r.pilot&&dateInputValue(l._date)!==date&&l._track===r.track;}).sort(function(a,b){return a._time-b._time;})[0]||null;
+    return {pilot:r.pilot,track:r.track,best:r.best,previous:previous&&previous._time,gain:previous?previous._time-r.best:null};
+  }).filter(function(r){return r.gain!=null&&r.gain>0;}).sort(function(a,b){return b.gain-a.gain;}).slice(0,5);
+  var sessionHtml=sessions.slice(0,12).map(function(s){
+    var pilot=s.bestPilot||('Inconnu #'+(s.bestTransponder||''));
+    return '<a class="activity-row session-home-row session-home-link" href="#/pilote-session/'+encodeURIComponent(pilot)+'/'+encodeURIComponent(s.key)+'"><div class="activity-date">'+escapeHtml(s.date||s.name)+'</div><div><div class="activity-track">'+escapeHtml(s.bestPilot||s.bestTransponder||'-')+'</div><div class="activity-sub">'+s.laps+' tours · '+Object.keys(s.pilots).length+' pilotes · '+escapeHtml(Object.keys(s.tracks).join(' / ')||'-')+'</div></div><div><strong>'+fmtTimeS(s.best)+'</strong><div class="activity-sub">best</div></div></a>';
+  }).join('');
+  app.innerHTML=
+    '<section class="club-today-hero card"><div><span class="badge">MRCP aujourd hui</span><h1>Aujourd hui au club</h1><p class="pilot-sub">Vue rapide de la journee : pilotes actifs, tours, records et progressions.</p></div><input id="clubTodayDate" type="date" value="'+escapeHtml(date)+'"></section>' +
+    '<section class="grid today-kpis"><div class="card"><h3>Tours</h3><div class="big">'+dayLaps.length+'</div></div><div class="card"><h3>Pilotes</h3><div class="big">'+rows.length+'</div><p class="small">'+escapeHtml(pilots.slice(0,4).join(', ')||'-')+'</p></div><div class="card"><h3>TT1/8</h3><div class="big">'+(counts['TT1/8']||0)+'</div></div><div class="card"><h3>TT1/10</h3><div class="big">'+(counts['TT1/10']||0)+'</div></div></section>' +
+    '<section class="report-columns"><div class="card"><div class="panel-title"><h2>Classement du jour</h2><a class="mini-button" href="#/jour">Live jour</a></div>'+liveDayTable(rows)+'</div><div class="card"><h2>Progressions du jour</h2>'+(progress.length?progress.map(function(r){return '<div class="record-row"><div class="record-rank">+'+r.gain.toFixed(1)+'</div><div><div class="record-name">'+escapeHtml(r.pilot)+'</div><div class="record-sub">'+escapeHtml(r.track)+' ancien '+fmtTimeS(r.previous)+'</div></div><div class="record-time">'+fmtTimeS(r.best)+'</div></div>';}).join(''):'<p class="small">Pas encore de progression detectee pour cette date.</p>')+'</div></section>' +
+    '<section class="card"><div class="panel-title"><h2>Sessions de la journee</h2><a class="mini-button" href="#/journee?date='+escapeHtml(date)+'">Vue detaillee</a></div>'+(sessionHtml||'<p class="small">Aucune session pour cette date.</p>')+'</section>';
+  var input=document.getElementById('clubTodayDate');
+  if(input)input.onchange=function(){location.hash='#/club-today?date='+input.value;};
+}
+
+function comparePilotRow(name){
+  var s=pilotStats(name), b18=pilotBestByTrack(s,'TT1/8'), b10=pilotBestByTrack(s,'TT1/10'), cons=pilotConsistency(s);
+  return '<tr><td><a href="#/pilote/'+encodeURIComponent(name)+'"><strong>'+escapeHtml(name)+'</strong></a></td><td>'+s.laps.length+'</td><td>'+s.sessions+'</td><td><strong>'+fmtTimeS(b18&&b18._time)+'</strong></td><td><strong>'+fmtTimeS(b10&&b10._time)+'</strong></td><td>'+fmtTimeS(s.avg)+'</td><td>'+fmtTimeS(cons)+'</td></tr>';
+}
+function comparePage(){
+  var pilots=allPilots();
+  var selected=(hashParam('pilots','')||'').split('|').filter(Boolean).slice(0,4);
+  if(!selected.length)selected=pilots.slice(0,3);
+  var selects=[0,1,2,3].map(function(i){
+    return '<select class="compare-select" data-index="'+i+'"><option value="">Pilote '+(i+1)+'</option>'+pilots.map(function(p){return '<option value="'+escapeHtml(p)+'" '+(selected[i]===p?'selected':'')+'>'+escapeHtml(p)+'</option>';}).join('')+'</select>';
+  }).join('');
+  var rows=selected.filter(Boolean).map(comparePilotRow).join('');
+  app.innerHTML='<section class="card"><div class="panel-title"><div><h2>Comparatif pilotes</h2><p class="small">Compare jusqu a 4 pilotes sur leurs meilleurs tours, volume et regularite.</p></div></div><div class="compare-controls">'+selects+'</div></section><section class="card"><div class="table-wrap"><table><thead><tr><th>Pilote</th><th>Tours</th><th>Sessions</th><th>Best TT1/8</th><th>Best TT1/10</th><th>Moyenne</th><th>Regularite</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>';
+  document.querySelectorAll('.compare-select').forEach(function(el){
+    el.onchange=function(){
+      var values=Array.from(document.querySelectorAll('.compare-select')).map(function(s){return s.value;}).filter(Boolean);
+      location.hash='#/comparatif?pilots='+encodeURIComponent(values.join('|'));
+    };
+  });
+}
+
+function qrProfilePage(){
+  app.innerHTML='<section class="pilot-hero"><div class="card pilot-main-card"><h2>QR code choisir mon profil</h2><p class="pilot-sub">A afficher au club : chaque pilote scanne, choisit son nom, puis retrouve automatiquement ses chronos sur son telephone.</p><div class="share-row"><a class="btn-primary" href="#/mes-chronos">Tester le choix profil</a></div></div><div class="card qr-card"><img class="qr-img qr-img-large" src="'+qrUrlForProfileChoice()+'" alt="QR code choisir mon profil"><p class="small">'+escapeHtml(location.origin+location.pathname+'#/mes-chronos')+'</p></div></section>';
+}
+
+function recordHistoryRows(track){
+  var best=Infinity, rows=[];
+  getAllLaps().filter(function(l){return l._track===track;}).sort(function(a,b){return parseDateValue(a._date)-parseDateValue(b._date)||a._time-b._time;}).forEach(function(l){
+    if(l._time<best){best=l._time;rows.push(l);}
+  });
+  return rows.reverse();
+}
+function recordHistoryPage(){
+  var tracks=['TT1/8','TT1/10'];
+  app.innerHTML='<section class="card"><div class="panel-title"><div><h2>Historique des records</h2><p class="small">Les records successifs du club, du plus recent au plus ancien.</p></div><a class="mini-button" href="#/podiums">Retour podiums</a></div></section>'+
+    tracks.map(function(track){
+      var rows=recordHistoryRows(track);
+      return '<section class="card"><h2>'+escapeHtml(track)+'</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Pilote</th><th>Temps</th><th>Session</th></tr></thead><tbody>'+rows.map(function(l){return '<tr><td>'+escapeHtml(l._date||'-')+'</td><td><a href="#/pilote/'+encodeURIComponent(l._pilot)+'">'+escapeHtml(l._pilot)+'</a></td><td><strong>'+fmtTimeS(l._time)+'</strong></td><td>'+escapeHtml(l.session_name||'-')+'</td></tr>';}).join('')+'</tbody></table></div></section>';
+    }).join('');
+}
+
+function downloadPilotShareImage(name){
+  var s=pilotStats(name), b18=pilotBestByTrack(s,'TT1/8'), b10=pilotBestByTrack(s,'TT1/10');
+  var canvas=document.createElement('canvas'), w=1200, h=630, ctx=canvas.getContext('2d');
+  canvas.width=w;canvas.height=h;
+  var grad=ctx.createLinearGradient(0,0,w,h);grad.addColorStop(0,'#052d34');grad.addColorStop(1,'#07142a');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='rgba(62,230,111,.18)';ctx.beginPath();ctx.arc(980,80,260,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#f7fbff';ctx.font='900 58px Segoe UI, Arial';ctx.fillText('MRCP Dashboard',70,95);
+  ctx.font='900 70px Segoe UI, Arial';ctx.fillText(name.slice(0,28),70,205);
+  ctx.fillStyle='#b9c9d3';ctx.font='28px Segoe UI, Arial';ctx.fillText('Resume pilote partageable',70,255);
+  [['Best TT1/8',fmtTimeS(b18&&b18._time)],['Best TT1/10',fmtTimeS(b10&&b10._time)],['Tours',String(s.laps.length)],['Sessions',String(s.sessions)]].forEach(function(item,i){
+    var x=70+(i%2)*520,y=340+Math.floor(i/2)*125;
+    ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(x,y,440,88);
+    ctx.fillStyle='#9fd0ff';ctx.font='24px Segoe UI, Arial';ctx.fillText(item[0],x+24,y+32);
+    ctx.fillStyle='#ffffff';ctx.font='900 38px Segoe UI, Arial';ctx.fillText(item[1],x+24,y+72);
+  });
+  ctx.fillStyle='#ffd23f';ctx.font='26px Segoe UI, Arial';ctx.fillText(location.origin+location.pathname+'#/pilote/'+encodeURIComponent(name),70,590);
+  var filename='mrcp-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.png';
+  canvas.toBlob(function(blob){
+    var file=blob&&window.File?new File([blob],filename,{type:'image/png'}):null;
+    if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
+      navigator.share({title:'MRCP Dashboard - '+name,text:'Resume pilote MRCP',files:[file]}).catch(function(){});
+      return;
+    }
+    var a=document.createElement('a');a.download=filename;a.href=canvas.toDataURL('image/png');a.click();
+  },'image/png');
 }
 
 var liveTimer = null;
@@ -1843,7 +1944,7 @@ function adminPage(){
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';document.body.classList.toggle('live-tv',h.indexOf('#/live-tv')===0);if(h.indexOf('#/live-tv')===0)return liveDecoderTvPage();if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return liveDayPage();
-    if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
+    if(h.indexOf('#/club-today')===0)return clubTodayPage();if(h.indexOf('#/comparatif')===0)return comparePage();if(h.indexOf('#/qr-profil')===0)return qrProfilePage();if(h.indexOf('#/historique-records')===0)return recordHistoryPage();if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return podiums();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){
     var current=getAdminConfig();
