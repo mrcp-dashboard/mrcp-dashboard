@@ -108,6 +108,8 @@
 
     cells.forEach(el => {
       if (el.dataset.profileChecked === "1") return;
+      if (el.closest("a, button, .session-home-link")) return;
+      if (el.querySelector(".activity-track")) return;
       if (el.querySelector(".pilot-profile-btn-v53")) return;
 
       const text = clean(el.childNodes[0]?.textContent || el.textContent);
