@@ -1439,6 +1439,29 @@ function liveDayTable(rows){
     }).join('')+'</tbody></table></div>';
 }
 
+function liveTimingTeaserPage(){
+  if(liveTimer) clearTimeout(liveTimer);
+  app.innerHTML=
+    '<section class="live-teaser card">'+
+      '<div class="live-teaser-copy">'+
+        '<span class="badge live-teaser-badge">En preparation</span>'+
+        '<h1>Live timing MRCP</h1>'+
+        '<p>Les chronos en direct depuis le decodeur arrivent bientot sur le dashboard.</p>'+
+        '<div class="live-teaser-grid">'+
+          '<div><span>Classement live</span><strong>Tours</strong></div>'+
+          '<div><span>Chronos instantanes</span><strong>Best / dernier</strong></div>'+
+          '<div><span>Affichage paddock</span><strong>TV ready</strong></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="live-teaser-screen" aria-hidden="true">'+
+        '<div class="live-teaser-row is-leader"><b>1</b><span>Alexis D.</span><strong>31.548 s</strong></div>'+
+        '<div class="live-teaser-row"><b>2</b><span>Pilote MRCP</span><strong>+0.284</strong></div>'+
+        '<div class="live-teaser-row"><b>3</b><span>Puce 5926001</span><strong>+0.912</strong></div>'+
+        '<div class="live-teaser-pulse">Connexion decodeur en cours</div>'+
+      '</div>'+
+    '</section>';
+}
+
 function liveDecoderTime(v){return Number.isFinite(Number(v))?Number(v).toFixed(3)+' s':'-';}
 function livePilotLabel(r){
   var name=String((r&&r.pilot)||'').trim();
@@ -2214,7 +2237,7 @@ function adminPage(){
   if(reset)reset.onclick=function(){if(confirm('Oublier acces admin sur ce navigateur ?')){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();}};
 }
 function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(err&&err.message?err.message:String(err))+'</p></section>';console.error(err);}
-function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';document.body.classList.toggle('live-tv',h.indexOf('#/live-tv')===0);if(h.indexOf('#/live-tv')===0)return liveDecoderTvPage();if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return clubTodayPage();
+function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';document.body.classList.toggle('live-tv',h.indexOf('#/live-tv')===0);if(h.indexOf('#/live-timing')===0)return liveTimingTeaserPage();if(h.indexOf('#/live-tv')===0)return liveDecoderTvPage();if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return clubTodayPage();
     if(h.indexOf('#/club-today')===0)return clubTodayPage();if(h.indexOf('#/records-club')===0)return clubRecordsPage();if(h.indexOf('#/rouleurs')===0)return ridersPage();if(h.indexOf('#/comparatif')===0)return comparePage();if(h.indexOf('#/qr-profil')===0)return qrProfilePage();if(h.indexOf('#/historique-records')===0)return recordHistoryPage();if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return clubRecordsPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-summary')===0)return adminSummaryPage();if(h.indexOf('#/admin-unknown-pilots')===0)return adminUnknownPilotsPage();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
   async function unlock(){

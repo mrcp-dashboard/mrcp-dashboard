@@ -691,6 +691,101 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   margin-top:14px;
 }
 
+.live-teaser{
+  min-height:520px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(360px,.8fr);
+  gap:28px;
+  align-items:center;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(255,182,39,.18),transparent 34%),
+    radial-gradient(circle at 85% 80%,rgba(24,216,122,.18),transparent 32%),
+    linear-gradient(135deg,rgba(7,26,46,.98),rgba(4,11,23,.98));
+}
+.live-teaser-copy h1{
+  margin:18px 0 12px;
+  font-size:clamp(48px,7vw,96px);
+  line-height:.95;
+}
+.live-teaser-copy p{
+  max-width:720px;
+  color:var(--muted);
+  font-size:clamp(18px,2vw,28px);
+}
+.live-teaser-badge{
+  background:rgba(255,182,39,.18);
+  border-color:rgba(255,182,39,.45);
+  color:#ffe4a3;
+}
+.live-teaser-grid{
+  margin-top:34px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.live-teaser-grid div{
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(255,255,255,.05);
+}
+.live-teaser-grid span{
+  display:block;
+  color:var(--muted);
+  font-size:13px;
+}
+.live-teaser-grid strong{
+  display:block;
+  margin-top:8px;
+  font-size:20px;
+}
+.live-teaser-screen{
+  display:grid;
+  gap:12px;
+  padding:22px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:28px;
+  background:rgba(0,0,0,.32);
+  box-shadow:0 24px 80px rgba(0,0,0,.35);
+}
+.live-teaser-row{
+  display:grid;
+  grid-template-columns:48px 1fr auto;
+  gap:14px;
+  align-items:center;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.06);
+}
+.live-teaser-row b{
+  width:42px;height:42px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+}
+.live-teaser-row span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:900;
+}
+.live-teaser-row strong{font-size:22px}
+.live-teaser-row.is-leader{
+  border:1px solid rgba(255,199,60,.48);
+  background:linear-gradient(135deg,rgba(255,199,60,.22),rgba(255,255,255,.06));
+}
+.live-teaser-pulse{
+  margin-top:10px;
+  padding:14px 16px;
+  border-radius:999px;
+  color:#b9ffd4;
+  background:rgba(31,198,107,.14);
+  text-align:center;
+  font-weight:900;
+}
+
 .live-tv{
   min-height:100vh;
   padding:24px;
@@ -864,6 +959,13 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
 
 @media(max-width:900px){
   .live-hero,.live-grid{
+    grid-template-columns:1fr;
+  }
+  .live-teaser{
+    grid-template-columns:1fr;
+    min-height:auto;
+  }
+  .live-teaser-grid{
     grid-template-columns:1fr;
   }
   .live-tv-content{
