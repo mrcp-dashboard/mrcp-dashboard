@@ -27,6 +27,7 @@ from live_decoder_test import P3ParseError, parse_record, split_records
 DOCS_DIR = Path(os.environ.get("MRCP_DOCS_DIR", Path(__file__).resolve().parent))
 STATE_FILE = Path(os.environ.get("MRCP_DECODER_STATE_FILE", DOCS_DIR / "live_decoder_state.json"))
 CORRECTIONS_FILE = Path(os.environ.get("MRCP_CORRECTIONS_FILE", DOCS_DIR / "corrections.json"))
+PILOTS_FILE = Path(os.environ.get("MRCP_PILOTS_FILE", DOCS_DIR / "speedhive_pilots.json"))
 
 
 def utc_now() -> str:
@@ -45,15 +46,30 @@ def normalize_transponder(value: Any) -> str:
     return str(value or "").replace("/0", "").strip()
 
 
-def load_pilot_map() -> Dict[str, str]:
-    if not CORRECTIONS_FILE.exists():
+def read_json(path: Path) -> Dict[str, Any]:
+    if not path.exists():
         return {}
     try:
-        data = json.loads(CORRECTIONS_FILE.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return {}
-    mapping = data.get("transponders") if isinstance(data.get("transponders"), dict) else {}
-    return {normalize_transponder(k): str(v) for k, v in mapping.items() if str(v).strip()}
+    return data if isinstance(data, dict) else {}
+
+
+def load_pilot_map() -> Dict[str, str]:
+    mapping: Dict[str, str] = {}
+
+    pilots = read_json(PILOTS_FILE)
+    mapping.update(
+        {normalize_transponder(k): str(v).strip() for k, v in pilots.items() if str(v).strip()}
+    )
+
+    data = read_json(CORRECTIONS_FILE)
+    corrections_mapping = data.get("transponders") if isinstance(data.get("transponders"), dict) else {}
+    mapping.update(
+        {normalize_transponder(k): str(v).strip() for k, v in corrections_mapping.items() if str(v).strip()}
+    )
+    return mapping
 
 
 def atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
@@ -101,6 +117,7 @@ class LiveState:
         self.session_date = local_date()
         self.pilot_map = load_pilot_map()
         self._last_corrections_mtime = CORRECTIONS_FILE.stat().st_mtime if CORRECTIONS_FILE.exists() else None
+        self._last_pilots_mtime = PILOTS_FILE.stat().st_mtime if PILOTS_FILE.exists() else None
 
     def reset_if_new_day(self) -> bool:
         current = local_date()
@@ -114,8 +131,10 @@ class LiveState:
 
     def refresh_pilot_map_if_needed(self) -> None:
         mtime = CORRECTIONS_FILE.stat().st_mtime if CORRECTIONS_FILE.exists() else None
-        if mtime != self._last_corrections_mtime:
+        pilots_mtime = PILOTS_FILE.stat().st_mtime if PILOTS_FILE.exists() else None
+        if mtime != self._last_corrections_mtime or pilots_mtime != self._last_pilots_mtime:
             self._last_corrections_mtime = mtime
+            self._last_pilots_mtime = pilots_mtime
             self.pilot_map = load_pilot_map()
 
     def pilot_name(self, transponder: str) -> str:
