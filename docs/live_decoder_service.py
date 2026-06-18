@@ -215,9 +215,9 @@ class LiveState:
             row = {k: v for k, v in pilot.items() if not k.startswith("_") and k != "total_lap_time"}
             rows.append(row)
         rows.sort(key=lambda r: (
+            -int(r["laps"]),
             r["best_lap"] is None,
             r["best_lap"] if r["best_lap"] is not None else 999999,
-            -int(r["laps"]),
             r["pilot"],
         ))
         for index, row in enumerate(rows, start=1):

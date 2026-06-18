@@ -1440,18 +1440,52 @@ function liveDayTable(rows){
 }
 
 function liveDecoderTime(v){return Number.isFinite(Number(v))?Number(v).toFixed(3)+' s':'-';}
+function livePilotLabel(r){
+  var name=String((r&&r.pilot)||'').trim();
+  if(!name||name.indexOf('Inconnu #')===0||name==='Pilote inconnu')return String((r&&r.transponder)||'-');
+  return name;
+}
+function liveDecoderRows(rows){
+  return (rows||[]).slice().sort(function(a,b){
+    var lapDiff=Number(b.laps||0)-Number(a.laps||0);
+    if(lapDiff)return lapDiff;
+    var bestA=Number.isFinite(Number(a.best_lap))?Number(a.best_lap):Infinity;
+    var bestB=Number.isFinite(Number(b.best_lap))?Number(b.best_lap):Infinity;
+    if(bestA!==bestB)return bestA-bestB;
+    return livePilotLabel(a).localeCompare(livePilotLabel(b));
+  }).map(function(r,i){
+    var row=Object.assign({},r);
+    row.position=i+1;
+    return row;
+  });
+}
+function liveLeaderBest(rows){
+  var leader=(rows||[])[0]||null;
+  var value=leader&&Number(leader.best_lap);
+  return Number.isFinite(value)?value:null;
+}
+function liveDecoderGap(v,leaderBest){
+  var value=Number(v);
+  var leader=Number(leaderBest);
+  if(!Number.isFinite(value)||!Number.isFinite(leader))return '-';
+  var gap=value-leader;
+  if(Math.abs(gap)<0.0005)return 'Leader';
+  return '+'+gap.toFixed(3)+' s';
+}
 function liveDecoderTable(rows){
-  if(!rows||!rows.length)return '<p class="small">Aucun passage live decodeur pour le moment.</p>';
-  return '<div class="table-wrap live-day-table"><table><thead><tr><th>#</th><th>Pilote / puce</th><th>Tours</th><th>Meilleur</th><th>Dernier tour</th><th>Moyenne</th><th>Passages</th><th>Piste</th></tr></thead><tbody>'+
-    rows.map(function(r,i){
+  var sorted=liveDecoderRows(rows);
+  var leaderBest=liveLeaderBest(sorted);
+  if(!sorted.length)return '<p class="small">Aucun passage live decodeur pour le moment.</p>';
+  return '<div class="table-wrap live-day-table"><table><thead><tr><th>#</th><th>Pilote / puce</th><th>Tours</th><th>Dernier</th><th>Meilleur</th><th>Moyenne</th><th>Ecart leader</th><th>Piste</th></tr></thead><tbody>'+
+    sorted.map(function(r,i){
       return '<tr>'+
         '<td>'+(r.position||i+1)+'</td>'+
-        '<td><strong>'+escapeHtml(r.pilot||r.transponder||'-')+'</strong><div class="small">'+escapeHtml(r.transponder||'')+'</div></td>'+
+        '<td><strong>'+escapeHtml(livePilotLabel(r))+'</strong><div class="small">'+escapeHtml(r.transponder||'')+'</div></td>'+
         '<td>'+Number(r.laps||0)+'</td>'+
-        '<td><strong>'+liveDecoderTime(r.best_lap)+'</strong></td>'+
         '<td>'+liveDecoderTime(r.last_lap)+'</td>'+
+        '<td><strong>'+liveDecoderTime(r.best_lap)+'</strong></td>'+
         '<td>'+liveDecoderTime(r.avg_lap)+'</td>'+
-        '<td>'+Number(r.passings||0)+'</td>'+
+        '<td><strong>'+liveDecoderGap(r.best_lap,leaderBest)+'</strong></td>'+
         '<td><span class="badge">'+escapeHtml(r.track||'-')+'</span></td>'+
       '</tr>';
     }).join('')+'</tbody></table></div>';
@@ -1468,13 +1502,13 @@ function liveDecoderPage(){
   app.innerHTML='<section class="card"><div class="panel-title"><h2>Live timing reel</h2><span class="badge">route test cachee</span></div><p class="small">Lecture directe du decodeur AMB/P3. Cette page n est pas encore visible dans le menu utilisateur.</p><div id="liveDecoderContent"><p class="small">Chargement...</p></div></section>';
   fetchLiveDecoderState().then(function(state){
     var latest=state.latest_passing||{};
-    var rows=state.ranking||[];
+    var rows=liveDecoderRows(state.ranking||[]);
     document.getElementById('liveDecoderContent').innerHTML=
       '<div class="grid">'+
         '<div class="card"><h3>Connexion</h3><div class="big">'+(state.connected?'OK':'-')+'</div><p class="small">'+escapeHtml(state.message||'')+'</p></div>'+
         '<div class="card"><h3>Passages</h3><div class="big">'+Number(state.passings_count||0)+'</div><p class="small">'+escapeHtml(state.local_time||state.generated_at||'')+'</p></div>'+
         '<div class="card"><h3>Tours</h3><div class="big">'+Number(state.laps_count||0)+'</div><p class="small">'+Number(state.pilots_count||0)+' pilotes / puces · '+escapeHtml(state.session_date||'-')+'</p></div>'+
-        '<div class="card"><h3>Dernier passage</h3><div class="big">'+escapeHtml(latest.transponder||'-')+'</div><p class="small">'+escapeHtml(latest.pilot||'')+' '+liveDecoderTime(latest.lap_time)+'</p></div>'+
+        '<div class="card"><h3>Dernier passage</h3><div class="big">'+escapeHtml(latest.transponder||'-')+'</div><p class="small">'+escapeHtml(livePilotLabel(latest))+' '+liveDecoderTime(latest.lap_time)+'</p></div>'+
       '</div>'+
       '<section class="card"><div class="panel-title"><h2>Classement decodeur</h2><span class="small">'+escapeHtml(state.track||'-')+'</span></div>'+liveDecoderTable(rows)+'</section>';
   }).catch(function(e){
@@ -1485,14 +1519,18 @@ function liveDecoderPage(){
 }
 
 function liveTvRows(rows){
-  if(!rows||!rows.length)return '<div class="live-tv-empty">En attente des premiers passages</div>';
-  return rows.slice(0,8).map(function(r,i){
+  var sorted=liveDecoderRows(rows);
+  var leaderBest=liveLeaderBest(sorted);
+  if(!sorted.length)return '<div class="live-tv-empty">En attente des premiers passages</div>';
+  return sorted.slice(0,8).map(function(r,i){
     return '<div class="live-tv-row">'+
       '<div class="live-tv-pos">'+(r.position||i+1)+'</div>'+
-      '<div class="live-tv-pilot"><strong>'+escapeHtml(r.pilot||r.transponder||'-')+'</strong><span>'+escapeHtml(r.transponder||'')+'</span></div>'+
+      '<div class="live-tv-pilot"><strong>'+escapeHtml(livePilotLabel(r))+'</strong><span>'+escapeHtml(r.transponder||'')+'</span></div>'+
       '<div class="live-tv-stat"><span>Tours</span><strong>'+Number(r.laps||0)+'</strong></div>'+
-      '<div class="live-tv-stat"><span>Best</span><strong>'+liveDecoderTime(r.best_lap)+'</strong></div>'+
       '<div class="live-tv-stat"><span>Dernier</span><strong>'+liveDecoderTime(r.last_lap)+'</strong></div>'+
+      '<div class="live-tv-stat"><span>Best</span><strong>'+liveDecoderTime(r.best_lap)+'</strong></div>'+
+      '<div class="live-tv-stat"><span>Moy.</span><strong>'+liveDecoderTime(r.avg_lap)+'</strong></div>'+
+      '<div class="live-tv-stat"><span>Ecart</span><strong>'+liveDecoderGap(r.best_lap,leaderBest)+'</strong></div>'+
     '</div>';
   }).join('');
 }
@@ -1500,7 +1538,7 @@ function liveTvRows(rows){
 function liveTvVoiceEnabled(){return hashParam('voice','0')==='1';}
 function liveTvVoiceLabel(){return liveTvVoiceEnabled()?'Synthese vocale ON':'Synthese vocale OFF';}
 function liveTvVoiceText(latest){
-  var pilot=latest.pilot||latest.transponder||'Puce inconnue';
+  var pilot=livePilotLabel(latest);
   var lap=Number(latest.lap_time);
   if(Number.isFinite(lap)&&lap>0)return pilot+', '+lap.toFixed(3).replace('.',',')+' secondes';
   return pilot+', passage detecte';
@@ -1531,14 +1569,14 @@ function liveDecoderTvPage(){
   app.innerHTML='<section class="live-tv-board"><div class="live-tv-header"><div><div class="live-status"><span class="live-dot"></span> LIVE REEL MRCP</div><h1>Live timing</h1></div><div class="live-tv-head-right"><div class="live-tv-voice">'+liveTvVoiceLabel()+'</div><div class="live-tv-clock">'+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</div></div></div><div id="liveTvContent" class="live-tv-content"><div class="live-tv-empty">Chargement du decodeur...</div></div></section>';
   fetchLiveDecoderState().then(function(state){
     var latest=state.latest_passing||{};
-    var rows=state.ranking||[];
+    var rows=liveDecoderRows(state.ranking||[]);
     announceLivePassing(state);
     document.getElementById('liveTvContent').innerHTML=
       '<div class="live-tv-hero">'+
         '<div><span class="small">Connexion</span><strong>'+(state.connected?'OK':'Hors ligne')+'</strong><em>'+escapeHtml(state.message||'')+'</em></div>'+
         '<div><span class="small">Passages</span><strong>'+Number(state.passings_count||0)+'</strong><em>'+escapeHtml(state.session_date||'-')+'</em></div>'+
         '<div><span class="small">Tours</span><strong>'+Number(state.laps_count||0)+'</strong><em>'+Number(state.pilots_count||0)+' pilotes / puces</em></div>'+
-        '<div class="live-tv-last"><span class="small">Dernier passage</span><strong>'+escapeHtml(latest.pilot||latest.transponder||'-')+'</strong><em>'+liveDecoderTime(latest.lap_time)+' · '+escapeHtml(latest.track||state.track||'-')+'</em></div>'+
+        '<div class="live-tv-last"><span class="small">Dernier passage</span><strong>'+escapeHtml(livePilotLabel(latest))+'</strong><em>'+liveDecoderTime(latest.lap_time)+' · '+escapeHtml(latest.track||state.track||'-')+'</em></div>'+
       '</div>'+
       '<div class="live-tv-ranking">'+liveTvRows(rows)+'</div>';
   }).catch(function(e){
