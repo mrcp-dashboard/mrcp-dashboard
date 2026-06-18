@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-18T07:15:04",
+  "generated_at": "2026-06-18T07:18:05",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 200,
     "pilots_count": 73,
-    "laps_count": 9985,
+    "laps_count": 9990,
     "tracks": {
       "TT1/8": {
-        "laps_count": 9810,
+        "laps_count": 9815,
         "activities_count": 200,
         "pilots_count": 73
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 8029,
+    "suspicious_laps_count": 8034,
     "unknown_pilots_count": 4,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -9042,6 +9042,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "7933362587",
+        "date_fr": "18/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 19,
+        "quality_score": 15,
+        "suspicious_laps_count": 17,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7922748910",
         "date_fr": "14/06/2026",
         "tracks": [
@@ -9171,17 +9182,6 @@
         "laps_count": 20,
         "quality_score": 35,
         "suspicious_laps_count": 13,
-        "unknown_pilots_count": 0
-      },
-      {
-        "id": "7933362587",
-        "date_fr": "18/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 14,
-        "quality_score": 40,
-        "suspicious_laps_count": 12,
         "unknown_pilots_count": 0
       },
       {
@@ -9841,7 +9841,7 @@
       "date_fr": "18/06/2026",
       "source_file": "sessions_7933362587.csv",
       "pilot_count": 1,
-      "laps_count": 14,
+      "laps_count": 19,
       "best_lap": 36.414,
       "best_pilot": "FREDERIC SMAKAL",
       "tracks": [
@@ -9849,26 +9849,26 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 14
+        "TT1/8": 19
       },
-      "quality_score": 40,
-      "suspicious_laps_count": 12,
+      "quality_score": 15,
+      "suspicious_laps_count": 17,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "5926001",
           "pilot_name": "FREDERIC SMAKAL",
           "pilot_slug": "frederic-smakal-5926001",
-          "laps_count": 14,
+          "laps_count": 19,
           "best_lap": 36.414,
-          "avg_lap": 41.613,
-          "consistency": 6.148,
+          "avg_lap": 40.6,
+          "consistency": 5.55,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 14
+            "TT1/8": 19
           },
           "laps": [
             {
@@ -10083,6 +10083,81 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "7933362587|5926001|1|09:14:07|42.083"
+            },
+            {
+              "activity_id": "7933362587",
+              "transponder": "5926001",
+              "raw_transponder": "5926001",
+              "pilot_name": "FREDERIC SMAKAL",
+              "date": "2026-06-18",
+              "date_fr": "18/06/2026",
+              "start_time": "09:14:49",
+              "lap_no": 2,
+              "lap_time": 38.562,
+              "speed": "24.273 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7933362587|5926001|2|09:14:49|38.562"
+            },
+            {
+              "activity_id": "7933362587",
+              "transponder": "5926001",
+              "raw_transponder": "5926001",
+              "pilot_name": "FREDERIC SMAKAL",
+              "date": "2026-06-18",
+              "date_fr": "18/06/2026",
+              "start_time": "09:15:28",
+              "lap_no": 3,
+              "lap_time": 38.245,
+              "speed": "24.474 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7933362587|5926001|3|09:15:28|38.245"
+            },
+            {
+              "activity_id": "7933362587",
+              "transponder": "5926001",
+              "raw_transponder": "5926001",
+              "pilot_name": "FREDERIC SMAKAL",
+              "date": "2026-06-18",
+              "date_fr": "18/06/2026",
+              "start_time": "09:16:06",
+              "lap_no": 4,
+              "lap_time": 37.451,
+              "speed": "24.993 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7933362587|5926001|4|09:16:06|37.451"
+            },
+            {
+              "activity_id": "7933362587",
+              "transponder": "5926001",
+              "raw_transponder": "5926001",
+              "pilot_name": "FREDERIC SMAKAL",
+              "date": "2026-06-18",
+              "date_fr": "18/06/2026",
+              "start_time": "09:16:44",
+              "lap_no": 5,
+              "lap_time": 37.42,
+              "speed": "25.013 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7933362587|5926001|5|09:16:44|37.420"
+            },
+            {
+              "activity_id": "7933362587",
+              "transponder": "5926001",
+              "raw_transponder": "5926001",
+              "pilot_name": "FREDERIC SMAKAL",
+              "date": "2026-06-18",
+              "date_fr": "18/06/2026",
+              "start_time": "09:17:21",
+              "lap_no": 6,
+              "lap_time": 37.145,
+              "speed": "25.199 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7933362587|5926001|6|09:17:21|37.145"
             }
           ],
           "rank": 1,
@@ -172426,16 +172501,16 @@
           "date": "2026-06-18",
           "date_fr": "18/06/2026",
           "rank": 1,
-          "laps_count": 14,
+          "laps_count": 19,
           "best_lap": 36.414,
-          "avg_lap": 41.613,
-          "consistency": 6.148,
+          "avg_lap": 40.6,
+          "consistency": 5.55,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 14
+            "TT1/8": 19
           }
         },
         {
@@ -172473,13 +172548,13 @@
           }
         }
       ],
-      "total_laps": 132,
+      "total_laps": 137,
       "best_lap": 36.414,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 132
+        "TT1/8": 137
       },
       "activities_count": 3,
       "avg_best_lap": 37.263
