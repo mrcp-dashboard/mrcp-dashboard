@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <title>MRCP Live Zero</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:#000;color:#f4f8ff;font-family:Arial,Helvetica,sans-serif}
+    body{overflow:hidden}
+    .page{height:100vh;display:flex;flex-direction:column;padding:12px;gap:10px}
+    .top{display:grid;grid-template-columns:1fr auto;align-items:center;border-bottom:2px solid #123;padding-bottom:10px}
+    .title{display:flex;align-items:center;gap:14px;min-width:0}
+    .dot{width:18px;height:18px;border-radius:50%;background:#18d86d;box-shadow:0 0 18px #18d86d}
+    h1{margin:0;font-size:clamp(30px,5vw,74px);line-height:1;font-weight:900;letter-spacing:0}
+    .clock{font-size:clamp(34px,6vw,88px);font-weight:900;line-height:1}
+    .status{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .box{border:1px solid #16452f;background:#03120b;padding:8px 12px;min-height:62px}
+    .box span{display:block;color:#8fb4a0;font-size:clamp(12px,1.5vw,18px)}
+    .box strong{display:block;margin-top:3px;font-size:clamp(24px,3vw,42px);line-height:1}
+    .ranking{flex:1;min-height:0;display:flex;flex-direction:column;gap:7px}
+    .row{display:grid;grid-template-columns:54px minmax(0,1fr) 92px 132px 132px 132px 120px;gap:8px;align-items:center;min-height:58px;border:1px solid #173018;background:#020702;padding:6px 10px}
+    .row:first-child{border-color:#f4bd35;background:#171306}
+    .pos{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#f4bd35;color:#070300;font-size:24px;font-weight:900}
+    .pilot{min-width:0}
+    .pilot strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(22px,3vw,42px);line-height:1;font-weight:900}
+    .pilot small{display:block;margin-top:2px;color:#8b9a93;font-size:14px}
+    .stat span{display:block;color:#8fb4a0;font-size:13px}
+    .stat strong{display:block;margin-top:2px;font-size:clamp(20px,2.3vw,36px);line-height:1;font-weight:900;white-space:nowrap}
+    .empty{flex:1;display:grid;place-items:center;text-align:center;color:#8fb4a0;font-size:clamp(28px,5vw,70px);border:1px dashed #173018}
+    .error{color:#ff9a8f}
+    @media(max-width:900px){
+      .page{padding:8px}
+      .status{grid-template-columns:repeat(2,1fr)}
+      .row{grid-template-columns:44px minmax(0,1fr) 70px 105px 105px;min-height:54px}
+      .row .stat:nth-last-child(-n+2){display:none}
+      .pos{width:36px;height:36px;font-size:20px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <div class="title"><span class="dot" id="dot"></span><h1>MRCP Live</h1></div>
+      <div class="clock" id="clock">--:--</div>
+    </header>
+    <section class="status">
+      <div class="box"><span>Connexion</span><strong id="connection">...</strong></div>
+      <div class="box"><span>Passages</span><strong id="passings">0</strong></div>
+      <div class="box"><span>Tours</span><strong id="laps">0</strong></div>
+      <div class="box"><span>Pilotes / puces</span><strong id="pilots">0</strong></div>
+    </section>
+    <section class="ranking" id="ranking">
+      <div class="empty">Chargement live...</div>
+    </section>
+  </main>
+
+  <script>
+    var stateUrl='live_decoder_state.json';
+    var refreshMs=Number(new URLSearchParams(location.search).get('refresh')||1500);
+    var ranking=document.getElementById('ranking');
+    function text(id,value){document.getElementById(id).textContent=value;}
+    function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    function time(v){var n=Number(v);return Number.isFinite(n)?n.toFixed(3)+' s':'-';}
+    function label(row){
+      var name=String(row&&row.pilot||'').trim();
+      if(!name||name.indexOf('Inconnu #')===0||name==='Pilote inconnu')return String(row&&row.transponder||'-');
+      return name;
+    }
+    function rows(list){
+      return (list||[]).slice().sort(function(a,b){
+        var laps=Number(b.laps||0)-Number(a.laps||0);
+        if(laps)return laps;
+        var bestA=Number.isFinite(Number(a.best_lap))?Number(a.best_lap):Infinity;
+        var bestB=Number.isFinite(Number(b.best_lap))?Number(b.best_lap):Infinity;
+        if(bestA!==bestB)return bestA-bestB;
+        return label(a).localeCompare(label(b));
+      });
+    }
+    function gap(best,leaderBest){
+      var value=Number(best), leader=Number(leaderBest);
+      if(!Number.isFinite(value)||!Number.isFinite(leader))return '-';
+      var diff=value-leader;
+      return Math.abs(diff)<0.0005?'Leader':'+'+diff.toFixed(3);
+    }
+    function render(data){
+      text('connection',data.connected?'OK':'KO');
+      text('passings',Number(data.passings_count||0));
+      text('laps',Number(data.laps_count||0));
+      text('pilots',Number(data.pilots_count||0));
+      document.getElementById('dot').style.background=data.connected?'#18d86d':'#ff4a3d';
+      var list=rows(data.ranking||[]);
+      var leaderBest=list[0]&&Number(list[0].best_lap);
+      if(!list.length){
+        ranking.innerHTML='<div class="empty">En attente des passages</div>';
+        return;
+      }
+      ranking.innerHTML=list.slice(0,10).map(function(r,i){
+        return '<div class="row">'+
+          '<div class="pos">'+(i+1)+'</div>'+
+          '<div class="pilot"><strong>'+esc(label(r))+'</strong><small>'+esc(r.transponder||'')+'</small></div>'+
+          '<div class="stat"><span>Tours</span><strong>'+Number(r.laps||0)+'</strong></div>'+
+          '<div class="stat"><span>Dernier</span><strong>'+time(r.last_lap)+'</strong></div>'+
+          '<div class="stat"><span>Best</span><strong>'+time(r.best_lap)+'</strong></div>'+
+          '<div class="stat"><span>Moy.</span><strong>'+time(r.avg_lap)+'</strong></div>'+
+          '<div class="stat"><span>Ecart</span><strong>'+gap(r.best_lap,leaderBest)+'</strong></div>'+
+        '</div>';
+      }).join('');
+    }
+    function tickClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+    async function load(){
+      tickClock();
+      try{
+        var res=await fetch(stateUrl+'?ts='+Date.now(),{cache:'no-store'});
+        if(!res.ok)throw new Error('HTTP '+res.status);
+        render(await res.json());
+      }catch(e){
+        text('connection','KO');
+        document.getElementById('dot').style.background='#ff4a3d';
+        ranking.innerHTML='<div class="empty error">Live indisponible<br><small>'+esc(e.message)+'</small></div>';
+      }
+    }
+    setInterval(load,refreshMs);
+    setInterval(tickClock,1000);
+    load();
+  </script>
+</body>
+</html>

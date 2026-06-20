@@ -76,6 +76,38 @@ La page kiosque avec synthese vocale :
 http://192.168.1.2:8080/index_v2.html#/live-tv?voice=1
 ```
 
+## Page ultra legere Pi Zero 2 W
+
+Le Pi Zero 2 W est limite pour Chromium avec le dashboard complet. Utiliser
+la page noire dediee, sans librairie et sans l'application principale :
+
+```text
+http://192.168.1.2:8080/live_zero.html
+```
+
+Elle lit seulement :
+
+```text
+http://192.168.1.2:8080/live_decoder_state.json
+```
+
+Commande Chromium conseillee si le Pi Zero reste utilise :
+
+```bash
+/usr/lib/chromium/chromium \
+  --kiosk \
+  --start-fullscreen \
+  --password-store=basic \
+  --disable-gpu \
+  --disable-gpu-compositing \
+  --use-gl=swiftshader \
+  --disable-accelerated-2d-canvas \
+  --disable-dev-shm-usage \
+  --no-first-run \
+  --no-default-browser-check \
+  http://192.168.1.2:8080/live_zero.html
+```
+
 ## Script de demarrage kiosque
 
 Creer le fichier :
