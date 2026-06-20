@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-06-20T10:51:04",
+  "generated_at": "2026-06-20T10:54:05",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 202,
     "pilots_count": 74,
-    "laps_count": 10080,
+    "laps_count": 10083,
     "tracks": {
       "TT1/8": {
-        "laps_count": 9905,
+        "laps_count": 9908,
         "activities_count": 202,
         "pilots_count": 74
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 8112,
+    "suspicious_laps_count": 8115,
     "unknown_pilots_count": 5,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -6574,8 +6574,8 @@
       },
       {
         "transponder": "7306876",
-        "laps_count": 31,
-        "best_lap": 39.899
+        "laps_count": 34,
+        "best_lap": 39.704
       }
     ],
     "ignored_raw_laps": [],
@@ -8857,6 +8857,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "7941568043",
+        "date_fr": "20/06/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 34,
+        "quality_score": 0,
+        "suspicious_laps_count": 27,
+        "unknown_pilots_count": 1
+      },
+      {
         "id": "7840059843",
         "date_fr": "25/05/2026",
         "tracks": [
@@ -8932,17 +8943,6 @@
         "quality_score": 0,
         "suspicious_laps_count": 25,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7941568043",
-        "date_fr": "20/06/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 31,
-        "quality_score": 0,
-        "suspicious_laps_count": 24,
-        "unknown_pilots_count": 1
       },
       {
         "id": "7838858454",
@@ -9868,34 +9868,34 @@
       "date_fr": "20/06/2026",
       "source_file": "sessions_7941568043.csv",
       "pilot_count": 1,
-      "laps_count": 31,
-      "best_lap": 39.899,
+      "laps_count": 34,
+      "best_lap": 39.704,
       "best_pilot": "Inconnu #7306876",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 31
+        "TT1/8": 34
       },
       "quality_score": 0,
-      "suspicious_laps_count": 24,
+      "suspicious_laps_count": 27,
       "unknown_pilots_count": 1,
       "participants": [
         {
           "transponder": "7306876",
           "pilot_name": "Inconnu #7306876",
           "pilot_slug": "inconnu-7306876-7306876",
-          "laps_count": 31,
-          "best_lap": 39.899,
-          "avg_lap": 43.849,
-          "consistency": 3.547,
+          "laps_count": 34,
+          "best_lap": 39.704,
+          "avg_lap": 43.609,
+          "consistency": 3.488,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 31
+            "TT1/8": 34
           },
           "laps": [
             {
@@ -10365,10 +10365,56 @@
               "base_track": "TT1/8",
               "lap_id": "7941568043|7306876|2|12:48:54|39.899",
               "personal_record": true
+            },
+            {
+              "activity_id": "7941568043",
+              "transponder": "7306876",
+              "raw_transponder": "7306876",
+              "pilot_name": "Inconnu #7306876",
+              "date": "2026-06-20",
+              "date_fr": "20/06/2026",
+              "start_time": "12:50:56",
+              "lap_no": 1,
+              "lap_time": 41.54,
+              "speed": "22.532 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7941568043|7306876|1|12:50:56|41.540"
+            },
+            {
+              "activity_id": "7941568043",
+              "transponder": "7306876",
+              "raw_transponder": "7306876",
+              "pilot_name": "Inconnu #7306876",
+              "date": "2026-06-20",
+              "date_fr": "20/06/2026",
+              "start_time": "12:51:37",
+              "lap_no": 2,
+              "lap_time": 42.135,
+              "speed": "22.214 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7941568043|7306876|2|12:51:37|42.135"
+            },
+            {
+              "activity_id": "7941568043",
+              "transponder": "7306876",
+              "raw_transponder": "7306876",
+              "pilot_name": "Inconnu #7306876",
+              "date": "2026-06-20",
+              "date_fr": "20/06/2026",
+              "start_time": "12:52:19",
+              "lap_no": 3,
+              "lap_time": 39.704,
+              "speed": "23.574 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "7941568043|7306876|3|12:52:19|39.704",
+              "personal_record": true
             }
           ],
           "rank": 1,
-          "personal_records_count": 3,
+          "personal_records_count": 4,
           "has_personal_record": true
         }
       ]
@@ -174902,29 +174948,29 @@
           "date": "2026-06-20",
           "date_fr": "20/06/2026",
           "rank": 1,
-          "laps_count": 31,
-          "best_lap": 39.899,
-          "avg_lap": 43.849,
-          "consistency": 3.547,
+          "laps_count": 34,
+          "best_lap": 39.704,
+          "avg_lap": 43.609,
+          "consistency": 3.488,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 31
+            "TT1/8": 34
           }
         }
       ],
-      "total_laps": 31,
-      "best_lap": 39.899,
+      "total_laps": 34,
+      "best_lap": 39.704,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 31
+        "TT1/8": 34
       },
       "activities_count": 1,
-      "avg_best_lap": 39.899
+      "avg_best_lap": 39.704
     },
     {
       "transponder": "6375754",
