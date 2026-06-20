@@ -108,6 +108,68 @@ Commande Chromium conseillee si le Pi Zero reste utilise :
   http://192.168.1.2:8080/live_zero.html
 ```
 
+## Affichage image sans navigateur pour Pi Zero
+
+Si Chromium ou Firefox restent trop lourds, utiliser le script image. Il genere
+un PNG noir avec les chronos, puis `feh` l'affiche en plein ecran et le recharge.
+
+Installer les dependances sur le Raspberry :
+
+```bash
+sudo apt update
+sudo apt install -y feh python3-pil
+```
+
+Recuperer le script depuis le serveur local apres `git pull` :
+
+```bash
+mkdir -p /home/mrcp/mrcp-zero
+curl -o /home/mrcp/mrcp-zero/mrcp_zero_screen.py http://192.168.1.2:8080/mrcp_zero_screen.py
+chmod +x /home/mrcp/mrcp-zero/mrcp_zero_screen.py
+```
+
+Test manuel :
+
+```bash
+DISPLAY=:0 /home/mrcp/mrcp-zero/mrcp_zero_screen.py \
+  --url http://192.168.1.2:8080/live_decoder_state.json \
+  --display
+```
+
+Service utilisateur systemd :
+
+```bash
+mkdir -p /home/mrcp/.config/systemd/user
+nano /home/mrcp/.config/systemd/user/mrcp-zero-screen.service
+```
+
+Contenu :
+
+```ini
+[Unit]
+Description=MRCP Zero live screen
+After=default.target
+
+[Service]
+Environment=DISPLAY=:0
+ExecStartPre=/bin/sleep 10
+ExecStart=/home/mrcp/mrcp-zero/mrcp_zero_screen.py --url http://192.168.1.2:8080/live_decoder_state.json --display
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+```
+
+Activer :
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable mrcp-zero-screen
+systemctl --user start mrcp-zero-screen
+sudo loginctl enable-linger mrcp
+```
+
 ## Script de demarrage kiosque
 
 Creer le fichier :
