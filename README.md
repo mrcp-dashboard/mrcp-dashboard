@@ -135,10 +135,23 @@ variables les plus importantes sont :
 - `MRCP_ADMIN_API_PORT` : port de l'API admin, `5055` par defaut.
 - `MRCP_LIVE_PORT` : port du live timing Socket.IO, `5056` par defaut.
 
+## Tests
+
+Un test de generation minimal couvre `build_data_v2.py` dans `docs/tests/`.
+Il travaille sur un jeu de donnees factice (CSV + pilotes de test) genere dans
+un dossier temporaire : il ne touche jamais aux fichiers reels du club
+(`speedhive_csv/`, `speedhive_pilots.json`, `corrections.json`,
+`lap_overrides.json`, `data_v2.json`).
+
+```bash
+py -m pytest docs/tests
+```
+
 ## Verification rapide avant publication
 
 ```bash
 py -m py_compile live_server.py docs/build_data_v2.py docs/admin_api.py docs/auto_check.py docs/speedhive_sync_linux.py docs/validate_dashboard_data.py docs/check_text_encoding.py
+py -m pytest docs/tests
 py docs/validate_dashboard_data.py
 py docs/check_text_encoding.py
 cd docs
@@ -149,6 +162,6 @@ Puis verifier au navigateur les pages principales listees dans "Demarrage local"
 
 ## Priorites de developpement suggerees
 
-1. Ajouter un test de generation minimal pour `build_data_v2.py`.
-2. Decouper progressivement `app_v2.js` en modules plus petits.
-3. Ameliorer l'experience mobile des pages admin.
+1. Decouper progressivement `app_v2.js` en modules plus petits.
+2. Ameliorer l'experience mobile des pages admin.
+3. Etendre la couverture de tests (validate_dashboard_data.py, admin_api.py).

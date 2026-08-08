@@ -153,6 +153,7 @@ ou restauration. Elles ne doivent pas etre suivies par Git.
 
 ```bash
 py -m py_compile live_server.py docs/build_data_v2.py docs/admin_api.py docs/auto_check.py docs/speedhive_sync_linux.py docs/validate_dashboard_data.py docs/check_text_encoding.py
+py -m pytest docs/tests
 py docs/build_data_v2.py
 py docs/validate_dashboard_data.py
 py docs/check_text_encoding.py
