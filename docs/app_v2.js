@@ -7,23 +7,67 @@ function showError(title,err){app.innerHTML='<section class="card"><h2>'+escapeH
 function router(){try{updateAdminNav();setActiveNav();var h=location.hash||'#/';document.body.classList.toggle('live-tv',h.indexOf('#/live-tv')===0);if(h.indexOf('#/live-timing')===0)return liveTimingTeaserPage();if(h.indexOf('#/live-tv')===0)return liveDecoderTvPage();if(h.indexOf('#/live-reel')===0)return liveDecoderPage();if(h.indexOf('#/journee')===0)return dayViewPage();if(h.indexOf('#/jour')===0)return clubTodayPage();
     if(h.indexOf('#/club-today')===0)return clubTodayPage();if(h.indexOf('#/records-club')===0)return clubRecordsPage();if(h.indexOf('#/rouleurs')===0)return ridersPage();if(h.indexOf('#/comparatif')===0)return comparePage();if(h.indexOf('#/qr-profil')===0)return qrProfilePage();if(h.indexOf('#/historique-records')===0)return recordHistoryPage();if(h.indexOf('#/mes-chronos')===0)return myChronos();if(h.indexOf('#/sessions')===0)return sessionsPage();if(h.indexOf('#/pilotes')===0)return pilots();if(h.indexOf('#/pilote-session/')===0)return pilotSessionPage(h.replace('#/pilote-session/',''));if(h.indexOf('#/pilote/')===0)return pilotPage(h.replace('#/pilote/',''));if(h.indexOf('#/podiums')===0)return clubRecordsPage();if(h.indexOf('#/quality')===0)return quality();if(h.indexOf('#/admin-summary')===0)return adminSummaryPage();if(h.indexOf('#/admin-unknown-pilots')===0)return adminUnknownPilotsPage();if(h.indexOf('#/admin-pilotes')===0)return adminPilots();if(h.indexOf('#/admin-records')===0)return adminRecords();if(h.indexOf('#/admin')===0)return adminPage();return home();}catch(e){showError('Erreur affichage',e);}}
 function bindAdmin(){
-  async function unlock(){
+  var modal=document.getElementById('adminLoginModal');
+  var urlInput=document.getElementById('adminLoginUrl');
+  var tokenInput=document.getElementById('adminLoginToken');
+  var errorBox=document.getElementById('adminLoginError');
+  var submitBtn=document.getElementById('adminLoginSubmit');
+  var cancelBtn=document.getElementById('adminLoginCancel');
+
+  function showLoginError(message){
+    if(!errorBox) return;
+    errorBox.textContent=message;
+    errorBox.classList.remove('hidden');
+  }
+  function hideLoginError(){
+    if(errorBox){errorBox.textContent='';errorBox.classList.add('hidden');}
+  }
+  function openLogin(){
+    if(!modal) return;
     var current=getAdminConfig();
-    var apiUrl=prompt('URL API admin', current.apiUrl||'http://127.0.0.1:5055');
-    if(!apiUrl) return;
-    var token=prompt('Token admin', current.token||'');
-    if(!token) return;
+    if(urlInput) urlInput.value=current.apiUrl||'http://127.0.0.1:5055';
+    if(tokenInput) tokenInput.value=current.token||'';
+    hideLoginError();
+    modal.classList.remove('hidden');
+    if(urlInput) urlInput.focus();
+  }
+  function closeLogin(){
+    if(modal) modal.classList.add('hidden');
+  }
+  async function submitLogin(){
+    var apiUrl=(urlInput&&urlInput.value||'').trim();
+    var token=(tokenInput&&tokenInput.value||'').trim();
+    if(!apiUrl||!token){
+      showLoginError('URL et token sont obligatoires.');
+      return;
+    }
+    hideLoginError();
+    if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='Connexion...';}
     try{
       await checkAdminToken(apiUrl, token);
-      alert('Mode admin active');
+      closeLogin();
       router();
     }catch(e){
-      alert('Acces admin refuse : '+e.message);
+      showLoginError('Accès refusé : '+e.message);
+    }finally{
+      if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='Se connecter';}
     }
   }
-  var a=document.getElementById('adminBtn');if(a)a.onclick=unlock;
-  var b=document.getElementById('adminBtnTop');if(b)b.onclick=unlock;
+
+  var a=document.getElementById('adminBtn');if(a)a.onclick=openLogin;
+  var b=document.getElementById('adminBtnTop');if(b)b.onclick=openLogin;
   var e=document.getElementById('adminExit');if(e)e.onclick=function(){clearAdminConfig();state.isAdmin=false;location.hash='#/';router();};
+
+  if(submitBtn) submitBtn.onclick=submitLogin;
+  if(cancelBtn) cancelBtn.onclick=closeLogin;
+  if(modal) modal.addEventListener('click',function(ev){if(ev.target===modal)closeLogin();});
+  [urlInput,tokenInput].forEach(function(input){
+    if(!input) return;
+    input.addEventListener('keydown',function(ev){
+      if(ev.key==='Enter'){ev.preventDefault();submitLogin();}
+      if(ev.key==='Escape'){ev.preventDefault();closeLogin();}
+    });
+  });
 }
 
 function setupPwa(){

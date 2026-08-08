@@ -79,6 +79,26 @@
   </div>
 </div>
 
+<div id="adminLoginModal" class="modal-overlay hidden">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle">
+    <h2 id="adminLoginTitle">🔐 Accès admin</h2>
+    <p class="small">Renseigne l'API admin locale (<code>docs/admin_api.py</code>) et son token pour débloquer les pages d'administration.</p>
+    <label class="modal-field">
+      <span>URL API admin</span>
+      <input type="url" id="adminLoginUrl" placeholder="http://127.0.0.1:5055" autocomplete="off" inputmode="url">
+    </label>
+    <label class="modal-field">
+      <span>Token admin</span>
+      <input type="password" id="adminLoginToken" placeholder="Token" autocomplete="off">
+    </label>
+    <p id="adminLoginError" class="modal-error hidden"></p>
+    <div class="modal-actions">
+      <button id="adminLoginCancel" class="btn-secondary" type="button">Annuler</button>
+      <button id="adminLoginSubmit" class="btn-primary" type="button">Se connecter</button>
+    </div>
+  </div>
+</div>
+
 <script src="app_v2_core.js?v=20260809-split1"></script>
 <script src="app_v2_admin_api.js?v=20260809-split1"></script>
 <script src="app_v2_laps.js?v=20260809-split1"></script>

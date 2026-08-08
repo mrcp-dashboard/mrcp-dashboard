@@ -93,11 +93,15 @@ changements Git quand il y en a.
 
 ## Administration
 
-Le mode admin du dashboard principal est accessible via le bouton Admin. Il demande
-maintenant :
+Le mode admin du dashboard principal est accessible via le bouton Admin, qui ouvre
+une fenetre modale (plus confortable au clavier tactile qu'une suite de `prompt()`).
+Elle demande :
 
 - l'URL de l'API admin locale, par exemple `http://127.0.0.1:5055`
 - le token configure dans `MRCP_ADMIN_TOKEN`
+
+En cas d'echec, l'erreur s'affiche dans la modale elle-meme (les champs restent
+remplis pour corriger et reessayer, pas d'`alert()` bloquante).
 
 Le token est garde dans le `localStorage` du navigateur utilise pour administrer.
 Le bouton "Quitter" oublie cet acces local.
@@ -172,7 +176,11 @@ Puis verifier au navigateur les pages principales listees dans "Demarrage local"
 
 ## Priorites de developpement suggerees
 
-1. Ameliorer l'experience mobile des pages admin.
-2. Etendre la couverture de tests (validate_dashboard_data.py, admin_api.py).
-3. Continuer a affiner le decoupage de `app_v2_*.js` (les fichiers pages
+1. Etendre la couverture de tests (validate_dashboard_data.py, admin_api.py).
+2. Continuer a affiner le decoupage de `app_v2_*.js` (les fichiers pages
    restent gros, ex. `app_v2_pages_home.js` et `app_v2_admin_records.js`).
+3. Poursuivre le passage en revue mobile des pages admin : la connexion admin
+   utilise maintenant une modale (voir "Administration" ci-dessus) et les
+   tableaux `admin-table-wrap` s'affichent deja en cartes sur petit ecran,
+   mais les flux longs (corrections pilotes/tours) gagneraient a avoir une
+   barre d'action collante (`mobile-sticky-action` existe deja ailleurs).

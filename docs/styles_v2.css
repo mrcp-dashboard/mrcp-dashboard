@@ -499,7 +499,7 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
 @media(max-width:720px){
   .main-area{padding:12px 12px 88px}
   .top-pills{justify-content:flex-start;overflow:auto;margin-bottom:14px}
-  .pill{padding:10px 12px;font-size:13px}
+  .pill{padding:10px 12px;font-size:13px;min-height:44px;box-sizing:border-box}
   .brand-main{font-size:34px}.brand-sub{font-size:16px}
   .sidebar{padding:12px}
   .side-nav{display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding-bottom:4px}
@@ -1289,6 +1289,83 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   }
 }
 
+/* V6.7 - Modale de connexion admin (remplace les prompt() natifs, plus
+   confortable au clavier tactile mobile). */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:rgba(4,8,16,.62);
+  backdrop-filter:blur(2px);
+}
+.modal-overlay.hidden{
+  display:none;
+}
+.modal-card{
+  width:100%;
+  max-width:420px;
+  max-height:calc(100vh - 32px);
+  overflow-y:auto;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  padding:22px;
+  box-shadow:0 24px 70px rgba(0,0,0,.5);
+}
+.modal-card h2{
+  margin:0 0 6px;
+}
+.modal-field{
+  display:block;
+  margin-top:14px;
+}
+.modal-field span{
+  display:block;
+  margin-bottom:6px;
+  font-size:13px;
+  color:var(--muted);
+}
+.modal-field input{
+  width:100%;
+  min-height:44px;
+  font-size:16px;
+  padding:10px 12px;
+}
+.modal-error{
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,80,80,.5);
+  background:rgba(255,80,80,.12);
+  color:#ffd6d6;
+  font-size:13px;
+}
+.modal-error.hidden{
+  display:none;
+}
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+.modal-actions button{
+  flex:1;
+  min-height:44px;
+}
+@media(max-width:480px){
+  .modal-card{
+    padding:18px;
+    border-radius:16px;
+  }
+  .modal-actions{
+    flex-direction:column-reverse;
+  }
+}
 
 /* V4.3 / V4.4 - Profil pilote complet + analyse IA */
 .qr-card{
