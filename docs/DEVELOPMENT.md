@@ -161,7 +161,33 @@ git status --short
 ```
 
 Verifier ensuite les pages principales en local, surtout apres modification de
-`app_v2.js`, `styles_v2.css`, `data_v2.json` ou des scripts `mrcp_v*.js`.
+`app_v2.js` / `app_v2_*.js`, `styles_v2.css`, `data_v2.json` ou des scripts
+`mrcp_v*.js`.
+
+## Decoupage de app_v2.js
+
+`app_v2.js` etait un unique fichier de 2348 lignes (~150 fonctions), enveloppe
+dans une IIFE (`(function(){...})()`). Il a ete decoupe en plusieurs fichiers
+`app_v2_*.js`, chacun charge par un `<script>` classique dans `index_v2.html`
+juste avant `app_v2.js` (qui ne garde que le routeur et le bootstrap).
+
+Points importants pour continuer ce travail :
+
+- Pas de modules ES ni de bundler : tous les fichiers partagent le meme scope
+  global (comme `mrcp_v54_*.js`, `mrcp_v55_*.js`, `mrcp_v60_live.js`). C'est
+  volontaire pour rester compatible avec le kiosque Raspberry Pi sans etape de
+  build.
+- L'IIFE d'origine a ete retiree : `DATA`, `state`, `lapsCache`, etc. sont
+  maintenant de vraies variables globales (`var` au niveau racine d'un script
+  classique = propriete de `window`). Ne pas les re-envelopper dans une IIFE
+  sans adapter tous les fichiers `app_v2_*.js` en consequence.
+- L'ordre de chargement dans `index_v2.html` compte : `app_v2.js` doit rester
+  le **dernier** des scripts `app_v2_*`, car il appelle `init()` immediatement
+  a la fin de son execution.
+- Apres toute modification, tester en local (`py -m http.server 8000` dans
+  `docs/`) et verifier la console navigateur sur au moins : accueil, pilotes,
+  sessions, records-club, comparatif, club-today, live-timing, un profil
+  pilote, et une page admin (verifier le refus d'acces sans token).
 
 ## Fichiers generes
 

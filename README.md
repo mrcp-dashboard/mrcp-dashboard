@@ -30,7 +30,17 @@ Ouvrir ensuite :
 ## Structure
 
 - `docs/index_v2.html` : entree principale du dashboard.
-- `docs/app_v2.js` : routage hash, pages publiques, pages admin et rendu global.
+- `docs/app_v2.js` : point d'entree, routage hash et bootstrap (PWA, admin).
+  La logique est repartie dans plusieurs fichiers `docs/app_v2_*.js` charges
+  juste avant lui (scripts classiques, meme scope global, pas de modules ES) :
+  - `app_v2_core.js` : etat global et utilitaires de base (formatage, theme).
+  - `app_v2_admin_api.js` : appels a l'API admin locale.
+  - `app_v2_laps.js` : agregation des tours et graphiques SVG.
+  - `app_v2_pages_home.js` : accueil, podiums, profil pilote complet.
+  - `app_v2_pages_lists.js` : mes chronos, pilotes, sessions, records, comparatif.
+  - `app_v2_live.js` : pages live (teaser, decodeur, TV, vue du jour).
+  - `app_v2_admin_records.js` : qualite des donnees et corrections de tours.
+  - `app_v2_admin_pilots.js` : corrections pilotes/transpondeurs, hub admin.
 - `docs/styles_v2.css` : styles principaux.
 - `docs/data_v2.json` : donnees consolidees utilisees par le front.
 - `docs/build_data_v2.py` : generation de `data_v2.json` depuis les exports CSV SpeedHive.
@@ -162,6 +172,7 @@ Puis verifier au navigateur les pages principales listees dans "Demarrage local"
 
 ## Priorites de developpement suggerees
 
-1. Decouper progressivement `app_v2.js` en modules plus petits.
-2. Ameliorer l'experience mobile des pages admin.
-3. Etendre la couverture de tests (validate_dashboard_data.py, admin_api.py).
+1. Ameliorer l'experience mobile des pages admin.
+2. Etendre la couverture de tests (validate_dashboard_data.py, admin_api.py).
+3. Continuer a affiner le decoupage de `app_v2_*.js` (les fichiers pages
+   restent gros, ex. `app_v2_pages_home.js` et `app_v2_admin_records.js`).
