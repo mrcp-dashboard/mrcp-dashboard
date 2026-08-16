@@ -16,8 +16,11 @@ var liveVoiceLastKey = '';
 var liveVoiceLastAt = 0;
 
 function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
-function fmtTime(v){var n=Number(v);return Number.isFinite(n)?n.toFixed(3):'-';}
-function fmtTimeS(v){return fmtTime(v)+' s';}
+// null/undefined/'' = pas de valeur -> '-'. Sans ce garde-fou Number(null) vaut 0
+// et une absence de record s'affichait "0.000 s". Le vrai 0 reste affiche (un
+// ecart au record de 0 s est legitime quand le pilote detient le record).
+function fmtTime(v){if(v===null||v===undefined||v==='')return '-';var n=Number(v);return Number.isFinite(n)?n.toFixed(3):'-';}
+function fmtTimeS(v){var t=fmtTime(v);return t==='-'?t:t+' s';}
 function lapSeconds(l){return Number(l.lap_time ?? l.time ?? l.seconds ?? l.best_lap ?? l.duration);}
 function normalizeTrack(l){if(l.track)return l.track;var t=lapSeconds(l);if(!Number.isFinite(t))return'unknown';return t<30?'TT1/10':'TT1/8';}
 function normalizeTransponder(v){return String(v||'').replace('/0','').trim();}

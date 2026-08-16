@@ -75,6 +75,80 @@ function applyRecordFilters(laps){
 }
 function bestByPilot(laps){var m=new Map();laps.forEach(function(l){if(!m.has(l._pilot)||l._time<m.get(l._pilot)._time)m.set(l._pilot,l);});return Array.from(m.values()).sort(function(a,b){return a._time-b._time;});}
 function allPilots(){return bestByPilot(getAllLaps()).map(function(l){return l._pilot;}).sort(function(a,b){return a.localeCompare(b);});}
+
+// Series de tours consecutifs.
+// Le best lap recompense un tour isole : la moyenne sur N tours qui s'enchainent
+// mesure le rythme reellement tenu. Dans les CSV SpeedHive, lap_no repart a 1 a
+// chaque relance, donc une "serie" = suite de lap_no qui s'incrementent de 1.
+// N=5 couvre ~96% des pilotes sur les donnees actuelles (voir DEVELOPMENT.md).
+var SERIES_LAP_COUNT = 5;
+
+function lapSeriesRuns(laps){
+  // Regroupe par pilote + session avant de decouper : sans ca, une suite
+  // pourrait melanger deux pilotes ou deux sessions differentes.
+  var groups={};
+  laps.forEach(function(l){
+    var key=String(l._pilot||'')+'|'+String(l.activity_id||l.session_id||'');
+    (groups[key]=groups[key]||[]).push(l);
+  });
+  var runs=[];
+  Object.keys(groups).forEach(function(key){
+    var rows=groups[key].slice().sort(function(a,b){
+      return String(a.start_time||'').localeCompare(String(b.start_time||''))||(Number(a.lap_no||0)-Number(b.lap_no||0));
+    });
+    var current=[];
+    rows.forEach(function(l){
+      var n=Number(l.lap_no);
+      var last=current.length?current[current.length-1]:null;
+      // Coupure si le numero de tour ne suit pas, ou si on change de piste.
+      if(last&&(!Number.isFinite(n)||n!==Number(last.lap_no)+1||last._track!==l._track)){
+        runs.push(current);
+        current=[];
+      }
+      current.push(l);
+    });
+    if(current.length)runs.push(current);
+  });
+  return runs;
+}
+
+function bestLapSeries(laps,n){
+  n=n||SERIES_LAP_COUNT;
+  var best=null;
+  lapSeriesRuns(laps).forEach(function(run){
+    if(run.length<n)return;
+    var sum=0;
+    for(var i=0;i<run.length;i++){
+      sum+=run[i]._time;
+      if(i>=n)sum-=run[i-n]._time;
+      if(i>=n-1){
+        var avg=sum/n;
+        if(!best||avg<best.avg){
+          var window=run.slice(i-n+1,i+1);
+          best={
+            avg:avg,
+            n:n,
+            laps:window,
+            pilot:window[0]._pilot,
+            track:window[0]._track,
+            date:window[0]._date,
+            activity_id:window[0].activity_id,
+            start_time:window[0].start_time
+          };
+        }
+      }
+    }
+  });
+  return best;
+}
+
+function bestSeriesByPilot(laps,n){
+  var byPilot={};
+  laps.forEach(function(l){(byPilot[l._pilot]=byPilot[l._pilot]||[]).push(l);});
+  return Object.keys(byPilot).map(function(name){
+    return bestLapSeries(byPilot[name],n);
+  }).filter(Boolean).sort(function(a,b){return a.avg-b.avg;});
+}
 function lapDistanceMeters(track){
   var distances=(DATA&&DATA.meta&&DATA.meta.track_distances_m)||{};
   var value=Number(distances[track]||TRACK_LAP_DISTANCE_METERS[track]||distances.default||DEFAULT_LAP_DISTANCE_METERS);

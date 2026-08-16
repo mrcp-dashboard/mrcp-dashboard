@@ -330,6 +330,8 @@ function pilotFullProfileHtml(name){
   var insights = pilotAiInsights(s);
   var consistency = pilotConsistency(s);
   var badges = pilotBadges(s);
+  var series18 = bestLapSeries(s.laps.filter(function(l){return l._track==='TT1/8';}));
+  var series10 = bestLapSeries(s.laps.filter(function(l){return l._track==='TT1/10';}));
 
   return '<section class="pilot-hero">' +
     '<div class="card pilot-main-card">' +
@@ -341,6 +343,8 @@ function pilotFullProfileHtml(name){
         '<div class="goal-pill"><span class="small">Best TT1/10</span><strong>'+fmtTimeS(best10&&best10._time)+'</strong></div>' +
         '<div class="goal-pill"><span class="small">Moyenne</span><strong>'+fmtTimeS(s.avg)+'</strong></div>' +
         '<div class="goal-pill"><span class="small">Régularité</span><strong>'+fmtTimeS(consistency)+'</strong></div>' +
+        '<div class="goal-pill"><span class="small">Série '+SERIES_LAP_COUNT+' tours TT1/8</span><strong>'+fmtTimeS(series18&&series18.avg)+'</strong></div>' +
+        '<div class="goal-pill"><span class="small">Série '+SERIES_LAP_COUNT+' tours TT1/10</span><strong>'+fmtTimeS(series10&&series10.avg)+'</strong></div>' +
       '</div>' +
       '<div class="share-row">' +
         '<button id="setMyProfile" class="btn-primary">C’est mon profil</button>' +

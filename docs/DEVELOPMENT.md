@@ -72,6 +72,33 @@ Schema observe :
 La generation est faite par `build_data_v2.py`. Les corrections persistantes sont
 dans `corrections.json` et `lap_overrides.json`.
 
+## Series de tours consecutifs
+
+`app_v2_laps.js` calcule la **meilleure moyenne sur N tours qui s'enchainent**
+(`SERIES_LAP_COUNT = 5`), affichee sur la fiche pilote et la page Records club.
+
+Le best lap recompense un tour isole ; la serie mesure le rythme reellement
+tenu. Les deux classements different vraiment : au 16 aout 2026, le record
+TT1/10 est a Fouad Elward (20.500 s) mais la meilleure serie est a NATHANAEL
+(23.712 s) - Fouad n'a meme aucune serie de 5 tours.
+
+Definition d'une serie, importante pour ne pas produire de faux chiffres :
+
+- dans les CSV SpeedHive, `lap_no` **repart a 1 a chaque relance**. Une serie
+  est donc une suite de `lap_no` qui s'incrementent de 1 ;
+- le regroupement se fait par **pilote + session** avant le decoupage, sinon
+  une suite pourrait melanger deux pilotes ou deux sessions ;
+- un changement de piste coupe la serie (TT1/8 et TT1/10 ne se comparent pas).
+
+Le choix de N=5 est empirique : sur les donnees d'aout 2026, 96% des pilotes
+ont au moins une serie de 5 tours (41% des relances font 5 tours ou plus).
+Monter N reduirait la couverture. Si le format des roulages change (relances
+plus courtes), reverifier avec `docs/tools/series_coverage.py` :
+
+```bash
+py docs/tools/series_coverage.py
+```
+
 ## Services
 
 | Service | Fichier | Port par defaut |
