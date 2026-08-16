@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-08-16T20:18:10",
+  "generated_at": "2026-08-16T20:20:57",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,7 +11,7 @@
   "summary": {
     "activities_count": 214,
     "pilots_count": 76,
-    "laps_count": 10832,
+    "laps_count": 10830,
     "tracks": {
       "TT1/8": {
         "laps_count": 10656,
@@ -19,18 +19,18 @@
         "pilots_count": 76
       },
       "TT1/10": {
-        "laps_count": 176,
-        "activities_count": 16,
-        "pilots_count": 12
+        "laps_count": 174,
+        "activities_count": 14,
+        "pilots_count": 10
       }
     }
   },
   "records": {
     "best_lap": {
-      "pilot": "PIERRE BOYER",
-      "transponder": "9626492",
-      "time": 16.236,
-      "slug": "pierre-boyer-9626492"
+      "pilot": "Fouad Elward",
+      "transponder": "9070058",
+      "time": 20.5,
+      "slug": "fouad-elward-9070058"
     },
     "most_active": {
       "pilot": "GREGOIRE BARROSO",
@@ -42,12 +42,12 @@
   "data_quality": {
     "global_score": 0,
     "suspicious_laps_count": 8803,
-    "unknown_pilots_count": 3,
+    "unknown_pilots_count": 2,
     "ignored_raw_laps_count": 0,
     "overrides": {
-      "excluded_count": 130,
-      "forced_track_count": 127,
-      "excluded_applied_count": 130
+      "excluded_count": 132,
+      "forced_track_count": 126,
+      "excluded_applied_count": 132
     },
     "suspicious_laps": [
       {
@@ -6554,13 +6554,8 @@
     "unknown_pilots": [
       {
         "transponder": "4254924",
-        "laps_count": 136,
-        "best_lap": 28.762
-      },
-      {
-        "transponder": "6462549",
-        "laps_count": 68,
-        "best_lap": 34.138
+        "laps_count": 135,
+        "best_lap": 34.099
       },
       {
         "transponder": "6282793",
@@ -6601,6 +6596,14 @@
         "transponder": "8046737",
         "lap_time": 17.323,
         "reason": "Exclu admin groupe puce"
+      },
+      {
+        "lap_id": "7710528918|4254924|1|18:46:10|28.762",
+        "activity_id": "7710528918",
+        "date_fr": "25/04/2026",
+        "transponder": "4254924",
+        "lap_time": 28.762,
+        "reason": "Exclu admin"
       },
       {
         "lap_id": "7717111575|7064819|4|13:55:41|23.883",
@@ -7609,6 +7612,14 @@
         "transponder": "6944083",
         "lap_time": 31.795,
         "reason": "Exclu admin"
+      },
+      {
+        "lap_id": "8142963311|9626492|2|16:36:23|16.236",
+        "activity_id": "8142963311",
+        "date_fr": "09/08/2026",
+        "transponder": "9626492",
+        "lap_time": 16.236,
+        "reason": "Exclu admin"
       }
     ],
     "sessions_quality": [
@@ -8145,10 +8156,9 @@
         "id": "8142963311",
         "date_fr": "09/08/2026",
         "tracks": [
-          "TT1/10",
           "TT1/8"
         ],
-        "laps_count": 74,
+        "laps_count": 73,
         "quality_score": 0,
         "suspicious_laps_count": 68,
         "unknown_pilots_count": 0
@@ -8503,7 +8513,7 @@
         "laps_count": 68,
         "quality_score": 0,
         "suspicious_laps_count": 49,
-        "unknown_pilots_count": 1
+        "unknown_pilots_count": 0
       },
       {
         "id": "7933362587",
@@ -9514,10 +9524,9 @@
         "id": "7710528918",
         "date_fr": "25/04/2026",
         "tracks": [
-          "TT1/10",
           "TT1/8"
         ],
-        "laps_count": 10,
+        "laps_count": 9,
         "quality_score": 72,
         "suspicious_laps_count": 5,
         "unknown_pilots_count": 1
@@ -10111,7 +10120,7 @@
       "pilot_count": 1,
       "laps_count": 68,
       "best_lap": 34.138,
-      "best_pilot": "Inconnu #6462549",
+      "best_pilot": "Quentin Blanco",
       "tracks": [
         "TT1/8"
       ],
@@ -10121,12 +10130,12 @@
       },
       "quality_score": 0,
       "suspicious_laps_count": 49,
-      "unknown_pilots_count": 1,
+      "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "6462549",
-          "pilot_name": "Inconnu #6462549",
-          "pilot_slug": "inconnu-6462549-6462549",
+          "pilot_name": "Quentin Blanco",
+          "pilot_slug": "quentin-blanco-6462549",
           "laps_count": 68,
           "best_lap": 34.138,
           "avg_lap": 42.815,
@@ -10143,7 +10152,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:28:47",
@@ -10158,7 +10167,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:30:55",
@@ -10173,7 +10182,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:41:38",
@@ -10189,7 +10198,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:42:20",
@@ -10204,7 +10213,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:43:07",
@@ -10219,7 +10228,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:43:57",
@@ -10235,7 +10244,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:51:22",
@@ -10250,7 +10259,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:52:18",
@@ -10265,7 +10274,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:53:08",
@@ -10280,7 +10289,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:53:52",
@@ -10295,7 +10304,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "14:54:33",
@@ -10310,7 +10319,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:01:29",
@@ -10325,7 +10334,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:02:11",
@@ -10340,7 +10349,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:02:50",
@@ -10356,7 +10365,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:03:27",
@@ -10371,7 +10380,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:04:12",
@@ -10386,7 +10395,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:43:04",
@@ -10402,7 +10411,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:43:41",
@@ -10418,7 +10427,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:44:15",
@@ -10433,7 +10442,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "15:45:58",
@@ -10448,7 +10457,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:22:35",
@@ -10463,7 +10472,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:23:16",
@@ -10478,7 +10487,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:25:09",
@@ -10493,7 +10502,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:25:51",
@@ -10508,7 +10517,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:30:31",
@@ -10523,7 +10532,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:31:31",
@@ -10538,7 +10547,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:32:11",
@@ -10553,7 +10562,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:33:07",
@@ -10568,7 +10577,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:33:49",
@@ -10583,7 +10592,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:36:11",
@@ -10598,7 +10607,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:36:49",
@@ -10613,7 +10622,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:37:47",
@@ -10628,7 +10637,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:38:41",
@@ -10643,7 +10652,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:39:18",
@@ -10658,7 +10667,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:40:07",
@@ -10673,7 +10682,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:40:43",
@@ -10688,7 +10697,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:41:21",
@@ -10703,7 +10712,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "16:43:45",
@@ -10718,7 +10727,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:20:37",
@@ -10733,7 +10742,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:21:20",
@@ -10748,7 +10757,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:21:57",
@@ -10763,7 +10772,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:24:15",
@@ -10778,7 +10787,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:24:58",
@@ -10793,7 +10802,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:25:38",
@@ -10808,7 +10817,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:26:16",
@@ -10823,7 +10832,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:26:55",
@@ -10838,7 +10847,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:35:15",
@@ -10853,7 +10862,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:35:52",
@@ -10868,7 +10877,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:36:29",
@@ -10883,7 +10892,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:37:05",
@@ -10898,7 +10907,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:37:41",
@@ -10913,7 +10922,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:38:20",
@@ -10928,7 +10937,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:40:00",
@@ -10943,7 +10952,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:40:38",
@@ -10958,7 +10967,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "17:41:23",
@@ -10973,7 +10982,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:22:28",
@@ -10988,7 +10997,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:23:09",
@@ -11003,7 +11012,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:23:47",
@@ -11018,7 +11027,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:24:25",
@@ -11033,7 +11042,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:26:23",
@@ -11048,7 +11057,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:28:14",
@@ -11063,7 +11072,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:28:49",
@@ -11078,7 +11087,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:32:50",
@@ -11093,7 +11102,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:33:30",
@@ -11108,7 +11117,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:34:09",
@@ -11123,7 +11132,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:35:57",
@@ -11138,7 +11147,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:36:42",
@@ -11153,7 +11162,7 @@
               "activity_id": "8179693253",
               "transponder": "6462549",
               "raw_transponder": "6462549",
-              "pilot_name": "Inconnu #6462549",
+              "pilot_name": "Quentin Blanco",
               "date": "2026-08-16",
               "date_fr": "16/08/2026",
               "start_time": "18:37:20",
@@ -11265,17 +11274,15 @@
       "date_fr": "09/08/2026",
       "source_file": "sessions_8142963311.csv",
       "pilot_count": 1,
-      "laps_count": 74,
-      "best_lap": 16.236,
+      "laps_count": 73,
+      "best_lap": 33.111,
       "best_pilot": "PIERRE BOYER",
       "tracks": [
-        "TT1/10",
         "TT1/8"
       ],
-      "track": "mixte",
+      "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 73,
-        "TT1/10": 1
+        "TT1/8": 73
       },
       "quality_score": 0,
       "suspicious_laps_count": 68,
@@ -11285,17 +11292,15 @@
           "transponder": "9626492",
           "pilot_name": "PIERRE BOYER",
           "pilot_slug": "pierre-boyer-9626492",
-          "laps_count": 74,
-          "best_lap": 16.236,
-          "avg_lap": 37.666,
-          "consistency": 4.733,
+          "laps_count": 73,
+          "best_lap": 33.111,
+          "avg_lap": 37.959,
+          "consistency": 4.042,
           "tracks": [
-            "TT1/10",
             "TT1/8"
           ],
-          "track": "mixte",
+          "track": "TT1/8",
           "track_counts": {
-            "TT1/10": 1,
             "TT1/8": 73
           },
           "laps": [
@@ -11929,21 +11934,6 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8142963311|9626492|1|16:35:49|33.992"
-            },
-            {
-              "activity_id": "8142963311",
-              "transponder": "9626492",
-              "raw_transponder": "9626492",
-              "pilot_name": "PIERRE BOYER",
-              "date": "2026-08-09",
-              "date_fr": "09/08/2026",
-              "start_time": "16:36:23",
-              "lap_no": 2,
-              "lap_time": 16.236,
-              "speed": "57.650 km/h",
-              "track": "TT1/10",
-              "base_track": "TT1/10",
-              "lap_id": "8142963311|9626492|2|16:36:23|16.236"
             },
             {
               "activity_id": "8142963311",
@@ -84084,16 +84074,14 @@
       "date_fr": "25/04/2026",
       "source_file": "sessions_7710528918.csv",
       "pilot_count": 1,
-      "laps_count": 10,
-      "best_lap": 28.762,
+      "laps_count": 9,
+      "best_lap": 34.099,
       "best_pilot": "Inconnu #4254924",
       "tracks": [
-        "TT1/10",
         "TT1/8"
       ],
-      "track": "mixte",
+      "track": "TT1/8",
       "track_counts": {
-        "TT1/10": 1,
         "TT1/8": 9
       },
       "quality_score": 72,
@@ -84104,35 +84092,18 @@
           "transponder": "4254924",
           "pilot_name": "Inconnu #4254924",
           "pilot_slug": "inconnu-4254924-4254924",
-          "laps_count": 10,
-          "best_lap": 28.762,
-          "avg_lap": 43.062,
-          "consistency": 7.133,
+          "laps_count": 9,
+          "best_lap": 34.099,
+          "avg_lap": 44.651,
+          "consistency": 5.594,
           "tracks": [
-            "TT1/10",
             "TT1/8"
           ],
-          "track": "mixte",
+          "track": "TT1/8",
           "track_counts": {
-            "TT1/10": 1,
             "TT1/8": 9
           },
           "laps": [
-            {
-              "activity_id": "7710528918",
-              "transponder": "4254924",
-              "raw_transponder": "4254924",
-              "pilot_name": "Inconnu #4254924",
-              "date": "2026-04-25",
-              "date_fr": "25/04/2026",
-              "start_time": "18:46:10",
-              "lap_no": 1,
-              "lap_time": 28.762,
-              "speed": "32.543 km/h",
-              "track": "TT1/10",
-              "base_track": "TT1/10",
-              "lap_id": "7710528918|4254924|1|18:46:10|28.762"
-            },
             {
               "activity_id": "7710528918",
               "transponder": "4254924",
@@ -182304,61 +182275,6 @@
   ],
   "pilots": [
     {
-      "transponder": "9626492",
-      "name": "PIERRE BOYER",
-      "slug": "pierre-boyer-9626492",
-      "activities": [
-        {
-          "activity_id": "8142963311",
-          "date": "2026-08-09",
-          "date_fr": "09/08/2026",
-          "rank": 1,
-          "laps_count": 74,
-          "best_lap": 16.236,
-          "avg_lap": 37.666,
-          "consistency": 4.733,
-          "tracks": [
-            "TT1/10",
-            "TT1/8"
-          ],
-          "track": "mixte",
-          "track_counts": {
-            "TT1/10": 1,
-            "TT1/8": 73
-          }
-        },
-        {
-          "activity_id": "7716493386",
-          "date": "2026-04-26",
-          "date_fr": "26/04/2026",
-          "rank": 1,
-          "laps_count": 142,
-          "best_lap": 34.072,
-          "avg_lap": 40.278,
-          "consistency": 5.955,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 142
-          }
-        }
-      ],
-      "total_laps": 216,
-      "best_lap": 16.236,
-      "tracks": [
-        "TT1/10",
-        "TT1/8"
-      ],
-      "track_counts": {
-        "TT1/8": 215,
-        "TT1/10": 1
-      },
-      "activities_count": 2,
-      "avg_best_lap": 25.154
-    },
-    {
       "transponder": "9070058",
       "name": "Fouad Elward",
       "slug": "fouad-elward-9070058",
@@ -183172,129 +183088,6 @@
       "avg_best_lap": 35.037
     },
     {
-      "transponder": "4254924",
-      "name": "Inconnu #4254924",
-      "slug": "inconnu-4254924-4254924",
-      "activities": [
-        {
-          "activity_id": "7811459391",
-          "date": "2026-05-17",
-          "date_fr": "17/05/2026",
-          "rank": 1,
-          "laps_count": 1,
-          "best_lap": 50.169,
-          "avg_lap": 50.169,
-          "consistency": 0,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 1
-          }
-        },
-        {
-          "activity_id": "7772039604",
-          "date": "2026-05-09",
-          "date_fr": "09/05/2026",
-          "rank": 1,
-          "laps_count": 17,
-          "best_lap": 40.788,
-          "avg_lap": 48.525,
-          "consistency": 6.091,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 17
-          }
-        },
-        {
-          "activity_id": "7762983894",
-          "date": "2026-05-08",
-          "date_fr": "08/05/2026",
-          "rank": 1,
-          "laps_count": 18,
-          "best_lap": 40.902,
-          "avg_lap": 46.409,
-          "consistency": 5.602,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 18
-          }
-        },
-        {
-          "activity_id": "7736202777",
-          "date": "2026-05-01",
-          "date_fr": "01/05/2026",
-          "rank": 1,
-          "laps_count": 20,
-          "best_lap": 43.447,
-          "avg_lap": 48.995,
-          "consistency": 3.357,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 20
-          }
-        },
-        {
-          "activity_id": "7718259708",
-          "date": "2026-04-26",
-          "date_fr": "26/04/2026",
-          "rank": 1,
-          "laps_count": 70,
-          "best_lap": 38.582,
-          "avg_lap": 46.726,
-          "consistency": 5.451,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 70
-          }
-        },
-        {
-          "activity_id": "7710528918",
-          "date": "2026-04-25",
-          "date_fr": "25/04/2026",
-          "rank": 1,
-          "laps_count": 10,
-          "best_lap": 28.762,
-          "avg_lap": 43.062,
-          "consistency": 7.133,
-          "tracks": [
-            "TT1/10",
-            "TT1/8"
-          ],
-          "track": "mixte",
-          "track_counts": {
-            "TT1/10": 1,
-            "TT1/8": 9
-          }
-        }
-      ],
-      "total_laps": 136,
-      "best_lap": 28.762,
-      "tracks": [
-        "TT1/10",
-        "TT1/8"
-      ],
-      "track_counts": {
-        "TT1/10": 1,
-        "TT1/8": 135
-      },
-      "activities_count": 6,
-      "avg_best_lap": 40.442
-    },
-    {
       "transponder": "4120178",
       "name": "VINCENT DECLA",
       "slug": "vincent-decla-4120178",
@@ -184026,6 +183819,57 @@
       "avg_best_lap": 33.397
     },
     {
+      "transponder": "9626492",
+      "name": "PIERRE BOYER",
+      "slug": "pierre-boyer-9626492",
+      "activities": [
+        {
+          "activity_id": "8142963311",
+          "date": "2026-08-09",
+          "date_fr": "09/08/2026",
+          "rank": 1,
+          "laps_count": 73,
+          "best_lap": 33.111,
+          "avg_lap": 37.959,
+          "consistency": 4.042,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 73
+          }
+        },
+        {
+          "activity_id": "7716493386",
+          "date": "2026-04-26",
+          "date_fr": "26/04/2026",
+          "rank": 1,
+          "laps_count": 142,
+          "best_lap": 34.072,
+          "avg_lap": 40.278,
+          "consistency": 5.955,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 142
+          }
+        }
+      ],
+      "total_laps": 215,
+      "best_lap": 33.111,
+      "tracks": [
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/8": 215
+      },
+      "activities_count": 2,
+      "avg_best_lap": 33.591
+    },
+    {
       "transponder": "4497814",
       "name": "LOUIS BLANCO",
       "slug": "louis-blanco-4497814",
@@ -184400,6 +184244,125 @@
       "avg_best_lap": 34.349
     },
     {
+      "transponder": "4254924",
+      "name": "Inconnu #4254924",
+      "slug": "inconnu-4254924-4254924",
+      "activities": [
+        {
+          "activity_id": "7811459391",
+          "date": "2026-05-17",
+          "date_fr": "17/05/2026",
+          "rank": 1,
+          "laps_count": 1,
+          "best_lap": 50.169,
+          "avg_lap": 50.169,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          }
+        },
+        {
+          "activity_id": "7772039604",
+          "date": "2026-05-09",
+          "date_fr": "09/05/2026",
+          "rank": 1,
+          "laps_count": 17,
+          "best_lap": 40.788,
+          "avg_lap": 48.525,
+          "consistency": 6.091,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 17
+          }
+        },
+        {
+          "activity_id": "7762983894",
+          "date": "2026-05-08",
+          "date_fr": "08/05/2026",
+          "rank": 1,
+          "laps_count": 18,
+          "best_lap": 40.902,
+          "avg_lap": 46.409,
+          "consistency": 5.602,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 18
+          }
+        },
+        {
+          "activity_id": "7736202777",
+          "date": "2026-05-01",
+          "date_fr": "01/05/2026",
+          "rank": 1,
+          "laps_count": 20,
+          "best_lap": 43.447,
+          "avg_lap": 48.995,
+          "consistency": 3.357,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 20
+          }
+        },
+        {
+          "activity_id": "7718259708",
+          "date": "2026-04-26",
+          "date_fr": "26/04/2026",
+          "rank": 1,
+          "laps_count": 70,
+          "best_lap": 38.582,
+          "avg_lap": 46.726,
+          "consistency": 5.451,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 70
+          }
+        },
+        {
+          "activity_id": "7710528918",
+          "date": "2026-04-25",
+          "date_fr": "25/04/2026",
+          "rank": 1,
+          "laps_count": 9,
+          "best_lap": 34.099,
+          "avg_lap": 44.651,
+          "consistency": 5.594,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 9
+          }
+        }
+      ],
+      "total_laps": 135,
+      "best_lap": 34.099,
+      "tracks": [
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/8": 135
+      },
+      "activities_count": 6,
+      "avg_best_lap": 41.331
+    },
+    {
       "transponder": "7196952",
       "name": "STEPHNE AUDIFAX",
       "slug": "stephne-audifax-7196952",
@@ -184469,8 +184432,8 @@
     },
     {
       "transponder": "6462549",
-      "name": "Inconnu #6462549",
-      "slug": "inconnu-6462549-6462549",
+      "name": "Quentin Blanco",
+      "slug": "quentin-blanco-6462549",
       "activities": [
         {
           "activity_id": "8179693253",
