@@ -184,7 +184,7 @@ function seriesTable(rows,limit){
         '<td><a href="#/pilote/'+encodeURIComponent(s.pilot)+'">'+escapeHtml(s.pilot)+'</a></td>'+
         '<td><strong>'+fmtTimeS(s.avg)+'</strong></td>'+
         '<td>'+fmtTimeS(fastest._time)+'</td>'+
-        '<td>'+escapeHtml(s.date||'')+'</td></tr>';
+        '<td>'+escapeHtml(dateFrFromValue(s.date))+'</td></tr>';
     }).join('')+
   '</tbody></table></div>';
 }
@@ -200,14 +200,14 @@ function clubRecordsPage(){
   var rider=biggestRider(month), progress=bestProgression('month');
   app.innerHTML='<section class="card club-record-hero"><div><span class="badge">Tableau officiel</span><h1>Records club MRCP</h1><p class="pilot-sub">Les références du club : records absolus, records du mois et pilotes les plus actifs.</p></div><a class="mini-button" href="#/historique-records">Historique records</a></section>'+
     '<section class="club-record-grid">'+
-      clubRecordBox('Record absolu TT1/8',fmtTimeS(best18&&best18._time),best18?best18._pilot+' · '+(best18._date||''):'',best18?'#/pilote/'+encodeURIComponent(best18._pilot):'')+
-      clubRecordBox('Record absolu TT1/10',fmtTimeS(best10&&best10._time),best10?best10._pilot+' · '+(best10._date||''):'',best10?'#/pilote/'+encodeURIComponent(best10._pilot):'')+
-      clubRecordBox('Record du mois TT1/8',fmtTimeS(month18&&month18._time),month18?month18._pilot+' · '+(month18._date||''):'',month18?'#/pilote/'+encodeURIComponent(month18._pilot):'')+
-      clubRecordBox('Record du mois TT1/10',fmtTimeS(month10&&month10._time),month10?month10._pilot+' · '+(month10._date||''):'',month10?'#/pilote/'+encodeURIComponent(month10._pilot):'')+
+      clubRecordBox('Record absolu TT1/8',fmtTimeS(best18&&best18._time),best18?best18._pilot+' · '+dateFrFromValue(best18._date):'',best18?'#/pilote/'+encodeURIComponent(best18._pilot):'')+
+      clubRecordBox('Record absolu TT1/10',fmtTimeS(best10&&best10._time),best10?best10._pilot+' · '+dateFrFromValue(best10._date):'',best10?'#/pilote/'+encodeURIComponent(best10._pilot):'')+
+      clubRecordBox('Record du mois TT1/8',fmtTimeS(month18&&month18._time),month18?month18._pilot+' · '+dateFrFromValue(month18._date):'',month18?'#/pilote/'+encodeURIComponent(month18._pilot):'')+
+      clubRecordBox('Record du mois TT1/10',fmtTimeS(month10&&month10._time),month10?month10._pilot+' · '+dateFrFromValue(month10._date):'',month10?'#/pilote/'+encodeURIComponent(month10._pilot):'')+
       clubRecordBox('Gros rouleur du mois',rider?rider.laps+' tours':'-',rider?rider.pilot+' · '+fmtKm(rider.km)+' km':'',rider?'#/pilote/'+encodeURIComponent(rider.pilot):'')+
       clubRecordBox('Progression du mois',progress?'+'+progress.gain.toFixed(3)+' s':'-',progress?progress.pilot+' · '+progress.track+' · '+fmtTimeS(progress.best):'')+
-      clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/8',fmtTimeS(topSeries18&&topSeries18.avg),topSeries18?topSeries18.pilot+' · '+(topSeries18.date||''):'',topSeries18?'#/pilote/'+encodeURIComponent(topSeries18.pilot):'')+
-      clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/10',fmtTimeS(topSeries10&&topSeries10.avg),topSeries10?topSeries10.pilot+' · '+(topSeries10.date||''):'',topSeries10?'#/pilote/'+encodeURIComponent(topSeries10.pilot):'')+
+      clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/8',fmtTimeS(topSeries18&&topSeries18.avg),topSeries18?topSeries18.pilot+' · '+dateFrFromValue(topSeries18.date):'',topSeries18?'#/pilote/'+encodeURIComponent(topSeries18.pilot):'')+
+      clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/10',fmtTimeS(topSeries10&&topSeries10.avg),topSeries10?topSeries10.pilot+' · '+dateFrFromValue(topSeries10.date):'',topSeries10?'#/pilote/'+encodeURIComponent(topSeries10.pilot):'')+
     '</section>'+
     '<section class="report-columns"><div class="card"><h2>Top TT1/8</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/8';})),5)+'</div><div class="card"><h2>Top TT1/10</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/10';})),5)+'</div></section>'+
     '<section class="card"><h2>🔥 Meilleures séries de '+SERIES_LAP_COUNT+' tours</h2>'+

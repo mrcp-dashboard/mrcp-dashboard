@@ -72,6 +72,24 @@ function podiumHallOfFameHtml(laps){
   '</tbody></table></div>';
 }
 
+function homeRecordBreakersHtml(){
+  var rows=latestPersonalRecords(6);
+  if(!rows.length)return '';
+  var items=rows.map(function(r){
+    return '<a class="record-row" href="#/pilote/'+encodeURIComponent(r.pilot)+'">' +
+      '<div class="record-rank">🔥</div>' +
+      '<div><div class="record-name">'+escapeHtml(r.pilot)+'</div>' +
+        '<div class="record-sub">'+escapeHtml(displayTrack(r.track))+' · '+escapeHtml(dateFrFromValue(r.date))+'</div></div>' +
+      '<div class="record-time">'+fmtTimeS(r.time)+
+        '<div class="record-sub">-'+r.gain.toFixed(3)+' s</div></div>' +
+    '</a>';
+  }).join('');
+  return '<section class="card"><div class="panel-title"><h2>🔥 Ils ont battu leur record</h2>' +
+      '<a class="mini-button" href="#/historique-records">Historique</a></div>' +
+    '<p class="small">Derniers pilotes à avoir amélioré leur propre meilleur temps, avec le gain réalisé.</p>' +
+    '<div>'+items+'</div></section>';
+}
+
 function home(){
   var laps=getAllLaps(), sessions=latestActivities(10), pilotsCount=bestByPilot(laps).length, distanceKm=totalDistanceKm(laps);
   var dayLaps=liveDaySourceLaps(todayKey());
@@ -90,7 +108,7 @@ function home(){
       '<div><strong>'+fmtTimeS(a.best)+'</strong><div class="activity-sub">best</div></div>' +
     '</a>';
   }).join('');
-  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/journee?date='+todayKey()+'" class="btn-secondary">Vue journée</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div><div class="kpi"><div class="kpi-icon">📋</div><div><div class="kpi-label">Tours aujourd hui</div><div class="kpi-value">'+dayLaps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">'+escapeHtml(todayKey())+'</div></div></div><div class="kpi"><div class="kpi-icon">👤</div><div><div class="kpi-label">Pilotes jour</div><div class="kpi-value">'+dayRows.length+'</div><div class="kpi-label">actifs</div></div></div><div class="kpi"><div class="kpi-icon">⚡</div><div><div class="kpi-label">Best jour</div><div class="kpi-value">'+fmtTime(dayBest&&dayBest.best)+'</div><div class="kpi-label">'+escapeHtml(dayBest?dayBest.pilot:'-')+'</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏁 Records du jour</h2><a class="mini-button" href="#/journee?date='+todayKey()+'">Voir journée</a></div><div class="day-record-grid"><div><span class="badge">TT1/8</span><strong>'+fmtTimeS(dayBest18&&dayBest18.best)+'</strong><small>'+escapeHtml(dayBest18?dayBest18.pilot:'-')+'</small></div><div><span class="badge">TT1/10</span><strong>'+fmtTimeS(dayBest10&&dayBest10.best)+'</strong><small>'+escapeHtml(dayBest10?dayBest10.pilot:'-')+'</small></div></div>'+homePodiumsHtml()+'</div></section>';
+  app.innerHTML='<section class="hero-dashboard"><div class="hero-card"><h1>Dashboard MRCP</h1><p>Chronos, records, podiums et progression personnelle.</p><div class="hero-actions"><a href="#/sessions" class="btn-primary">Sessions</a><a href="#/journee?date='+todayKey()+'" class="btn-secondary">Vue journée</a></div></div><div class="card kpi-card"><h2>Chiffres clés</h2><div class="kpi-grid"><div class="kpi"><div class="kpi-icon">👥</div><div><div class="kpi-label">Pilotes</div><div class="kpi-value">'+pilotsCount+'</div><div class="kpi-label">inscrits</div></div></div><div class="kpi"><div class="kpi-icon">⏱️</div><div><div class="kpi-label">Tours</div><div class="kpi-value">'+laps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">enregistrés</div></div></div><div class="kpi"><div class="kpi-icon">📍</div><div><div class="kpi-label">Kilomètres</div><div class="kpi-value">'+fmtKm(distanceKm)+'</div><div class="kpi-label">estimés</div></div></div><div class="kpi"><div class="kpi-icon">📋</div><div><div class="kpi-label">Tours aujourd hui</div><div class="kpi-value">'+dayLaps.length.toLocaleString('fr-FR')+'</div><div class="kpi-label">'+escapeHtml(todayKey())+'</div></div></div><div class="kpi"><div class="kpi-icon">👤</div><div><div class="kpi-label">Pilotes jour</div><div class="kpi-value">'+dayRows.length+'</div><div class="kpi-label">actifs</div></div></div><div class="kpi"><div class="kpi-icon">⚡</div><div><div class="kpi-label">Best jour</div><div class="kpi-value">'+fmtTime(dayBest&&dayBest.best)+'</div><div class="kpi-label">'+escapeHtml(dayBest?dayBest.pilot:'-')+'</div></div></div></div></div></section><section class="dashboard-grid home-dashboard-grid"><div class="card home-sessions-card"><div class="panel-title"><h2>📅 10 dernières sessions</h2><a class="mini-button" href="#/sessions">Voir tout</a></div><div>'+(sessionRows||'<p class="small">Aucune session trouvée.</p>')+'</div></div><div class="card"><div class="panel-title"><h2>🏁 Records du jour</h2><a class="mini-button" href="#/journee?date='+todayKey()+'">Voir journée</a></div><div class="day-record-grid"><div><span class="badge">TT1/8</span><strong>'+fmtTimeS(dayBest18&&dayBest18.best)+'</strong><small>'+escapeHtml(dayBest18?dayBest18.pilot:'-')+'</small></div><div><span class="badge">TT1/10</span><strong>'+fmtTimeS(dayBest10&&dayBest10.best)+'</strong><small>'+escapeHtml(dayBest10?dayBest10.pilot:'-')+'</small></div></div>'+homePodiumsHtml()+'</div></section>'+homeRecordBreakersHtml();
 }
 
 function sessionPaceBlocksHtml(laps){

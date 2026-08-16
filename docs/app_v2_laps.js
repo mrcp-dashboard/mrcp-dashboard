@@ -172,6 +172,12 @@ function fmtKm(v){
   if(!Number.isFinite(n))return '-';
   return n>=1000?n.toLocaleString('fr-FR',{maximumFractionDigits:0}):n.toLocaleString('fr-FR',{maximumFractionDigits:1});
 }
+// ISO (2026-05-10) -> format francais (10/05/2026). Les laps portent leur date
+// en ISO dans _date, alors que le reste du site affiche du jj/mm/aaaa.
+function dateFrFromValue(value){
+  var m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m?m[3]+'/'+m[2]+'/'+m[1]:String(value||'');
+}
 function dateInputValue(value){
   var s=String(value||'').trim();
   var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -182,11 +188,15 @@ function dateInputValue(value){
 }
 function latestActivities(limit){var map={};getAllLaps().forEach(function(l){var key=l.session_id||l.session_name||l._date||'session';if(!map[key]){var sortDate=parseDateValue(l._date||l.session_date||l.date||key);if(sortDate===Number.MAX_SAFE_INTEGER)sortDate=0;map[key]={key:key,name:l.session_name||l._date||key,date:l._date||'',sortDate:sortDate,pilots:{},tracks:{},laps:0,best:null,bestPilot:'',bestTransponder:''};}map[key].pilots[l._pilot]=true;map[key].tracks[l._track]=true;map[key].laps++;if(!map[key].best||l._time<map[key].best){map[key].best=l._time;map[key].bestPilot=l._pilot;map[key].bestTransponder=normalizeTransponder(l.transponder||'');}});return Object.values(map).sort(function(a,b){return b.sortDate-a.sortDate||String(b.date||b.name).localeCompare(String(a.date||a.name));}).slice(0,limit||5);}
 
+function lapsChronologically(laps){
+  return laps.slice().sort(function(a,b){
+    return parseDateValue(a._date||a.session_date||a.date)-parseDateValue(b._date||b.session_date||b.date)||lapSortValue(a)-lapSortValue(b)||a._time-b._time;
+  });
+}
+
 function personalRecordMap(){
   var map={}, best={};
-  getAllLaps().slice().sort(function(a,b){
-    return parseDateValue(a._date||a.session_date||a.date)-parseDateValue(b._date||b.session_date||b.date)||lapSortValue(a)-lapSortValue(b)||a._time-b._time;
-  }).forEach(function(l){
+  lapsChronologically(getAllLaps()).forEach(function(l){
     var key=l._pilot+'|'+l._track;
     if(best[key]!=null&&l._time<best[key]){
       map[l.lap_id]=true;
@@ -194,6 +204,43 @@ function personalRecordMap(){
     if(best[key]==null||l._time<best[key])best[key]=l._time;
   });
   return map;
+}
+
+// Chaque fois qu'un pilote ameliore son propre record sur une piste, avec le
+// temps precedent : c'est ce qui permet d'afficher le gain ("-0.412 s").
+// Le tout premier tour d'un pilote sur une piste n'est pas un record battu.
+function personalRecordEvents(){
+  var events=[], best={};
+  lapsChronologically(getAllLaps()).forEach(function(l){
+    var key=l._pilot+'|'+l._track;
+    var previous=best[key];
+    if(previous!=null&&l._time<previous){
+      events.push({
+        pilot:l._pilot,
+        track:l._track,
+        time:l._time,
+        previous:previous,
+        gain:previous-l._time,
+        date:l._date,
+        dateMs:lapDateMs(l),
+        lap_id:l.lap_id
+      });
+    }
+    if(previous==null||l._time<previous)best[key]=l._time;
+  });
+  return events;
+}
+
+// Derniers records battus, un seul par pilote (le plus recent) pour ne pas
+// qu'un pilote en forme remplisse toute la liste.
+function latestPersonalRecords(limit){
+  var seen={}, rows=[];
+  personalRecordEvents().reverse().forEach(function(e){
+    if(seen[e.pilot])return;
+    seen[e.pilot]=true;
+    rows.push(e);
+  });
+  return rows.slice(0,limit||6);
 }
 
 function pilotBadges(stats){
