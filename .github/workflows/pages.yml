@@ -1,9 +1,15 @@
 name: Deploy GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
+  # Le LXC pousse un commit "Auto update dashboard" toutes les 3 minutes.
+  # Un declenchement sur chaque push fait s'annuler les deploiements les uns
+  # les autres en boucle des qu'un deploiement met plus de ~3 min a finir :
+  # GitHub Pages n'autorise qu'un deploiement a la fois par depot et annule
+  # l'ancien des qu'un nouveau demarre. Un planning toutes les 15 minutes
+  # laisse largement le temps a chaque deploiement de se terminer avant le
+  # suivant. Voir docs/DEVELOPMENT.md.
+  schedule:
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:

@@ -1,5 +1,30 @@
 # Notes de developpement MRCP Dashboard
 
+## Deploiement GitHub Pages
+
+`.github/workflows/pages.yml` deploie `docs/` sur GitHub Pages. Il se
+declenche sur un **planning toutes les 15 minutes** (`schedule: cron`), pas
+sur chaque push.
+
+C'est volontaire : le LXC pousse un commit "Auto update dashboard" toutes les
+~3 minutes. GitHub Pages n'autorise qu'un seul deploiement a la fois par
+depot et annule l'ancien des qu'un nouveau demarre. Avec un declenchement sur
+`push`, des qu'un deploiement met ne serait-ce que 3 minutes a se terminer,
+il se fait annuler par le commit suivant avant d'aboutir - et ça boucle a
+l'infini. C'est exactement ce qui s'est passe du **12 au 16 aout 2026** :
+100% des deploiements ont ete annules pendant 5 jours, le site public restant
+fige sur sa version du 11 aout 23:57 alors meme que les commits Git
+continuaient d'arriver normalement.
+
+Pour verifier que les deploiements aboutissent a nouveau :
+
+```bash
+gh run list --repo mrcp-dashboard/mrcp-dashboard --workflow="Deploy GitHub Pages" --limit 5
+```
+
+Si ça recommence a boucler en `cancelled`, augmenter l'intervalle du cron
+(ou reduire la frequence de push du LXC) plutot que de repasser sur `push`.
+
 ## Pages principales
 
 | Page | Role |
