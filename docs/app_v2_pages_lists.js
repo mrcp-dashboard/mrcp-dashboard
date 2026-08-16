@@ -209,7 +209,7 @@ function clubRecordsPage(){
       clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/8',fmtTimeS(topSeries18&&topSeries18.avg),topSeries18?topSeries18.pilot+' · '+(topSeries18.date||''):'',topSeries18?'#/pilote/'+encodeURIComponent(topSeries18.pilot):'')+
       clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/10',fmtTimeS(topSeries10&&topSeries10.avg),topSeries10?topSeries10.pilot+' · '+(topSeries10.date||''):'',topSeries10?'#/pilote/'+encodeURIComponent(topSeries10.pilot):'')+
     '</section>'+
-    '<section class="report-columns"><div class="card"><h2>Top TT1/8</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/8';})),10)+'</div><div class="card"><h2>Top TT1/10</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/10';})),10)+'</div></section>'+
+    '<section class="report-columns"><div class="card"><h2>Top TT1/8</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/8';})),5)+'</div><div class="card"><h2>Top TT1/10</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/10';})),5)+'</div></section>'+
     '<section class="card"><h2>🔥 Meilleures séries de '+SERIES_LAP_COUNT+' tours</h2>'+
       '<p class="small">Moyenne sur '+SERIES_LAP_COUNT+' tours qui s’enchaînent, sans relance. Le meilleur tour récompense un tour isolé : la série montre le rythme réellement tenu.</p>'+
       '<div class="report-columns"><div><h3>TT1/8</h3>'+seriesTable(series18,5)+'</div><div><h3>TT1/10</h3>'+seriesTable(series10,5)+'</div></div>'+
