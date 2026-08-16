@@ -26,6 +26,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -38,8 +39,21 @@ HISTORY_FILE = DOCS_DIR / "admin_history.json"
 BACKUP_DIR = DOCS_DIR / "backups" / "admin"
 MANAGED_JSON_FILES = ("lap_overrides.json", "corrections.json", "data_v2.json")
 
+# Declenchement best-effort du deploiement GitHub Pages juste apres un push
+# de corrections admin, pour ne pas attendre le prochain creneau du planning
+# toutes les 15 min (.github/workflows/pages.yml). Necessite un token avec
+# les droits Actions (scope "repo" classique ou "actions:write" fin-grained).
+# Voir README.md > Configuration.
+GITHUB_REPO = os.environ.get("MRCP_GITHUB_REPO", "mrcp-dashboard/mrcp-dashboard")
+GITHUB_TOKEN = os.environ.get("MRCP_GITHUB_TOKEN", "")
+GITHUB_PAGES_WORKFLOW = os.environ.get("MRCP_GITHUB_PAGES_WORKFLOW", "pages.yml")
+
 if not TOKEN:
     print("ATTENTION: MRCP_ADMIN_TOKEN non défini. Définis un token avant usage en production.")
+if not GITHUB_TOKEN:
+    print("INFO: MRCP_GITHUB_TOKEN non défini. Les corrections seront publiées sur Git "
+          "normalement, mais le déploiement GitHub Pages attendra le prochain créneau "
+          "planifié (jusqu'à 15 min) au lieu de se déclencher immédiatement.")
 
 app = Flask(__name__)
 CORS(app)
@@ -250,6 +264,41 @@ def restore_admin_backup_files(backup_id):
     return restored
 
 
+def trigger_pages_deploy():
+    """Declenche un run manuel de 'Deploy GitHub Pages' (workflow_dispatch).
+
+    Best-effort et non bloquant : si le token n'est pas configure ou que
+    l'appel echoue, on ne fait pas echouer la publication des corrections -
+    elles sont deja pushees sur Git, le planning toutes les 15 min finira
+    par les deployer de toute facon.
+    """
+    if not GITHUB_TOKEN:
+        return {"ok": False, "skipped": True, "reason": "MRCP_GITHUB_TOKEN non configure"}
+
+    url = (
+        f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows/"
+        f"{GITHUB_PAGES_WORKFLOW}/dispatches"
+    )
+    try:
+        res = requests.post(
+            url,
+            headers={
+                "Authorization": f"Bearer {GITHUB_TOKEN}",
+                "Accept": "application/vnd.github+json",
+            },
+            json={"ref": "main"},
+            timeout=10,
+        )
+        # 204 No Content = accepte par GitHub.
+        return {
+            "ok": res.status_code == 204,
+            "status_code": res.status_code,
+            "body": res.text[:300] if res.text else "",
+        }
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 def publish_docs_changes(message, history_entry):
     commands = []
     build = run_cmd([sys.executable, "build_data_v2.py"], cwd=DOCS_DIR)
@@ -289,6 +338,7 @@ def publish_docs_changes(message, history_entry):
         return commands, "git push a echoue."
 
     history_entry["status"] = "pushed"
+    history_entry["deploy_trigger"] = trigger_pages_deploy()
     return commands, ""
 
 
@@ -337,6 +387,7 @@ def admin_status():
         "project_root": str(PROJECT_ROOT),
         "docs_dir": str(DOCS_DIR),
         "token_configured": bool(TOKEN),
+        "github_deploy_token_configured": bool(GITHUB_TOKEN),
         "git": git_info(),
         "files": {
             "data_v2": file_status(DOCS_DIR / "data_v2.json"),
@@ -475,13 +526,22 @@ def apply_corrections():
         }), 500
 
     history_entry["status"] = "pushed"
+    deploy_trigger = trigger_pages_deploy()
+    history_entry["deploy_trigger"] = deploy_trigger
     append_admin_history(history_entry)
+
+    message_suffix = (
+        " Deploiement GitHub Pages declenche."
+        if deploy_trigger.get("ok")
+        else " Deploiement GitHub Pages non declenche immediatement (planning toutes les 15 min)."
+    )
     return jsonify({
         "ok": True,
         "written": written,
         "history": history_entry,
         "commit": history_entry["commit"],
-        "message": "Corrections appliquées, data_v2.json régénéré et GitHub mis à jour.",
+        "deploy_triggered": bool(deploy_trigger.get("ok")),
+        "message": "Corrections appliquées, data_v2.json régénéré et GitHub mis à jour." + message_suffix,
         "commands": commands,
     })
 

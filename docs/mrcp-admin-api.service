@@ -11,6 +11,12 @@ Environment=MRCP_DOCS_DIR=/opt/mrcp-dashboard/docs
 Environment=MRCP_ADMIN_API_HOST=0.0.0.0
 Environment=MRCP_ADMIN_API_PORT=5055
 Environment=MRCP_ADMIN_TOKEN=CHANGE_MOI_TOKEN_SECRET
+# Optionnel : declenche le deploiement GitHub Pages immediatement apres une
+# correction admin au lieu d'attendre le prochain creneau planifie (15 min).
+# Token GitHub avec scope "repo" (classique) ou "actions:write" (fin-grained).
+# Laisser vide pour desactiver (comportement precedent : deploiement planifie).
+Environment=MRCP_GITHUB_REPO=mrcp-dashboard/mrcp-dashboard
+Environment=MRCP_GITHUB_TOKEN=
 ExecStart=/opt/mrcp-dashboard/venv/bin/python /opt/mrcp-dashboard/docs/admin_api.py
 Restart=always
 RestartSec=5

@@ -134,6 +134,12 @@ Quand l'API est disponible, le dashboard peut appeler directement :
 Avant chaque application ou restauration, l'API cree une sauvegarde locale dans
 `docs/backups/admin/`. Ce dossier est ignore par Git.
 
+Si `MRCP_GITHUB_TOKEN` est configure, l'API declenche aussi un deploiement
+GitHub Pages immediat (`workflow_dispatch`) juste apres le push - sinon le
+site public attend le prochain creneau du planning (voir "Deploiement
+GitHub Pages" dans docs/DEVELOPMENT.md). C'est toujours best-effort : si le
+declenchement echoue, les corrections restent publiees sur Git normalement.
+
 Consulter `docs/README_V4_2_ADMIN_API.txt` pour l'installation systemd sur le LXC.
 
 ## Configuration
@@ -148,6 +154,12 @@ variables les plus importantes sont :
 - `MRCP_ADMIN_API_HOST` : interface d'ecoute de l'API admin.
 - `MRCP_ADMIN_API_PORT` : port de l'API admin, `5055` par defaut.
 - `MRCP_LIVE_PORT` : port du live timing Socket.IO, `5056` par defaut.
+- `MRCP_GITHUB_TOKEN` : optionnel, token GitHub (scope `repo` classique ou
+  `actions:write` fin-grained) permettant a `admin_api.py` de declencher
+  immediatement le deploiement GitHub Pages apres une correction admin, au
+  lieu d'attendre le prochain creneau du planning (jusqu'a 15 min). Laisser
+  vide pour desactiver.
+- `MRCP_GITHUB_REPO` : depot cible pour ce declenchement, `mrcp-dashboard/mrcp-dashboard` par defaut.
 
 ## Tests
 

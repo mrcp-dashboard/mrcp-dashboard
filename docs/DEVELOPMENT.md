@@ -25,6 +25,12 @@ gh run list --repo mrcp-dashboard/mrcp-dashboard --workflow="Deploy GitHub Pages
 Si ça recommence a boucler en `cancelled`, augmenter l'intervalle du cron
 (ou reduire la frequence de push du LXC) plutot que de repasser sur `push`.
 
+`docs/admin_api.py` peut declencher un deploiement immediat (`workflow_dispatch`)
+juste apres un push de corrections admin, si `MRCP_GITHUB_TOKEN` est configure
+(voir "Flux admin API" plus bas et README.md > Configuration). Ca ne concerne
+que les corrections admin, pas les commits automatiques du LXC - ceux-la
+restent sur le planning 15 min, pour ne pas recreer la boucle d'annulation.
+
 ## Pages principales
 
 | Page | Role |
@@ -161,7 +167,11 @@ appliquees. Depuis le hub admin ou les pages de corrections, le bouton
 - un message de commit
 
 vers `POST /apply-corrections`. L'API ecrit les JSON, regenere les donnees,
-commit puis push.
+commit, push, puis declenche un deploiement GitHub Pages immediat si
+`MRCP_GITHUB_TOKEN` est configure (`history_entry.deploy_trigger` et
+`deploy_triggered` dans la reponse indiquent si ça a marche). `POST
+/restore-backup` fait la meme chose. Sans le token, tout fonctionne pareil
+sauf que le deploiement attend le prochain creneau du planning (15 min).
 
 L'API conserve aussi un filet de securite local :
 
