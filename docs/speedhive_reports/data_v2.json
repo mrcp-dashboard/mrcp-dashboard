@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-08-19T09:27:09",
+  "generated_at": "2026-08-19T09:30:09",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 217,
     "pilots_count": 76,
-    "laps_count": 10913,
+    "laps_count": 10916,
     "tracks": {
       "TT1/8": {
-        "laps_count": 10739,
+        "laps_count": 10742,
         "activities_count": 217,
         "pilots_count": 76
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 8882,
+    "suspicious_laps_count": 8885,
     "unknown_pilots_count": 2,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -9471,6 +9471,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "8188195971",
+        "date_fr": "19/08/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 8,
+        "quality_score": 60,
+        "suspicious_laps_count": 8,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7914834823",
         "date_fr": "13/06/2026",
         "tracks": [
@@ -9557,17 +9568,6 @@
         "quality_score": 72,
         "suspicious_laps_count": 5,
         "unknown_pilots_count": 1
-      },
-      {
-        "id": "8188195971",
-        "date_fr": "19/08/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 5,
-        "quality_score": 75,
-        "suspicious_laps_count": 5,
-        "unknown_pilots_count": 0
       },
       {
         "id": "7866920544",
@@ -10049,34 +10049,34 @@
       "date_fr": "19/08/2026",
       "source_file": "sessions_8188195971.csv",
       "pilot_count": 1,
-      "laps_count": 5,
-      "best_lap": 33.477,
+      "laps_count": 8,
+      "best_lap": 32.939,
       "best_pilot": "DORIAN GIANNETTA",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 5
+        "TT1/8": 8
       },
-      "quality_score": 75,
-      "suspicious_laps_count": 5,
+      "quality_score": 60,
+      "suspicious_laps_count": 8,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "5893236",
           "pilot_name": "DORIAN GIANNETTA",
           "pilot_slug": "dorian-giannetta-5893236",
-          "laps_count": 5,
-          "best_lap": 33.477,
-          "avg_lap": 34.004,
-          "consistency": 0.805,
+          "laps_count": 8,
+          "best_lap": 32.939,
+          "avg_lap": 34.462,
+          "consistency": 1.449,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 5
+            "TT1/8": 8
           },
           "laps": [
             {
@@ -10153,6 +10153,51 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8188195971|5893236|3|11:26:32|33.857"
+            },
+            {
+              "activity_id": "8188195971",
+              "transponder": "5893236",
+              "raw_transponder": "5893236",
+              "pilot_name": "DORIAN GIANNETTA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "11:27:05",
+              "lap_no": 4,
+              "lap_time": 35.151,
+              "speed": "26.628 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188195971|5893236|4|11:27:05|35.151"
+            },
+            {
+              "activity_id": "8188195971",
+              "transponder": "5893236",
+              "raw_transponder": "5893236",
+              "pilot_name": "DORIAN GIANNETTA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "11:27:41",
+              "lap_no": 5,
+              "lap_time": 32.939,
+              "speed": "28.416 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188195971|5893236|5|11:27:41|32.939"
+            },
+            {
+              "activity_id": "8188195971",
+              "transponder": "5893236",
+              "raw_transponder": "5893236",
+              "pilot_name": "DORIAN GIANNETTA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "11:28:13",
+              "lap_no": 6,
+              "lap_time": 37.58,
+              "speed": "24.907 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188195971|5893236|6|11:28:13|37.580"
             }
           ],
           "rank": 1,
@@ -184588,16 +184633,16 @@
           "date": "2026-08-19",
           "date_fr": "19/08/2026",
           "rank": 1,
-          "laps_count": 5,
-          "best_lap": 33.477,
-          "avg_lap": 34.004,
-          "consistency": 0.805,
+          "laps_count": 8,
+          "best_lap": 32.939,
+          "avg_lap": 34.462,
+          "consistency": 1.449,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 5
+            "TT1/8": 8
           }
         },
         {
@@ -184686,16 +184731,16 @@
           }
         }
       ],
-      "total_laps": 519,
+      "total_laps": 522,
       "best_lap": 31.084,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 519
+        "TT1/8": 522
       },
       "activities_count": 6,
-      "avg_best_lap": 31.849
+      "avg_best_lap": 31.76
     },
     {
       "transponder": "6686431",
