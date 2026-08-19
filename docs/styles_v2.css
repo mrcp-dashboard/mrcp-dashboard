@@ -1420,6 +1420,91 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
 .progress-list{margin:8px 0 0;padding-left:20px;line-height:1.7}
 .progress-list li{margin-bottom:4px}
 
+/* V7.1 - Affiche club imprimable */
+.print-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.poster{
+  background:linear-gradient(180deg, rgba(5,36,52,.86), rgba(2,16,30,.84));
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:26px;
+}
+.poster-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+  padding-bottom:16px;
+  border-bottom:2px solid var(--line);
+}
+.poster-head h1{margin:0 0 4px;font-size:30px}
+.poster-qr{width:120px;height:120px;background:#fff;border-radius:12px;padding:6px}
+.poster-records{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin:18px 0;
+}
+.poster-record{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  text-align:center;
+}
+.poster-record span{display:block;color:var(--muted);font-size:12px;font-weight:850;text-transform:uppercase}
+.poster-record strong{display:block;margin:4px 0;font-size:26px;font-weight:1000}
+.poster-record small{color:var(--muted)}
+.poster-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+  margin-bottom:16px;
+}
+.poster-block{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+}
+.poster-block h3{margin:0 0 2px;font-size:17px}
+.poster-table{width:100%;border-collapse:collapse;margin-top:8px}
+.poster-table td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+.poster-rank{width:30px;font-size:17px}
+.poster-time{text-align:right;font-weight:1000;white-space:nowrap}
+.poster-foot{margin:0;color:var(--muted);font-size:12px;text-align:center}
+
+/* pilot_links_v53.js injecte un bouton "Profil" partout ou il reconnait un nom
+   de pilote. Sur une affiche destinee au papier c'est du bruit : on le masque
+   ici uniquement, sans toucher au comportement des autres pages. */
+.poster .pilot-profile-btn-v53{display:none!important}
+
+@media(max-width:720px){
+  .poster{padding:16px}
+  .poster-records{grid-template-columns:1fr 1fr}
+  .poster-qr{width:96px;height:96px}
+}
+
+/* Sortie papier : fond blanc, encre economisee, pas de coupure au milieu
+   d'un bloc de classement. */
+@media print{
+  .print-actions{display:none!important}
+  .poster{
+    background:#fff!important;
+    color:#000!important;
+    border:none!important;
+    border-radius:0!important;
+    padding:0!important;
+  }
+  .poster-head{border-bottom:2px solid #333!important}
+  .poster-head h1{color:#000!important}
+  .poster-record,.poster-block{
+    border:1px solid #999!important;
+    break-inside:avoid;
+  }
+  .poster-record span,.poster-record small,.poster-foot,.poster-block .small{color:#444!important}
+  .poster-table td{border-bottom:1px solid #ccc!important}
+  .poster-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
 /* V4.3 / V4.4 - Profil pilote complet + analyse IA */
 .qr-card{
   text-align:center;
