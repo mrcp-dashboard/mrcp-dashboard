@@ -136,17 +136,18 @@ async function fetchFreshDashboardData(){
 
 async function init(){
   try{
-    setupTheme(); bindAdmin(); setupPwa(); updateAdminNav();
+    setupTheme(); bindAdmin(); setupPwa(); updateAdminNav(); setupDataFreshness();
     var today=document.getElementById('todayLabel');if(today)today.textContent=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
     var renderedFromCache=false;
     try{
       var cached=await readCachedDashboardData();
-      if(cached){DATA=cached;clearDerivedCache();router();renderedFromCache=true;}
+      if(cached){DATA=cached;clearDerivedCache();router();updateDataFreshness();renderedFromCache=true;}
     }catch(cacheError){console.log('Cache data ignore',cacheError);}
     try{
       DATA=await fetchFreshDashboardData();
       clearDerivedCache();
       router();
+      updateDataFreshness();
     }catch(fetchError){
       if(!renderedFromCache)throw fetchError;
       console.log('Rafraichissement data impossible',fetchError);

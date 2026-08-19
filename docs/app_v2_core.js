@@ -44,6 +44,65 @@ function forcedTrack(lapId,o){return (o||getOverrides()).forced_track[lapId]||nu
 function getAdminConfig(){try{var raw=JSON.parse(localStorage.getItem(ADMIN_CFG_KEY)||'{}');return{apiUrl:String(raw.apiUrl||'').replace(/\/+$/,''),token:String(raw.token||'')};}catch(e){return{apiUrl:'',token:''};}}
 function setAdminConfig(cfg){localStorage.setItem(ADMIN_CFG_KEY,JSON.stringify({apiUrl:String(cfg.apiUrl||'').replace(/\/+$/,''),token:String(cfg.token||'')},null,2));}
 function clearAdminConfig(){localStorage.removeItem(ADMIN_CFG_KEY);}
+// --- Fraicheur des donnees -------------------------------------------------
+// Le pied de page restait fige sur "Donnees en cours de chargement" : rien ne
+// l'alimentait. Il sert maintenant de temoin de sante de la chaine
+// SpeedHive -> LXC -> GitHub Pages (le site est reste fige 5 jours en aout 2026
+// sans que ce soit visible).
+var FRESHNESS_WARN_MINUTES = 15;
+var FRESHNESS_ALERT_MINUTES = 60;
+var freshnessTimer = null;
+
+// generated_at peut arriver sans fuseau horaire (donnees generees avant le
+// passage de build_data_v2.py a un horodatage explicite, ou relues du cache) :
+// dans ce cas c'est de l'UTC, car le serveur tourne en UTC. Sans ce garde-fou
+// un navigateur francais lirait la date comme de l'heure de Paris, soit 2 h
+// dans le futur.
+function parseGeneratedAt(value){
+  var s = String(value || '').trim();
+  if(!s) return null;
+  if(!/(Z|[+-]\d{2}:?\d{2})$/.test(s)) s += 'Z';
+  var t = Date.parse(s);
+  return Number.isFinite(t) ? t : null;
+}
+
+function fmtAgeMinutes(minutes){
+  if(minutes < 1) return "à l'instant";
+  if(minutes < 60) return 'il y a ' + Math.round(minutes) + ' min';
+  var h = Math.floor(minutes / 60), m = Math.round(minutes % 60);
+  if(h < 24) return 'il y a ' + h + ' h' + (m ? ' ' + (m < 10 ? '0' : '') + m : '');
+  var d = Math.floor(h / 24);
+  return 'il y a ' + d + ' jour' + (d > 1 ? 's' : '');
+}
+
+function updateDataFreshness(){
+  var el = document.getElementById('lastUpdateFooter');
+  if(!el) return;
+  var t = DATA && parseGeneratedAt(DATA.generated_at);
+  if(!t){
+    el.textContent = 'Données en cours de chargement';
+    el.className = '';
+    return;
+  }
+  // Marge negative possible si l'horloge du visiteur est en avance : on la
+  // ramene a zero plutot que d'afficher une duree absurde.
+  var minutes = Math.max(0, (Date.now() - t) / 60000);
+  var state = minutes >= FRESHNESS_ALERT_MINUTES ? 'alert'
+            : minutes >= FRESHNESS_WARN_MINUTES ? 'warn' : 'ok';
+  var label = state === 'ok' ? 'Données à jour' : 'Données en retard';
+  el.textContent = label + ' · ' + fmtAgeMinutes(minutes);
+  el.className = 'freshness freshness-' + state;
+  el.title = 'Dernière génération : ' + new Date(t).toLocaleString('fr-FR');
+}
+
+function setupDataFreshness(){
+  updateDataFreshness();
+  if(freshnessTimer) clearInterval(freshnessTimer);
+  // Le kiosque Raspberry Pi laisse la page ouverte en continu : sans ce
+  // rafraichissement l'age afficherait indefiniment sa valeur du chargement.
+  freshnessTimer = setInterval(updateDataFreshness, 30000);
+}
+
 function applyTheme(theme){
   theme = theme === 'warm' ? 'warm' : 'green';
   document.body.classList.toggle('theme-warm', theme === 'warm');

@@ -441,7 +441,11 @@ def build() -> dict[str, Any]:
 
     return {
         "schema_version": 3.5,
-        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        # astimezone() rend l'horodatage non ambigu (ex. ...+00:00). Sans lui,
+        # le front recevait une date sans fuseau : le serveur tourne en UTC mais
+        # un navigateur francais l'interpretait en heure de Paris, soit 2 h dans
+        # le futur - et un age de donnees negatif.
+        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "club_name": CLUB_NAME,
         "source": "SpeedHive Practice 4308",
         "filters": {"lap_min": LAP_MIN, "lap_max": LAP_MAX, "tt10_limit": TT10_LIMIT},
