@@ -188,6 +188,24 @@ function seriesTable(rows,limit){
     }).join('')+
   '</tbody></table></div>';
 }
+function clubProgressHtml(){
+  var rows = clubSeasonProgress();
+  if(!rows.length) return '';
+  var items = rows.slice(0, 5).map(function(r, i){
+    var medal = ['🥇','🥈','🥉'][i] || (i + 1);
+    return '<a class="record-row" href="#/pilote/' + encodeURIComponent(r.pilot) + '">' +
+      '<div class="record-rank">' + medal + '</div>' +
+      '<div><div class="record-name">' + escapeHtml(r.pilot) + '</div>' +
+        '<div class="record-sub">' + escapeHtml(displayTrack(r.track)) + ' · depuis le ' + escapeHtml(dateFrFromValue(r.firstDay)) + ' · ' + r.days + ' journées</div></div>' +
+      '<div class="record-time"><span class="progress-gain">-' + r.gain.toFixed(3) + ' s</span>' +
+        '<div class="record-sub">' + fmtTimeS(r.first) + ' → ' + fmtTimeS(r.best) + '</div></div>' +
+    '</a>';
+  }).join('');
+  return '<section class="card"><h2>📈 Plus grosses progressions du club</h2>' +
+    '<p class="small">Écart entre le meilleur tour de la première journée de roulage et le meilleur temps atteint depuis. Minimum ' + SEASON_PROGRESS_MIN_DAYS + ' journées pour être classé.</p>' +
+    '<div>' + items + '</div></section>';
+}
+
 function clubRecordsPage(){
   var all=getAllLaps(), month=periodFilteredLaps('month');
   var series18=bestSeriesByPilot(all.filter(function(l){return l._track==='TT1/8';}));
@@ -213,7 +231,8 @@ function clubRecordsPage(){
     '<section class="card"><h2>🔥 Meilleures séries de '+SERIES_LAP_COUNT+' tours</h2>'+
       '<p class="small">Moyenne sur '+SERIES_LAP_COUNT+' tours qui s’enchaînent, sans relance. Le meilleur tour récompense un tour isolé : la série montre le rythme réellement tenu.</p>'+
       '<div class="report-columns"><div><h3>TT1/8</h3>'+seriesTable(series18,5)+'</div><div><h3>TT1/10</h3>'+seriesTable(series10,5)+'</div></div>'+
-    '</section>';
+    '</section>'+
+    clubProgressHtml();
 }
 
 function riderRows(laps){

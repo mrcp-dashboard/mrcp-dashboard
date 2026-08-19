@@ -243,6 +243,62 @@ function latestPersonalRecords(limit){
   return rows.slice(0,limit||6);
 }
 
+// --- Progression sur la saison ---------------------------------------------
+// Compare le meilleur tour de la PREMIERE journee de roulage au meilleur tour
+// atteint depuis, sur une piste donnee. On raisonne par journee et non par tour
+// : un premier tour isole (echauffement, sortie de piste) fausserait le point
+// de depart.
+var SEASON_PROGRESS_MIN_DAYS = 3;
+
+function seasonProgressFor(laps){
+  var byDay = {};
+  laps.forEach(function(l){
+    var day = l._date || '';
+    if(!day) return;
+    if(byDay[day] === undefined || l._time < byDay[day]) byDay[day] = l._time;
+  });
+  var days = Object.keys(byDay).sort();
+  if(days.length < 2) return null;
+  var first = byDay[days[0]];
+  var best = first;
+  days.forEach(function(d){ if(byDay[d] < best) best = byDay[d]; });
+  return {
+    first: first,
+    best: best,
+    gain: first - best,
+    firstDay: days[0],
+    days: days.length
+  };
+}
+
+function pilotSeasonProgress(name, track){
+  return seasonProgressFor(getAllLaps().filter(function(l){
+    return l._pilot === name && l._track === track;
+  }));
+}
+
+// Classement club. Seuil plus exigeant que pour la fiche pilote : sur deux
+// journees seulement, une premiere sortie sous la pluie suffirait a fabriquer
+// une fausse grosse progression.
+function clubSeasonProgress(minDays){
+  minDays = minDays || SEASON_PROGRESS_MIN_DAYS;
+  var groups = {};
+  getAllLaps().forEach(function(l){
+    var key = l._pilot + '|' + l._track;
+    (groups[key] = groups[key] || []).push(l);
+  });
+  var rows = [];
+  Object.keys(groups).forEach(function(key){
+    var p = seasonProgressFor(groups[key]);
+    if(!p || p.days < minDays || p.gain <= 0) return;
+    var parts = key.split('|');
+    p.pilot = parts[0];
+    p.track = parts[1];
+    rows.push(p);
+  });
+  return rows.sort(function(a, b){ return b.gain - a.gain; });
+}
+
 function pilotBadges(stats){
   var badges=[];
   var dayKey=todayKey();

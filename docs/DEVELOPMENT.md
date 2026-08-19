@@ -117,6 +117,32 @@ plus courtes), reverifier avec `docs/tools/series_coverage.py` :
 py docs/tools/series_coverage.py
 ```
 
+## Divisions de niveau et progression
+
+Deux classements complementaires du classement au meilleur tour, tous deux
+calcules cote front (aucune donnee supplementaire dans `data_v2.json`).
+
+**Divisions** (`app_v2_divisions.js`, page `#/divisions`). Les pilotes d'une
+piste sont repartis en trois poules de niveau par tiers egaux, pas par seuils
+fixes : les poules restent equilibrees et suivent l'evolution du club. Deux
+garde-fous :
+
+- `DIVISION_MIN_LAPS = 10` tours sur la piste pour etre classe, sinon un tour
+  de chance isole placerait un pilote en division A ;
+- `DIVISION_MIN_PILOTS = 9` pilotes qualifies minimum pour former des poules.
+  TT1/10 ne les atteint pas (3 pilotes qualifies contre 66 en TT1/8) : la page
+  affiche alors un message explicite au lieu de poules d'un seul pilote.
+
+**Progression** (`app_v2_laps.js`). Ecart entre le meilleur tour de la
+premiere *journee* de roulage et le meilleur temps atteint depuis, par pilote
+et par piste. On raisonne par journee et non par tour : un premier tour isole
+(echauffement, sortie) fausserait le point de depart.
+
+- fiche pilote : affiche des 2 journees, masque si le gain est nul ;
+- podium club (page Records club) : `SEASON_PROGRESS_MIN_DAYS = 3`, plus
+  exigeant car sur deux journees une premiere sortie sous la pluie suffirait a
+  fabriquer une fausse grosse progression.
+
 ## Services
 
 | Service | Fichier | Port par defaut |

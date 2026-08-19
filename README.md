@@ -39,6 +39,7 @@ Ouvrir ensuite :
   - `app_v2_pages_home.js` : accueil, podiums, profil pilote complet.
   - `app_v2_pages_lists.js` : mes chronos, pilotes, sessions, records, comparatif.
   - `app_v2_live.js` : pages live (teaser, decodeur, TV, vue du jour).
+  - `app_v2_divisions.js` : divisions de niveau (poules A/B/C par piste).
   - `app_v2_admin_records.js` : qualite des donnees et corrections de tours.
   - `app_v2_admin_pilots.js` : corrections pilotes/transpondeurs, hub admin.
 - `docs/styles_v2.css` : styles principaux.
@@ -191,8 +192,8 @@ Puis verifier au navigateur les pages principales listees dans "Demarrage local"
 1. Etendre la couverture de tests (validate_dashboard_data.py, admin_api.py).
 2. Continuer a affiner le decoupage de `app_v2_*.js` (les fichiers pages
    restent gros, ex. `app_v2_pages_home.js` et `app_v2_admin_records.js`).
-3. Poursuivre le passage en revue mobile des pages admin : la connexion admin
-   utilise maintenant une modale (voir "Administration" ci-dessus) et les
-   tableaux `admin-table-wrap` s'affichent deja en cartes sur petit ecran,
-   mais les flux longs (corrections pilotes/tours) gagneraient a avoir une
-   barre d'action collante (`mobile-sticky-action` existe deja ailleurs).
+3. Poursuivre le passage en revue mobile des pages admin : les flux longs
+   (corrections pilotes/tours) gagneraient a avoir une barre d'action
+   collante (`mobile-sticky-action` existe deja ailleurs).
+4. TT1/10 est trop peu roulee pour alimenter les divisions (3 pilotes
+   qualifies) : a revoir si la piste reprend de l'activite.

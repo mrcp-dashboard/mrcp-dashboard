@@ -332,6 +332,19 @@ function qrUrlForProfileChoice(){
   return 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(url);
 }
 
+function pilotProgressSentenceHtml(name){
+  var lines = ['TT1/8','TT1/10'].map(function(track){
+    var p = pilotSeasonProgress(name, track);
+    if(!p || p.gain <= 0) return '';
+    return '<li><strong>' + escapeHtml(displayTrack(track)) + '</strong> : ' +
+      '<span class="progress-gain">-' + p.gain.toFixed(3) + ' s</span> depuis le ' +
+      escapeHtml(dateFrFromValue(p.firstDay)) + ' (' + fmtTimeS(p.first) + ' → ' + fmtTimeS(p.best) + ')</li>';
+  }).filter(Boolean).join('');
+  if(!lines) return '';
+  return '<section class="card"><h3>📈 Progression depuis le début</h3>' +
+    '<ul class="progress-list">' + lines + '</ul></section>';
+}
+
 function pilotFullProfileHtml(name){
   var s = pilotStats(name);
   var best18 = pilotBestByTrack(s,'TT1/8');
@@ -377,6 +390,7 @@ function pilotFullProfileHtml(name){
       '<p class="small">À afficher au club : le pilote scanne et arrive directement sur sa fiche.</p>' +
     '</div>' +
   '</section>' +
+  pilotProgressSentenceHtml(name) +
 
   '<section class="grid">' +
     '<div class="card"><h3>Tours</h3><div class="big">'+s.laps.length+'</div></div>' +
