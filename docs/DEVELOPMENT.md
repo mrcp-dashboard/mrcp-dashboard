@@ -147,8 +147,13 @@ et par piste. On raisonne par journee et non par tour : un premier tour isole
 
 `app_v2_poster.js` (`#/affiche`) produit une page pensee pour le papier :
 records, podium de chaque division, meilleures series, plus grosses
-progressions, plus un QR code vers le dashboard. A ne pas confondre avec
-"Resume club" (`#/admin-summary`), qui reste admin et oriente diagnostic.
+progressions, plus un QR code vers le dashboard. **Reserve a l'admin** (c'est
+lui qui imprime), lien dans le menu admin. A ne pas confondre avec "Resume
+club" (`#/admin-summary`), egalement admin mais oriente diagnostic.
+
+Le controle d'acces est fait a la main dans `posterPage()` plutot qu'avec
+`adminOnly()` : cette fonction enveloppe le contenu dans une carte, ce qui
+ajouterait un cadre et un titre parasites a l'impression.
 
 Piege : `pilot_links_v53.js` parcourt tous les `td/th/div/span/p/li` de la
 page et injecte un bouton "Profil" des qu'il reconnait un nom de pilote. Sur

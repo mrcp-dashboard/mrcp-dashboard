@@ -21,6 +21,17 @@ function posterPodiumHtml(rows, title, subtitle){
 }
 
 function posterPage(){
+  // Reserve a l'admin : c'est lui qui imprime et affiche le document au club.
+  // On ne passe pas par adminOnly() comme les autres pages admin : cette
+  // fonction enveloppe le contenu dans une carte, ce qui ajouterait un cadre
+  // et un titre parasites a l'impression.
+  if(!state.isAdmin){
+    app.innerHTML = '<section class="card"><h2>Accès admin</h2>' +
+      '<p>L’affiche club est réservée à l’administrateur.</p>' +
+      '<p><a class="btn-primary" href="#/records-club">Voir les records du club</a></p></section>';
+    return;
+  }
+
   var all = getAllLaps();
   var best18 = bestByPilot(all.filter(function(l){ return l._track === 'TT1/8'; }))[0] || null;
   var best10 = bestByPilot(all.filter(function(l){ return l._track === 'TT1/10'; }))[0] || null;
