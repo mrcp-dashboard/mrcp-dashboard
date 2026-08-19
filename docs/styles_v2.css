@@ -1390,6 +1390,31 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   border-color:rgba(255,75,92,.50);
 }
 
+/* V7.0 - Divisions de niveau */
+.division-badge{
+  display:inline-grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  margin-right:8px;
+  border-radius:50%;
+  font-size:16px;
+  font-weight:1000;
+  color:#001020;
+}
+.division-A{background:linear-gradient(135deg,#ffe680,#ffbf1f)}
+.division-B{background:linear-gradient(135deg,#e6eef7,#a9bccf)}
+.division-C{background:linear-gradient(135deg,#f0c08a,#c98544)}
+.division-card{border-color:rgba(255,255,255,.14)}
+.division-mine{
+  margin:10px 0 0;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(62,230,111,.36);
+  background:rgba(62,230,111,.12);
+  font-weight:850;
+}
+
 /* V4.3 / V4.4 - Profil pilote complet + analyse IA */
 .qr-card{
   text-align:center;
