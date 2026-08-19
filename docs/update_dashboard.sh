@@ -5,7 +5,12 @@ PROJECT_ROOT="${MRCP_PROJECT_ROOT:-/opt/mrcp-dashboard}"
 PROJECT_DIR="${MRCP_DOCS_DIR:-$PROJECT_ROOT/docs}"
 PYTHON="${MRCP_PYTHON:-$PROJECT_ROOT/venv/bin/python}"
 GIT_BRANCH="${MRCP_GIT_BRANCH:-main}"
-SPEEDHIVE_LIMIT="${MRCP_SPEEDHIVE_LIMIT:-20}"
+# 20 etait trop juste : l'API trie par endTime decroissant, donc les sessions
+# en cours remontent en tete, mais au-dela de ~20 pilotes en piste en meme
+# temps certains sortaient de la fenetre et cessaient d'etre rafraichis
+# (52 activites le 19/04/2026). Passer a 200 ne coute presque rien : les CSV
+# deja telecharges sont ignores sans requete HTTP.
+SPEEDHIVE_LIMIT="${MRCP_SPEEDHIVE_LIMIT:-200}"
 
 echo "============================================================"
 echo "MRCP DASHBOARD AUTO UPDATE - $(date)"
