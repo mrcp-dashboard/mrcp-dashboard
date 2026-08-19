@@ -1505,6 +1505,53 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   .poster-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
 
+/* V7.2 - Rythme du club */
+.rythme-resume{
+  margin:12px 0 0;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(18,164,255,.34);
+  background:rgba(18,164,255,.12);
+}
+.rythme-bars{display:grid;gap:8px}
+.rythme-row{
+  display:grid;
+  grid-template-columns:minmax(66px,90px) 1fr minmax(78px,auto);
+  align-items:center;
+  gap:12px;
+}
+.rythme-label{font-weight:850;font-size:14px}
+.rythme-track{
+  height:20px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.rythme-fill{
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--blue),var(--green));
+}
+.rythme-top .rythme-fill{background:linear-gradient(90deg,var(--gold),var(--orange))}
+.rythme-value{
+  text-align:right;
+  font-weight:1000;
+  font-variant-numeric:tabular-nums;
+}
+.rythme-value small{display:block;color:var(--muted);font-weight:700;font-size:11px}
+
+@media(max-width:720px){
+  .rythme-row{grid-template-columns:minmax(54px,72px) 1fr minmax(64px,auto);gap:8px}
+  .rythme-label{font-size:13px}
+}
+
+@media print{
+  .rythme-track{background:#eee!important;border:1px solid #ccc}
+  .rythme-fill{background:#666!important}
+  .rythme-top .rythme-fill{background:#222!important}
+}
+
 /* V4.3 / V4.4 - Profil pilote complet + analyse IA */
 .qr-card{
   text-align:center;

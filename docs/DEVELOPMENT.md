@@ -143,6 +143,24 @@ et par piste. On raisonne par journee et non par tour : un premier tour isole
   exigeant car sur deux journees une premiere sortie sous la pluie suffirait a
   fabriquer une fausse grosse progression.
 
+## Affiche club et rythme
+
+`app_v2_poster.js` (`#/affiche`) produit une page pensee pour le papier :
+records, podium de chaque division, meilleures series, plus grosses
+progressions, plus un QR code vers le dashboard. A ne pas confondre avec
+"Resume club" (`#/admin-summary`), qui reste admin et oriente diagnostic.
+
+Piege : `pilot_links_v53.js` parcourt tous les `td/th/div/span/p/li` de la
+page et injecte un bouton "Profil" des qu'il reconnait un nom de pilote. Sur
+l'affiche il en ajoutait 18. Ils sont neutralises par la seule regle
+`.poster .pilot-profile-btn-v53{display:none}` : ne pas modifier
+`pilot_links_v53.js` pour ca, d'autres pages dependent de son comportement.
+
+`app_v2_rythme.js` (`#/rythme`) montre la frequentation par jour de semaine,
+par heure et par mois. Les barres sont en HTML/CSS et non en SVG : responsive
+et imprimable sans calcul de viewBox. La phrase de synthese est calculee sur
+les donnees, pas ecrite en dur.
+
 ## Services
 
 | Service | Fichier | Port par defaut |
