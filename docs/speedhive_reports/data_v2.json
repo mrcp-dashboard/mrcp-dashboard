@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-08-19T14:42:10",
+  "generated_at": "2026-08-19T14:45:15",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 219,
     "pilots_count": 76,
-    "laps_count": 11122,
+    "laps_count": 11128,
     "tracks": {
       "TT1/8": {
-        "laps_count": 10948,
+        "laps_count": 10954,
         "activities_count": 219,
         "pilots_count": 76
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 0,
-    "suspicious_laps_count": 9081,
+    "suspicious_laps_count": 9087,
     "unknown_pilots_count": 2,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -619,6 +619,19 @@
         "lap_no": 4,
         "start_time": "10:52:12",
         "lap_time": 31.349,
+        "track": "TT1/8",
+        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
+      },
+      {
+        "lap_id": "8188481052|4120178|6|16:44:33|31.352",
+        "activity_id": "8188481052",
+        "date_fr": "19/08/2026",
+        "pilot_name": "VINCENT DECLA",
+        "pilot_slug": "vincent-decla-4120178",
+        "transponder": "4120178",
+        "lap_no": 6,
+        "start_time": "16:44:33",
+        "lap_time": 31.352,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
       },
@@ -1983,6 +1996,19 @@
         "transponder": "6686431",
         "lap_no": 7,
         "start_time": "14:31:09",
+        "lap_time": 31.789,
+        "track": "TT1/8",
+        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
+      },
+      {
+        "lap_id": "8188481052|4120178|1|16:41:48|31.789",
+        "activity_id": "8188481052",
+        "date_fr": "19/08/2026",
+        "pilot_name": "VINCENT DECLA",
+        "pilot_slug": "vincent-decla-4120178",
+        "transponder": "4120178",
+        "lap_no": 1,
+        "start_time": "16:41:48",
         "lap_time": 31.789,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
@@ -5563,6 +5589,19 @@
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
       },
       {
+        "lap_id": "8188481052|4120178|5|16:44:00|32.408",
+        "activity_id": "8188481052",
+        "date_fr": "19/08/2026",
+        "pilot_name": "VINCENT DECLA",
+        "pilot_slug": "vincent-decla-4120178",
+        "transponder": "4120178",
+        "lap_no": 5,
+        "start_time": "16:44:00",
+        "lap_time": 32.408,
+        "track": "TT1/8",
+        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
+      },
+      {
         "lap_id": "7915552792|5893236|2|17:04:12|32.409",
         "activity_id": "7915552792",
         "date_fr": "13/06/2026",
@@ -6508,45 +6547,6 @@
         "lap_no": 6,
         "start_time": "11:34:58",
         "lap_time": 32.56,
-        "track": "TT1/8",
-        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
-      },
-      {
-        "lap_id": "7922894539|5893236|7|12:01:52|32.560",
-        "activity_id": "7922894539",
-        "date_fr": "14/06/2026",
-        "pilot_name": "DORIAN GIANNETTA",
-        "pilot_slug": "dorian-giannetta-5893236",
-        "transponder": "5893236",
-        "lap_no": 7,
-        "start_time": "12:01:52",
-        "lap_time": 32.56,
-        "track": "TT1/8",
-        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
-      },
-      {
-        "lap_id": "7915552792|5893236|11|16:36:29|32.566",
-        "activity_id": "7915552792",
-        "date_fr": "13/06/2026",
-        "pilot_name": "DORIAN GIANNETTA",
-        "pilot_slug": "dorian-giannetta-5893236",
-        "transponder": "5893236",
-        "lap_no": 11,
-        "start_time": "16:36:29",
-        "lap_time": 32.566,
-        "track": "TT1/8",
-        "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
-      },
-      {
-        "lap_id": "7870150902|8046737|7|19:23:43|32.569",
-        "activity_id": "7870150902",
-        "date_fr": "01/06/2026",
-        "pilot_name": "GREGOIRE BARROSO",
-        "pilot_slug": "gregoire-barroso-8046737",
-        "transponder": "8046737",
-        "lap_no": 7,
-        "start_time": "19:23:43",
-        "lap_time": 32.569,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent"
       }
@@ -7916,6 +7916,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "8188481052",
+        "date_fr": "19/08/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 90,
+        "quality_score": 0,
+        "suspicious_laps_count": 86,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "7682241684",
         "date_fr": "19/04/2026",
         "tracks": [
@@ -8023,17 +8034,6 @@
         "laps_count": 113,
         "quality_score": 0,
         "suspicious_laps_count": 81,
-        "unknown_pilots_count": 0
-      },
-      {
-        "id": "8188481052",
-        "date_fr": "19/08/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 84,
-        "quality_score": 0,
-        "suspicious_laps_count": 80,
         "unknown_pilots_count": 0
       },
       {
@@ -10354,7 +10354,7 @@
       "date_fr": "19/08/2026",
       "source_file": "sessions_8188481052.csv",
       "pilot_count": 1,
-      "laps_count": 84,
+      "laps_count": 90,
       "best_lap": 30.781,
       "best_pilot": "VINCENT DECLA",
       "tracks": [
@@ -10362,26 +10362,26 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 84
+        "TT1/8": 90
       },
       "quality_score": 0,
-      "suspicious_laps_count": 80,
+      "suspicious_laps_count": 86,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "4120178",
           "pilot_name": "VINCENT DECLA",
           "pilot_slug": "vincent-decla-4120178",
-          "laps_count": 84,
+          "laps_count": 90,
           "best_lap": 30.781,
-          "avg_lap": 33.855,
-          "consistency": 5.035,
+          "avg_lap": 33.784,
+          "consistency": 4.884,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 84
+            "TT1/8": 90
           },
           "laps": [
             {
@@ -11643,6 +11643,96 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8188481052|4120178|6|16:40:13|31.376"
+            },
+            {
+              "activity_id": "8188481052",
+              "transponder": "4120178",
+              "raw_transponder": "4120178",
+              "pilot_name": "VINCENT DECLA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "16:41:48",
+              "lap_no": 1,
+              "lap_time": 31.789,
+              "speed": "29.444 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188481052|4120178|1|16:41:48|31.789"
+            },
+            {
+              "activity_id": "8188481052",
+              "transponder": "4120178",
+              "raw_transponder": "4120178",
+              "pilot_name": "VINCENT DECLA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "16:42:19",
+              "lap_no": 2,
+              "lap_time": 32.812,
+              "speed": "28.526 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188481052|4120178|2|16:42:19|32.812"
+            },
+            {
+              "activity_id": "8188481052",
+              "transponder": "4120178",
+              "raw_transponder": "4120178",
+              "pilot_name": "VINCENT DECLA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "16:42:52",
+              "lap_no": 3,
+              "lap_time": 35.436,
+              "speed": "26.414 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188481052|4120178|3|16:42:52|35.436"
+            },
+            {
+              "activity_id": "8188481052",
+              "transponder": "4120178",
+              "raw_transponder": "4120178",
+              "pilot_name": "VINCENT DECLA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "16:43:28",
+              "lap_no": 4,
+              "lap_time": 32.909,
+              "speed": "28.442 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188481052|4120178|4|16:43:28|32.909"
+            },
+            {
+              "activity_id": "8188481052",
+              "transponder": "4120178",
+              "raw_transponder": "4120178",
+              "pilot_name": "VINCENT DECLA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "16:44:00",
+              "lap_no": 5,
+              "lap_time": 32.408,
+              "speed": "28.882 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188481052|4120178|5|16:44:00|32.408"
+            },
+            {
+              "activity_id": "8188481052",
+              "transponder": "4120178",
+              "raw_transponder": "4120178",
+              "pilot_name": "VINCENT DECLA",
+              "date": "2026-08-19",
+              "date_fr": "19/08/2026",
+              "start_time": "16:44:33",
+              "lap_no": 6,
+              "lap_time": 31.352,
+              "speed": "29.855 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8188481052|4120178|6|16:44:33|31.352"
             }
           ],
           "rank": 1,
@@ -187765,16 +187855,16 @@
           "date": "2026-08-19",
           "date_fr": "19/08/2026",
           "rank": 1,
-          "laps_count": 84,
+          "laps_count": 90,
           "best_lap": 30.781,
-          "avg_lap": 33.855,
-          "consistency": 5.035,
+          "avg_lap": 33.784,
+          "consistency": 4.884,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 84
+            "TT1/8": 90
           }
         },
         {
@@ -187829,13 +187919,13 @@
           }
         }
       ],
-      "total_laps": 233,
+      "total_laps": 239,
       "best_lap": 30.434,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 233
+        "TT1/8": 239
       },
       "activities_count": 4,
       "avg_best_lap": 30.703
