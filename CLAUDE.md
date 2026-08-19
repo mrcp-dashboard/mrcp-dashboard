@@ -11,10 +11,12 @@ live timing, admin). Le site public est un **front statique servi depuis `docs/`
 GitHub Pages** - HTML/CSS/JS classiques, **aucune etape de build, aucun bundler, aucun
 module ES**. Ce qui est dans `docs/` est exactement ce qui est deploye.
 
-Le deploiement GitHub Pages (`.github/workflows/pages.yml`) tourne sur un **planning
-toutes les 15 minutes**, pas a chaque push (voir "Deploiement GitHub Pages" dans
-docs/DEVELOPMENT.md pour le pourquoi). Un changement pousse sur `main` peut donc mettre
-jusqu'a ~15 min a apparaitre sur le site public - normal, pas un bug.
+Le deploiement GitHub Pages (`.github/workflows/pages.yml`) se declenche **sur chaque
+push** ; un planning toutes les 15 min sert uniquement de filet de securite. Un
+changement pousse sur `main` apparait donc en general sur le site public en moins
+d'une minute. Si le site se fige alors que les commits continuent d'arriver, voir
+"Deploiement GitHub Pages" dans docs/DEVELOPMENT.md (panne du 12-16 aout 2026 :
+deploiement bloque en etat `waiting` qui coince toute la file).
 
 ## Workflow de travail
 

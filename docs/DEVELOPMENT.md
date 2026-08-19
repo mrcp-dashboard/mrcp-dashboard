@@ -3,33 +3,51 @@
 ## Deploiement GitHub Pages
 
 `.github/workflows/pages.yml` deploie `docs/` sur GitHub Pages. Il se
-declenche sur un **planning toutes les 15 minutes** (`schedule: cron`), pas
-sur chaque push.
+declenche **sur chaque push** sur `main`, avec un planning (`schedule: cron`
+toutes les 15 min) qui ne sert que de **filet de securite**.
 
-C'est volontaire : le LXC pousse un commit "Auto update dashboard" toutes les
-~3 minutes. GitHub Pages n'autorise qu'un seul deploiement a la fois par
-depot et annule l'ancien des qu'un nouveau demarre. Avec un declenchement sur
-`push`, des qu'un deploiement met ne serait-ce que 3 minutes a se terminer,
-il se fait annuler par le commit suivant avant d'aboutir - et ça boucle a
-l'infini. C'est exactement ce qui s'est passe du **12 au 16 aout 2026** :
-100% des deploiements ont ete annules pendant 5 jours, le site public restant
-fige sur sa version du 11 aout 23:57 alors meme que les commits Git
-continuaient d'arriver normalement.
+Le LXC pousse un commit "Auto update dashboard" toutes les ~3 minutes et un
+deploiement dure ~20 secondes : il n'y a aucun risque de chevauchement, et le
+site public suit les donnees de pres.
 
-Pour verifier que les deploiements aboutissent a nouveau :
+### Panne du 12 au 16 aout 2026 (et fausse piste)
+
+Pendant 5 jours, 100% des deploiements sont sortis en `cancelled` et le site
+public est reste fige sur sa version du 11 aout 23:57, alors que les commits
+Git continuaient d'arriver normalement.
+
+La cause reelle etait **un deploiement bloque en etat `waiting`** (celui du
+12 aout 14:30) cote API Deployments : la file etant coincee, chaque nouveau
+run se faisait annuler en cascade. Le declenchement sur `push` n'y etait pour
+rien - il fonctionnait sans probleme depuis le 24 mai.
+
+Le passage temporaire a un cron seul a d'abord fait croire a une correction,
+mais il a surtout degrade la fraicheur : **GitHub decale fortement les
+workflows planifies**. Un cron `*/15` a livre en pratique ~32 min d'ecart
+moyen, jusqu'a 42 min. D'ou le retour au declenchement sur push.
+
+### Diagnostic si le site se fige a nouveau
 
 ```bash
 gh run list --repo mrcp-dashboard/mrcp-dashboard --workflow="Deploy GitHub Pages" --limit 5
 ```
 
-Si ça recommence a boucler en `cancelled`, augmenter l'intervalle du cron
-(ou reduire la frequence de push du LXC) plutot que de repasser sur `push`.
+Une serie de `cancelled` = la file est probablement coincee. Chercher un
+deploiement bloque, puis le forcer dans un etat terminal pour liberer la file :
+
+```bash
+gh api "repos/mrcp-dashboard/mrcp-dashboard/deployments?environment=github-pages&per_page=3" --jq '.[].id'
+gh api "repos/mrcp-dashboard/mrcp-dashboard/deployments/<ID>/statuses" --jq '.[0].state'
+gh api --method POST "repos/mrcp-dashboard/mrcp-dashboard/deployments/<ID>/statuses" -f state=error
+```
+
+Ne pas repasser sur un cron seul : ça masque le probleme et ralentit tout.
 
 `docs/admin_api.py` peut declencher un deploiement immediat (`workflow_dispatch`)
 juste apres un push de corrections admin, si `MRCP_GITHUB_TOKEN` est configure
 (voir "Flux admin API" plus bas et README.md > Configuration). Ca ne concerne
-que les corrections admin, pas les commits automatiques du LXC - ceux-la
-restent sur le planning 15 min, pour ne pas recreer la boucle d'annulation.
+que les corrections admin ; les commits automatiques du LXC declenchent deja
+leur propre deploiement via le trigger `push`.
 
 ## Pages principales
 
