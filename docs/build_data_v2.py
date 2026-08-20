@@ -33,8 +33,18 @@ LAP_OVERRIDES_FILE = ROOT / "lap_overrides.json"
 LAP_MIN = 8.0
 LAP_MAX = 300.0
 TT10_LIMIT = 30.0
+# Un tour est classe TT1/10 sous 30 s, TT1/8 au-dessus (TT10_LIMIT). Un TT1/10
+# lent peut donc basculer a tort en TT1/8 : la fenetre ci-dessous sert a le
+# reperer pour verification manuelle.
+#
+# La borne haute etait a 45 s, ce qui couvrait toute la plage normale du TT1/8
+# (mediane 38.9 s, record du club 30.4 s) : 83% des tours etaient signales, la
+# page Qualite affichait un mur de tours parfaitement normaux et le score
+# restait bloque a 0. A 32 s on ne garde que la zone reellement ambigue - les
+# TT1/10 avoues montent jusqu'a 33.8 s - soit ~2% des tours, une liste
+# reellement relisible.
 SUSPECT_TT18_LOW = 30.0
-SUSPECT_TT18_HIGH = 45.0
+SUSPECT_TT18_HIGH = 32.0
 CLUB_NAME = "Mini Racing Club Palois"
 
 
@@ -238,7 +248,7 @@ def read_activity_csv(path: Path, corrections: dict[str, Any], overrides: dict[s
                     "start_time": start_time,
                     "lap_time": round(lap_time, 3),
                     "track": track,
-                    "reason": "TT1/8 entre 30 et 45 s : vérifier si TT1/10 lent",
+                    "reason": f"TT1/8 entre {SUSPECT_TT18_LOW:.0f} et {SUSPECT_TT18_HIGH:.0f} s : vérifier si TT1/10 lent",
                 })
             entries.append(entry)
 
@@ -433,7 +443,19 @@ def build() -> dict[str, Any]:
         {"id": a["id"], "date_fr": a["date_fr"], "tracks": a.get("tracks", []), "laps_count": a["laps_count"], "quality_score": a["quality_score"], "suspicious_laps_count": a["suspicious_laps_count"], "unknown_pilots_count": a["unknown_pilots_count"]}
         for a in activities
     ], key=lambda x: (x["quality_score"], -x["suspicious_laps_count"]))
-    global_score = max(0, min(100, round(100 - len(suspicious_laps) * 0.6 - len(unknown_pilots) * 0.8 - len(quality_collector["ignored_raw_laps"]) * 0.1)))
+    # Score proportionnel au volume de donnees. L'ancienne formule retirait
+    # 0.6 point par tour suspect en valeur absolue : elle tombait a 0 des
+    # 167 tours signales, quel que soit le nombre total de tours, et ne
+    # distinguait donc plus un jeu de donnees sain d'un jeu catastrophique.
+    total_laps = sum(a["laps_count"] for a in activities)
+    suspicious_ratio = (len(suspicious_laps) / total_laps) if total_laps else 0.0
+    ignored_ratio = (len(quality_collector["ignored_raw_laps"]) / total_laps) if total_laps else 0.0
+    global_score = max(0, min(100, round(
+        100
+        - suspicious_ratio * 200   # 10% de tours suspects -> -20 points
+        - len(unknown_pilots) * 2  # chaque puce non nommee -> -2 points
+        - ignored_ratio * 100      # 10% de tours hors limites -> -10 points
+    )))
 
     return {
         "schema_version": 3.5,

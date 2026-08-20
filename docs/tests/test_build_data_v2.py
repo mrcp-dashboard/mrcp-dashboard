@@ -115,3 +115,63 @@ def test_main_writes_valid_json(project):
     with root_out.open(encoding="utf-8") as f:
         root_data = json.load(f)
     assert root_data["summary"]["activities_count"] == 1
+
+
+SUSPECT_CSV = textwrap.dedent(
+    """\
+    Transponder,Date,"Start time",Lap,"Total time",Laptime,MRCP,Speed,Diff
+    ,,,,,,,,
+    2000001,02-01-2026,10:00:00,1,0:00:31.000,0:00:31.000,0:00:31.000,"20.000 km/h",
+    2000001,02-01-2026,10:00:31,2,0:01:09.000,0:00:38.000,0:00:38.000,"20.000 km/h",
+    2000001,02-01-2026,10:01:09,3,0:01:53.000,0:00:44.000,0:00:44.000,"20.000 km/h",
+    """
+)
+
+
+def test_seuls_les_tours_de_la_zone_ambigue_sont_suspects(project, tmp_path):
+    """La fenetre suspecte ne doit couvrir que le chevauchement TT1/10 - TT1/8.
+
+    Elle allait jusqu'a 45 s, ce qui englobait la plage normale du TT1/8
+    (mediane ~39 s) et signalait 83% des tours.
+    """
+    bdv_mod, _ = project
+    (bdv_mod.CSV_DIR / "sessions_SUSPECT.csv").write_text(SUSPECT_CSV, encoding="utf-8")
+
+    data = bdv_mod.build()
+    suspects = data["data_quality"]["suspicious_laps"]
+    temps = sorted(s["lap_time"] for s in suspects)
+
+    # 31 s est dans la zone ambigue, 38 s et 44 s sont des TT1/8 normaux.
+    assert temps == [31.0], temps
+
+
+CLEAN_CSV = textwrap.dedent(
+    """    Transponder,Date,"Start time",Lap,"Total time",Laptime,MRCP,Speed,Diff
+    ,,,,,,,,
+    1000001,03-01-2026,10:00:00,1,0:00:38.000,0:00:38.000,0:00:38.000,"20.000 km/h",
+    1000001,03-01-2026,10:00:38,2,0:01:17.000,0:00:39.000,0:00:39.000,"20.000 km/h",
+    1000001,03-01-2026,10:01:17,3,0:01:57.000,0:00:40.000,0:00:40.000,"20.000 km/h",
+    """
+)
+
+
+def test_score_qualite_proche_de_100_sur_des_donnees_saines(project):
+    """Des donnees sans anomalie doivent donner un score quasi parfait.
+
+    L'ancienne formule retirait 0.6 point par tour suspect en valeur absolue
+    et tombait a 0 des 167 tours signales, quelle que soit la taille du jeu de
+    donnees - le score ne voulait donc plus rien dire.
+    """
+    bdv_mod, _ = project
+    # On remplace le jeu de base, qui contient volontairement un tour hors
+    # limites et une puce sans nom.
+    for csv_file in bdv_mod.CSV_DIR.glob("sessions_*.csv"):
+        csv_file.unlink()
+    (bdv_mod.CSV_DIR / "sessions_CLEAN.csv").write_text(CLEAN_CSV, encoding="utf-8")
+
+    data = bdv_mod.build()
+    quality = data["data_quality"]
+
+    assert quality["suspicious_laps_count"] == 0, quality
+    assert quality["unknown_pilots_count"] == 0, quality
+    assert quality["global_score"] == 100, quality

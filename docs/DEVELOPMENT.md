@@ -126,6 +126,28 @@ Schema observe :
 La generation est faite par `build_data_v2.py`. Les corrections persistantes sont
 dans `corrections.json` et `lap_overrides.json`.
 
+## Detection des tours suspects
+
+Un tour est classe TT1/10 sous 30 s et TT1/8 au-dessus (`TT10_LIMIT`). Un
+TT1/10 lent peut donc basculer a tort en TT1/8 : la fenetre
+`SUSPECT_TT18_LOW`/`SUSPECT_TT18_HIGH` de `build_data_v2.py` sert a reperer ces
+cas pour verification manuelle (page Qualite, admin).
+
+La borne haute etait a **45 s**, ce qui couvrait toute la plage normale du
+TT1/8 : mediane 38.9 s, record du club 30.4 s. Resultat au 21/08/2026 :
+**9137 tours sur 11011 signales (83%)**, page Qualite noyee sous des tours
+parfaitement normaux, et score bloque a 0/100.
+
+Ramenee a **32 s**, la fenetre ne couvre plus que la zone reellement ambigue
+(les TT1/10 assumes montent jusqu'a 33.8 s) : **240 tours, 2.1%**, une liste
+relisible. Score remonte a 92/100.
+
+Le calcul du score a ete recalibre en meme temps. Il retirait 0.6 point par
+tour suspect **en valeur absolue** : il tombait a 0 des 167 tours signales,
+quelle que soit la taille du jeu de donnees. Les penalites sont desormais
+proportionnelles au nombre total de tours. Comportement verrouille par
+`docs/tests/test_build_data_v2.py`.
+
 ## Series de tours consecutifs
 
 `app_v2_laps.js` calcule la **meilleure moyenne sur N tours qui s'enchainent**
