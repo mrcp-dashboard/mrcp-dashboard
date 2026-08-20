@@ -370,18 +370,96 @@ function qrProfilePage(){
 }
 
 function recordHistoryRows(track){
+  // Tri chronologique strict : a date egale on departage par heure de passage,
+  // pas par temps au tour. Departager par temps revenait a ne garder que le
+  // meilleur tour de chaque journee, ce qui escamotait les records tombes en
+  // cours de journee - dont le tout premier detenteur du club.
   var best=Infinity, rows=[];
-  getAllLaps().filter(function(l){return l._track===track;}).sort(function(a,b){return parseDateValue(a._date)-parseDateValue(b._date)||a._time-b._time;}).forEach(function(l){
+  getAllLaps().filter(function(l){return l._track===track;}).sort(function(a,b){
+    return parseDateValue(a._date)-parseDateValue(b._date)
+      || String(a.start_time||'').localeCompare(String(b.start_time||''))
+      || (Number(a.lap_no||0)-Number(b.lap_no||0));
+  }).forEach(function(l){
     if(l._time<best){best=l._time;rows.push(l);}
   });
   return rows.reverse();
 }
+// Courbe en escalier de la chute du record : un record tient jusqu'a ce qu'il
+// tombe, donc un trait horizontal puis une marche verticale - pas une droite
+// entre deux points, qui laisserait croire a une amelioration continue.
+// L'axe X est un vrai axe de temps (et non un index) : on voit ainsi que les
+// records sont tombes en rafale en avril puis rarement ensuite.
+function recordHistorySvg(rows){
+  if(rows.length < 2) return '<p class="small">Pas encore assez de records pour tracer une courbe.</p>';
+  var pts = rows.slice().reverse(); // recordHistoryRows() renvoie du plus recent au plus ancien
+  var w = 760, h = 260, left = 58, right = 18, top = 18, bottom = 48;
+
+  var t0 = parseDateValue(pts[0]._date);
+  var tLast = parseDateValue(pts[pts.length - 1]._date);
+  var tEnd = Math.max(Date.now(), tLast);
+  if(!(tEnd > t0)) tEnd = t0 + 86400000;
+
+  var times = pts.map(function(p){ return p._time; });
+  var min = Math.min.apply(null, times), max = Math.max.apply(null, times);
+  var margin = Math.max((max - min) * 0.12, 0.2);
+  min = Math.max(0, min - margin);
+  max = max + margin;
+  if(max === min) max = min + 1;
+
+  function x(ms){ return left + ((ms - t0) / (tEnd - t0)) * (w - left - right); }
+  function y(v){ return top + ((max - v) / (max - min)) * (h - top - bottom); }
+
+  // Escalier : palier horizontal jusqu'a la date du record suivant, puis chute.
+  var d = 'M' + x(t0).toFixed(1) + ' ' + y(pts[0]._time).toFixed(1);
+  for(var i = 1; i < pts.length; i++){
+    var px = x(parseDateValue(pts[i]._date)).toFixed(1);
+    d += ' L' + px + ' ' + y(pts[i - 1]._time).toFixed(1);
+    d += ' L' + px + ' ' + y(pts[i]._time).toFixed(1);
+  }
+  d += ' L' + x(tEnd).toFixed(1) + ' ' + y(pts[pts.length - 1]._time).toFixed(1);
+
+  var yTicks = [];
+  for(var yi = 0; yi < 5; yi++){
+    var tv = min + ((max - min) / 4) * yi;
+    var ty = y(tv);
+    yTicks.push('<line class="progress-grid" x1="' + left + '" y1="' + ty.toFixed(1) + '" x2="' + (w - right) + '" y2="' + ty.toFixed(1) + '"></line>' +
+      '<text class="progress-label" x="8" y="' + (ty + 4).toFixed(1) + '">' + fmtTime(tv) + '</text>');
+  }
+
+  var xTicks = '';
+  for(var k = 0; k <= 4; k++){
+    var ms = t0 + ((tEnd - t0) / 4) * k;
+    var tx = x(ms);
+    xTicks += '<line class="progress-axis" x1="' + tx.toFixed(1) + '" y1="' + (h - bottom) + '" x2="' + tx.toFixed(1) + '" y2="' + (h - bottom + 5) + '"></line>' +
+      '<text class="progress-label" text-anchor="middle" x="' + tx.toFixed(1) + '" y="' + (h - 20) + '">' +
+      escapeHtml(new Date(ms).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'})) + '</text>';
+  }
+
+  var last = pts[pts.length - 1];
+  var dots = pts.map(function(p, i){
+    var isLast = i === pts.length - 1;
+    return '<circle class="progress-dot ' + (isLast ? 'progress-dot-best' : '') + '" cx="' + x(parseDateValue(p._date)).toFixed(1) + '" cy="' + y(p._time).toFixed(1) + '" r="' + (isLast ? 6 : 4) + '">' +
+      '<title>' + escapeHtml(p._pilot) + ' - ' + fmtTimeS(p._time) + ' - ' + escapeHtml(dateFrFromValue(p._date)) + (isLast ? ' (record actuel)' : '') + '</title></circle>';
+  }).join('');
+
+  var gain = pts[0]._time - last._time;
+  return '<div class="progress-wrap"><svg class="progress-svg" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="xMidYMid meet">' +
+      yTicks.join('') +
+      '<line class="progress-axis" x1="' + left + '" y1="' + (h - bottom) + '" x2="' + (w - right) + '" y2="' + (h - bottom) + '"></line>' +
+      '<line class="progress-axis" x1="' + left + '" y1="' + top + '" x2="' + left + '" y2="' + (h - bottom) + '"></line>' +
+      xTicks +
+      '<path class="progress-line" d="' + d + '"></path>' + dots +
+      '<text class="progress-label axis-title" x="' + (left + 8) + '" y="12">Secondes</text>' +
+    '</svg></div>' +
+    '<p class="small">' + rows.length + ' records successifs · ' + fmtTimeS(pts[0]._time) + ' → <strong>' + fmtTimeS(last._time) + '</strong> (' + gain.toFixed(3) + ' s gagnées) · détenteur actuel : ' + escapeHtml(last._pilot) + '</p>';
+}
+
 function recordHistoryPage(){
   var tracks=['TT1/8','TT1/10'];
   app.innerHTML='<section class="card"><div class="panel-title"><div><h2>Historique des records</h2><p class="small">Les records successifs du club, du plus recent au plus ancien.</p></div><a class="mini-button" href="#/records-club">Retour records club</a></div></section>'+
     tracks.map(function(track){
       var rows=recordHistoryRows(track);
-      return '<section class="card"><h2>'+escapeHtml(track)+'</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Pilote</th><th>Temps</th><th>Session</th></tr></thead><tbody>'+rows.map(function(l){return '<tr><td>'+escapeHtml(l._date||'-')+'</td><td><a href="#/pilote/'+encodeURIComponent(l._pilot)+'">'+escapeHtml(l._pilot)+'</a></td><td><strong>'+fmtTimeS(l._time)+'</strong></td><td>'+escapeHtml(l.session_name||'-')+'</td></tr>';}).join('')+'</tbody></table></div></section>';
+      return '<section class="card"><h2>'+escapeHtml(track)+'</h2>'+recordHistorySvg(rows)+'<div class="table-wrap"><table><thead><tr><th>Date</th><th>Pilote</th><th>Temps</th><th>Session</th></tr></thead><tbody>'+rows.map(function(l){return '<tr><td>'+escapeHtml(dateFrFromValue(l._date)||'-')+'</td><td><a href="#/pilote/'+encodeURIComponent(l._pilot)+'">'+escapeHtml(l._pilot)+'</a></td><td><strong>'+fmtTimeS(l._time)+'</strong></td><td>'+escapeHtml(l.session_name||'-')+'</td></tr>';}).join('')+'</tbody></table></div></section>';
     }).join('');
 }
 
