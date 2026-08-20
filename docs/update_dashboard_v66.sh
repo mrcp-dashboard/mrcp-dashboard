@@ -28,7 +28,7 @@ fi
 
 cd "$PROJECT_ROOT"
 git pull --rebase origin "$GIT_BRANCH"
-git add docs/data_v2.json docs/speedhive_reports/data_v2.json
+git add docs/data_v2.json
 
 if git diff --cached --quiet; then
   echo "Rien a commit"

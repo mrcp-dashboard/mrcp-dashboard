@@ -35,16 +35,26 @@ echo "[3/5] Validation data_v2.json"
 "$PYTHON" validate_dashboard_data.py
 
 cd "$PROJECT_ROOT"
-echo "[4/5] Git add"
-git add docs
-
-echo "[5/5] Git commit / push"
-if git diff --cached --quiet; then
-  echo "Aucun changement a publier"
+echo "[4/5] Y a-t-il du nouveau a publier ?"
+# data_v2.json change a chaque passage a cause de generated_at, meme quand
+# personne n'a roule : sans ce filtre on commitait ~480 fois par jour pour
+# rien (mesure du 20/08/2026 : 119 commits d'affilee sans aucune donnee
+# nouvelle). Voir docs/tools/data_changed.py.
+if "$PYTHON" "$PROJECT_DIR/tools/data_changed.py" --verbose; then
+  echo "[5/5] Git commit / push"
+  git add docs
+  if git diff --cached --quiet; then
+    echo "Aucun changement a publier"
+  else
+    git commit -m "Auto update dashboard $(date '+%Y-%m-%d %H:%M')"
+    git pull --rebase origin "$GIT_BRANCH"
+    git push origin "$GIT_BRANCH"
+  fi
 else
-  git commit -m "Auto update dashboard $(date '+%Y-%m-%d %H:%M')"
-  git pull --rebase origin "$GIT_BRANCH"
-  git push origin "$GIT_BRANCH"
+  echo "[5/5] Rien de neuf : commit ignore"
+  # L'arbre doit rester propre, sinon le "git pull --rebase" du prochain
+  # passage echouerait sur des modifications locales non commitees.
+  git checkout -- docs/data_v2.json docs/speedhive_sync_meta.json 2>/dev/null || true
 fi
 
 echo "Termine"

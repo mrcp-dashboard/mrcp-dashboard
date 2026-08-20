@@ -43,23 +43,19 @@ def project(tmp_path, monkeypatch):
     corrections_file = tmp_path / "corrections.json"
     lap_overrides_file = tmp_path / "lap_overrides.json"
 
-    out_dir = tmp_path / "speedhive_reports"
     root_out = tmp_path / "data_v2.json"
-    report_out = out_dir / "data_v2.json"
 
     monkeypatch.setattr(bdv, "CSV_DIR", csv_dir)
     monkeypatch.setattr(bdv, "PILOTS_FILE", pilots_file)
     monkeypatch.setattr(bdv, "CORRECTIONS_FILE", corrections_file)
     monkeypatch.setattr(bdv, "LAP_OVERRIDES_FILE", lap_overrides_file)
-    monkeypatch.setattr(bdv, "OUT_DIR", out_dir)
     monkeypatch.setattr(bdv, "ROOT_OUT_FILE", root_out)
-    monkeypatch.setattr(bdv, "REPORT_OUT_FILE", report_out)
 
-    return bdv, root_out, report_out
+    return bdv, root_out
 
 
 def test_build_minimal_dataset(project):
-    bdv_mod, _, _ = project
+    bdv_mod, _ = project
     data = bdv_mod.build()
 
     assert data["schema_version"] == 3.5
@@ -81,7 +77,7 @@ def test_build_minimal_dataset(project):
 
 
 def test_personal_record_flagging(project):
-    bdv_mod, _, _ = project
+    bdv_mod, _ = project
     data = bdv_mod.build()
 
     activity = data["activities"][0]
@@ -100,7 +96,7 @@ def test_personal_record_flagging(project):
 
 
 def test_out_of_range_lap_is_ignored(project):
-    bdv_mod, _, _ = project
+    bdv_mod, _ = project
     data = bdv_mod.build()
 
     ignored = data["data_quality"]["ignored_raw_laps"]
@@ -110,18 +106,12 @@ def test_out_of_range_lap_is_ignored(project):
     assert ignored[0]["reason"] == "hors limites"
 
 
-def test_main_writes_valid_json_to_both_locations(project):
-    bdv_mod, root_out, report_out = project
+def test_main_writes_valid_json(project):
+    bdv_mod, root_out = project
 
     bdv_mod.main()
 
     assert root_out.exists()
-    assert report_out.exists()
-
     with root_out.open(encoding="utf-8") as f:
         root_data = json.load(f)
-    with report_out.open(encoding="utf-8") as f:
-        report_data = json.load(f)
-
-    assert root_data == report_data
     assert root_data["summary"]["activities_count"] == 1

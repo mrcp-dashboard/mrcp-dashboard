@@ -49,6 +49,42 @@ juste apres un push de corrections admin, si `MRCP_GITHUB_TOKEN` est configure
 que les corrections admin ; les commits automatiques du LXC declenchent deja
 leur propre deploiement via le trigger `push`.
 
+## Commits automatiques : ne publier que du nouveau
+
+`data_v2.json` contient `generated_at`, qui change a chaque regeneration. Le
+fichier differait donc **toujours** de la version commitee, meme quand personne
+n'avait roule. Mesure du 20/08/2026 : les 119 derniers commits automatiques ne
+publiaient aucune donnee nouvelle, pour ~480 commits et ~960 executions CI par
+jour, et un depot passe a 111 Mo en trois mois et demi.
+
+`docs/update_dashboard.sh` interroge maintenant `docs/tools/data_changed.py`
+avant de commiter :
+
+- code de sortie **0** : il y a du nouveau (donnees changees au-dela de
+  `generated_at`, nouveau CSV, ou tout autre fichier modifie sous `docs/`) ;
+- code de sortie **1** : rien de neuf, le commit est saute.
+
+Quand le commit est saute, le script restaure `data_v2.json` et
+`speedhive_sync_meta.json` : l'arbre doit rester propre, sinon le
+`git pull --rebase` du passage suivant echouerait sur des modifications
+locales. En cas de doute (JSON illisible, `git status` en echec) le script
+repond "il y a du nouveau" : mieux vaut un commit de trop qu'une donnee jamais
+publiee. Comportement couvert par `docs/tests/test_data_changed.py`.
+
+Consequence sur le temoin de fraicheur : `generated_at` ne bouge plus que
+lorsqu'il y a du nouveau. Une semaine sans roulage est normale, donc le pied de
+page n'alerte plus sur l'age (ce serait crier au loup) : il affiche simplement
+la date des donnees. Pour verifier que la publication fonctionne, utiliser la
+commande `gh run list` de la section "Deploiement GitHub Pages".
+
+## Un seul data_v2.json
+
+`build_data_v2.py` ecrivait aussi `speedhive_reports/data_v2.json`, copie
+octet pour octet du fichier principal, par securite contre les erreurs de
+dossier. Rien ne la lisait cote site : c'etait 7 Mo reecrits et commites a
+chaque cycle. La copie n'est plus generee, le fichier est sorti du depot et
+ignore par Git.
+
 ## Pages principales
 
 | Page | Role |

@@ -1374,20 +1374,10 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   padding:3px 10px;
   border:1px solid transparent;
 }
-.freshness-ok{
-  color:#caffd8;
-  background:rgba(62,230,111,.14);
-  border-color:rgba(62,230,111,.32);
-}
-.freshness-warn{
-  color:#ffd8b2;
-  background:rgba(255,159,49,.16);
-  border-color:rgba(255,159,49,.40);
-}
-.freshness-alert{
-  color:#ffd6d6;
-  background:rgba(255,75,92,.18);
-  border-color:rgba(255,75,92,.50);
+.freshness{
+  color:var(--muted);
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.14);
 }
 
 /* V7.0 - Divisions de niveau */

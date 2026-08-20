@@ -10,9 +10,7 @@ Il lit :
 - corrections.json (optionnel)
 - lap_overrides.json (optionnel, exporté depuis /admin)
 
-Il écrit les deux fichiers pour éviter les erreurs de dossier :
-- data_v2.json
-- speedhive_reports/data_v2.json
+Il écrit data_v2.json.
 """
 from __future__ import annotations
 
@@ -27,9 +25,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent
 CSV_DIR = ROOT / "speedhive_csv"
-OUT_DIR = ROOT / "speedhive_reports"
 ROOT_OUT_FILE = ROOT / "data_v2.json"
-REPORT_OUT_FILE = OUT_DIR / "data_v2.json"
 CORRECTIONS_FILE = ROOT / "corrections.json"
 PILOTS_FILE = ROOT / "speedhive_pilots.json"
 LAP_OVERRIDES_FILE = ROOT / "lap_overrides.json"
@@ -478,15 +474,11 @@ def build() -> dict[str, Any]:
 
 
 def main() -> None:
-    OUT_DIR.mkdir(exist_ok=True)
     data = build()
-    for target in (ROOT_OUT_FILE, REPORT_OUT_FILE):
-        with target.open("w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+    with ROOT_OUT_FILE.open("w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
     q = data.get("data_quality", {})
-    print("OK: data_v2.json généré à deux endroits :")
-    print(f" - {ROOT_OUT_FILE}")
-    print(f" - {REPORT_OUT_FILE}")
+    print(f"OK: data_v2.json généré : {ROOT_OUT_FILE}")
     print("Résumé:", data["summary"])
     print(f"Qualité: score {q.get('global_score')}/100 | suspects {q.get('suspicious_laps_count')} | inconnus {q.get('unknown_pilots_count')} | overrides exclus {q.get('overrides', {}).get('excluded_count')} | pistes forcées {q.get('overrides', {}).get('forced_track_count')}")
     if q.get("suspicious_laps_count"):

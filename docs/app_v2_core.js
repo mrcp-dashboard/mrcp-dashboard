@@ -46,11 +46,13 @@ function setAdminConfig(cfg){localStorage.setItem(ADMIN_CFG_KEY,JSON.stringify({
 function clearAdminConfig(){localStorage.removeItem(ADMIN_CFG_KEY);}
 // --- Fraicheur des donnees -------------------------------------------------
 // Le pied de page restait fige sur "Donnees en cours de chargement" : rien ne
-// l'alimentait. Il sert maintenant de temoin de sante de la chaine
-// SpeedHive -> LXC -> GitHub Pages (le site est reste fige 5 jours en aout 2026
-// sans que ce soit visible).
-var FRESHNESS_WARN_MINUTES = 15;
-var FRESHNESS_ALERT_MINUTES = 60;
+// l'alimentait. Il affiche desormais la date des donnees publiees.
+//
+// Pas d'alerte basee sur l'age : depuis que le LXC ne commite plus quand rien
+// n'a change (voir docs/tools/data_changed.py), `generated_at` ne bouge que
+// lorsqu'il y a du nouveau. Une semaine sans roulage est donc normale, et
+// colorer en rouge au bout d'une heure ne ferait que crier au loup. La date
+// affichee suffit : le club sait quand il a roule.
 var freshnessTimer = null;
 
 // generated_at peut arriver sans fuseau horaire (donnees generees avant le
@@ -87,12 +89,13 @@ function updateDataFreshness(){
   // Marge negative possible si l'horloge du visiteur est en avance : on la
   // ramene a zero plutot que d'afficher une duree absurde.
   var minutes = Math.max(0, (Date.now() - t) / 60000);
-  var state = minutes >= FRESHNESS_ALERT_MINUTES ? 'alert'
-            : minutes >= FRESHNESS_WARN_MINUTES ? 'warn' : 'ok';
-  var label = state === 'ok' ? 'Données à jour' : 'Données en retard';
-  el.textContent = label + ' · ' + fmtAgeMinutes(minutes);
-  el.className = 'freshness freshness-' + state;
-  el.title = 'Dernière génération : ' + new Date(t).toLocaleString('fr-FR');
+  // Au-dela de 24 h, la date exacte est plus parlante qu'un "il y a 5 jours".
+  var when = minutes < 24 * 60
+    ? fmtAgeMinutes(minutes)
+    : 'le ' + new Date(t).toLocaleDateString('fr-FR');
+  el.textContent = 'Dernière mise à jour · ' + when;
+  el.className = 'freshness';
+  el.title = 'Dernière génération des données : ' + new Date(t).toLocaleString('fr-FR');
 }
 
 function setupDataFreshness(){

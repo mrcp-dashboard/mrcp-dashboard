@@ -69,10 +69,7 @@ Le script lit notamment :
 - `corrections.json`
 - `lap_overrides.json`
 
-Il ecrit :
-
-- `docs/data_v2.json`
-- `docs/speedhive_reports/data_v2.json`
+Il ecrit `docs/data_v2.json`.
 
 ## Mise a jour serveur
 

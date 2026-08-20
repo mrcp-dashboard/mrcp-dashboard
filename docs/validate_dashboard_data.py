@@ -12,7 +12,6 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent
 DATA_FILE = ROOT / "data_v2.json"
-REPORT_DATA_FILE = ROOT / "speedhive_reports" / "data_v2.json"
 
 
 def fail(message: str) -> int:
@@ -67,19 +66,13 @@ def validate_payload(data: Any, source: Path) -> int:
 def main() -> int:
     if not DATA_FILE.exists():
         return fail(f"{DATA_FILE} introuvable")
-    if not REPORT_DATA_FILE.exists():
-        return fail(f"{REPORT_DATA_FILE} introuvable")
 
-    for path in (DATA_FILE, REPORT_DATA_FILE):
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return fail(f"lecture impossible {path}: {exc}")
-        code = validate_payload(data, path)
-        if code:
-            return code
+    try:
+        data = load_json(DATA_FILE)
+    except Exception as exc:
+        return fail(f"lecture impossible {DATA_FILE}: {exc}")
 
-    return 0
+    return validate_payload(data, DATA_FILE)
 
 
 if __name__ == "__main__":
