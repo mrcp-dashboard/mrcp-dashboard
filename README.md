@@ -42,6 +42,7 @@ Ouvrir ensuite :
   - `app_v2_divisions.js` : divisions de niveau (poules A/B/C par piste).
   - `app_v2_poster.js` : affiche club imprimable, admin (`#/affiche`).
   - `app_v2_rythme.js` : frequentation par jour, heure et mois (`#/rythme`).
+  - `app_v2_search.js` : recherche globale (pilote, puce, journee).
   - `app_v2_admin_records.js` : qualite des donnees et corrections de tours.
   - `app_v2_admin_pilots.js` : corrections pilotes/transpondeurs, hub admin.
 - `docs/styles_v2.css` : styles principaux.

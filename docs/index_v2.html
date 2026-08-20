@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=20260528-logo1">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png?v=20260528-logo1">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20260528-logo1">
-  <link rel="stylesheet" href="styles_v2.css?v=20260820-fresh3">
+  <link rel="stylesheet" href="styles_v2.css?v=20260821-search1">
   <link rel="stylesheet" href="mrcp_v66_premium.css?v=20260525-daypilot1">
 </head>
 <body class="theme-green">
@@ -60,6 +60,10 @@
     <div class="top-pills">
       <div class="pill">📡 <span>V1.0</span></div>
       <div class="pill">📅 <span id="todayLabel">Aujourd’hui</span></div>
+      <div class="pill search-pill">🔍
+        <input id="globalSearch" type="search" placeholder="Pilote, date..." autocomplete="off" aria-label="Recherche globale">
+        <div id="globalSearchResults" class="search-results hidden"></div>
+      </div>
       <label class="pill theme-pill">Theme <select id="themeSelect" class="theme-select"><option value="green">MRCP vert</option><option value="warm">MRCP orange</option></select></label>
       <button id="installPwaBtn" class="pill pill-button">Installer l'app</button>
       <button id="adminBtnTop" class="pill pill-button">⚙️ Admin</button>
@@ -111,9 +115,10 @@
 <script src="app_v2_divisions.js?v=20260819-div1"></script>
 <script src="app_v2_poster.js?v=20260820-poster3"></script>
 <script src="app_v2_rythme.js?v=20260820-rythme1"></script>
+<script src="app_v2_search.js?v=20260821-search2"></script>
 <script src="app_v2_admin_records.js?v=20260809-split1"></script>
 <script src="app_v2_admin_pilots.js?v=20260809-split1"></script>
-<script src="app_v2.js?v=20260820-rythme1"></script>
+<script src="app_v2.js?v=20260821-search1"></script>
 <script src="pilot_links_v53.js?v=20260617-compareclean1"></script>
 <div id="mrcp-v55-widgets"></div>
 <script src="mrcp_v55_widgets.js?v=20260608-regularity-track1"></script>

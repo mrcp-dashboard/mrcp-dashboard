@@ -224,6 +224,24 @@ par heure et par mois. Les barres sont en HTML/CSS et non en SVG : responsive
 et imprimable sans calcul de viewBox. La phrase de synthese est calculee sur
 les donnees, pas ecrite en dur.
 
+## Recherche globale
+
+`app_v2_search.js` ajoute un champ de recherche dans la barre du haut,
+disponible sur toutes les pages. Il **navigue** (vers une fiche pilote ou une
+journee) la ou les recherches deja presentes dans Pilotes, Sessions et les
+pages admin **filtrent une liste** : les deux se completent.
+
+Points a connaitre :
+
+- l'index est insensible aux accents et a la casse (`searchNormalize`) ;
+- les journees sont indexees dans les deux ecritures, `2026-04-19` et
+  `19/04/2026`, pour que les deux facons de taper fonctionnent ;
+- **un pilote peut avoir plusieurs puces** (DORIAN GIANNETTA en a deux) : le
+  champ `transponders` les collecte toutes, sinon la recherche par numero de
+  puce ne trouvait que la premiere rencontree ;
+- l'index est mis en cache et invalide par `clearDerivedCache()`, comme
+  `lapsCache`, donc il se reconstruit au rafraichissement des donnees.
+
 ## Services
 
 | Service | Fichier | Port par defaut |

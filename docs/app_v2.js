@@ -136,7 +136,7 @@ async function fetchFreshDashboardData(){
 
 async function init(){
   try{
-    setupTheme(); bindAdmin(); setupPwa(); updateAdminNav(); setupDataFreshness();
+    setupTheme(); bindAdmin(); setupPwa(); updateAdminNav(); setupDataFreshness(); setupGlobalSearch();
     var today=document.getElementById('todayLabel');if(today)today.textContent=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
     var renderedFromCache=false;
     try{

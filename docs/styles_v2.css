@@ -1542,6 +1542,71 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
   .rythme-top .rythme-fill{background:#222!important}
 }
 
+/* V7.3 - Recherche globale */
+.search-pill{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px 6px 13px;
+}
+.search-pill input{
+  width:190px;
+  border:0;
+  background:transparent;
+  padding:6px 2px;
+  font:inherit;
+  font-size:14px;
+  font-weight:800;
+  color:var(--text);
+}
+.search-pill input:focus{outline:none}
+.search-pill input::placeholder{color:var(--muted);font-weight:700}
+.search-results{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  z-index:60;
+  width:min(340px,86vw);
+  max-height:min(420px,60vh);
+  overflow-y:auto;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--panel2);
+  box-shadow:0 20px 50px rgba(0,0,0,.45);
+  padding:6px;
+}
+.search-results.hidden{display:none}
+.search-group{
+  padding:8px 10px 4px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.search-item{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding:9px 10px;
+  border-radius:10px;
+  color:var(--text);
+  text-decoration:none;
+}
+.search-item:hover,.search-item:focus{background:rgba(62,230,111,.14)}
+.search-item-main{font-weight:850;font-size:14px}
+.search-item-sub{color:var(--muted);font-size:12px}
+.search-empty{padding:12px 10px;color:var(--muted);font-size:13px}
+
+@media(max-width:720px){
+  .search-pill{flex:1 1 100%;order:-1}
+  .search-pill input{width:100%}
+  .search-results{left:0;right:auto;width:100%}
+}
+
+@media print{.search-pill{display:none!important}}
+
 /* V4.3 / V4.4 - Profil pilote complet + analyse IA */
 .qr-card{
   text-align:center;
