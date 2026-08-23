@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-08-23T16:15:20+00:00",
+  "generated_at": "2026-08-23T16:18:20+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 232,
     "pilots_count": 77,
-    "laps_count": 11645,
+    "laps_count": 11648,
     "tracks": {
       "TT1/8": {
-        "laps_count": 11470,
+        "laps_count": 11473,
         "activities_count": 232,
         "pilots_count": 77
       },
@@ -4513,7 +4513,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 5,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -6840,15 +6840,15 @@
       "date_fr": "23/08/2026",
       "source_file": "sessions_8212541043.csv",
       "pilot_count": 1,
-      "laps_count": 2,
-      "best_lap": 40.76,
+      "laps_count": 5,
+      "best_lap": 40.473,
       "best_pilot": "CYRILLE MAJESTE LABOURDENNE",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 5
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -6858,16 +6858,16 @@
           "transponder": "5552458",
           "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
           "pilot_slug": "cyrille-majeste-labourdenne-5552458",
-          "laps_count": 2,
-          "best_lap": 40.76,
-          "avg_lap": 42.27,
-          "consistency": 1.51,
+          "laps_count": 5,
+          "best_lap": 40.473,
+          "avg_lap": 42.291,
+          "consistency": 2.056,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 5
           },
           "laps": [
             {
@@ -6899,6 +6899,51 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8212541043|5552458|2|18:14:00|43.780"
+            },
+            {
+              "activity_id": "8212541043",
+              "transponder": "5552458",
+              "raw_transponder": "5552458",
+              "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "18:14:44",
+              "lap_no": 3,
+              "lap_time": 45.623,
+              "speed": "20.516 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8212541043|5552458|3|18:14:44|45.623"
+            },
+            {
+              "activity_id": "8212541043",
+              "transponder": "5552458",
+              "raw_transponder": "5552458",
+              "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "18:15:30",
+              "lap_no": 4,
+              "lap_time": 40.473,
+              "speed": "23.127 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8212541043|5552458|4|18:15:30|40.473"
+            },
+            {
+              "activity_id": "8212541043",
+              "transponder": "5552458",
+              "raw_transponder": "5552458",
+              "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "18:16:10",
+              "lap_no": 5,
+              "lap_time": 40.818,
+              "speed": "22.931 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8212541043|5552458|5|18:16:10|40.818"
             }
           ],
           "rank": 1,
@@ -196809,16 +196854,16 @@
           "date": "2026-08-23",
           "date_fr": "23/08/2026",
           "rank": 1,
-          "laps_count": 2,
-          "best_lap": 40.76,
-          "avg_lap": 42.27,
-          "consistency": 1.51,
+          "laps_count": 5,
+          "best_lap": 40.473,
+          "avg_lap": 42.291,
+          "consistency": 2.056,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 5
           }
         },
         {
@@ -196839,16 +196884,16 @@
           }
         }
       ],
-      "total_laps": 36,
+      "total_laps": 39,
       "best_lap": 37.85,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 36
+        "TT1/8": 39
       },
       "activities_count": 2,
-      "avg_best_lap": 39.305
+      "avg_best_lap": 39.162
     },
     {
       "transponder": "7423020",
