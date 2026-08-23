@@ -18,6 +18,7 @@ import csv
 import json
 import re
 import statistics
+import time
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -495,10 +496,42 @@ def build() -> dict[str, Any]:
     }
 
 
+def write_atomic(target: Path, data: Any) -> None:
+    """Ecrit le JSON sans jamais exposer un fichier incomplet.
+
+    Le LXC regenere ce fichier toutes les 3 minutes pendant que son serveur web
+    le sert. Avec un simple open("w"), le fichier est vide des l'ouverture puis
+    se remplit sur plusieurs Mo : une page chargee pile dans cette fenetre
+    recevait un JSON vide ou tronque, et affichait un dashboard a zero sans
+    message d'erreur. On ecrit donc a cote, puis on remplace d'un seul coup :
+    un lecteur voit soit l'ancien fichier complet, soit le nouveau.
+    """
+    tmp = target.with_name(target.name + ".tmp")
+    with tmp.open("w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+    # os.replace est atomique sur le meme systeme de fichiers. Sous Linux - le
+    # cas du serveur - il reussit meme si un lecteur a le fichier ouvert : ce
+    # lecteur continue simplement sur l'ancienne version. Sous Windows en
+    # revanche, remplacer un fichier ouvert leve PermissionError ; ça n'arrive
+    # qu'en execution locale, on retente donc brievement avant de se rabattre
+    # sur une ecriture directe plutot que d'echouer sans produire de donnees.
+    for attempt in range(10):
+        try:
+            tmp.replace(target)
+            return
+        except PermissionError:
+            time.sleep(0.05)
+
+    print("ATTENTION: remplacement atomique impossible (fichier verrouille), ecriture directe.")
+    with target.open("w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    tmp.unlink(missing_ok=True)
+
+
 def main() -> None:
     data = build()
-    with ROOT_OUT_FILE.open("w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    write_atomic(ROOT_OUT_FILE, data)
     q = data.get("data_quality", {})
     print(f"OK: data_v2.json généré : {ROOT_OUT_FILE}")
     print("Résumé:", data["summary"])
