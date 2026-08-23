@@ -1607,6 +1607,25 @@ body.theme-warm .podium-profile{background:linear-gradient(180deg,rgba(255,210,6
 
 @media print{.search-pill{display:none!important}}
 
+/* V7.4 - Ajout manuel d'une puce (admin) */
+.admin-add-chip{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:10px;
+}
+.admin-add-chip input{
+  flex:1 1 180px;
+  min-height:44px;
+  font-size:16px;
+}
+.admin-add-chip button{min-height:44px}
+@media(max-width:720px){
+  .admin-add-chip{flex-direction:column;align-items:stretch}
+  .admin-add-chip button{width:100%}
+}
+
 /* V4.3 / V4.4 - Profil pilote complet + analyse IA */
 .qr-card{
   text-align:center;

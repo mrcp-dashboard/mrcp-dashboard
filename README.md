@@ -107,6 +107,11 @@ remplis pour corriger et reessayer, pas d'`alert()` bloquante).
 Le token est garde dans le `localStorage` du navigateur utilise pour administrer.
 Le bouton "Quitter" oublie cet acces local.
 
+Depuis "Pilotes admin", un formulaire permet d'**ajouter une puce qui n'a pas
+encore roule** : le nouveau membre est pre-enregistre, et son nom s'applique
+automatiquement des son premier tour. Ces puces apparaissent dans le tableau
+avec la mention "Pre-enregistree" tant qu'elles n'ont aucun tour.
+
 Les pages admin permettent de preparer :
 
 - `lap_overrides.json` pour exclure ou forcer des tours.

@@ -45,9 +45,57 @@ function transponderSummary(){
   return Object.values(map).sort(function(a,b){return b.laps-a.laps;});
 }
 
+// Puces enregistrees a la main mais qui n'ont encore jamais roule : elles
+// n'apparaissent dans aucun tour, donc transponderSummary() les ignore. On les
+// reinjecte pour que l'admin puisse les revoir et les corriger.
+function preRegisteredRows(corrections, detectedRows){
+  var vues = {};
+  detectedRows.forEach(function(r){ vues[r.transponder] = true; });
+  return Object.keys(corrections.transponders || {}).filter(function(tp){
+    return !vues[tp];
+  }).map(function(tp){
+    return {
+      transponder: tp,
+      names: {},
+      laps: 0,
+      best: null,
+      tracks: {},
+      preRegistered: true
+    };
+  }).sort(function(a, b){ return a.transponder.localeCompare(b.transponder); });
+}
+
+function addPilotChip(rawTransponder, rawName){
+  var tp = normalizeTransponder(rawTransponder);
+  var name = String(rawName || '').trim();
+
+  if(!tp) return { ok:false, message:'Renseigne un numéro de puce.' };
+  if(!/^[0-9]+$/.test(tp)) return { ok:false, message:'Le numéro de puce ne doit contenir que des chiffres (reçu : ' + tp + ').' };
+  if(!name) return { ok:false, message:'Renseigne le nom du pilote.' };
+
+  var corrections = getPilotCorrections();
+  if(corrections.transponders[tp]){
+    return { ok:false, message:'La puce ' + tp + ' est déjà associée à ' + corrections.transponders[tp] + '. Modifie-la dans le tableau ci-dessous.' };
+  }
+  // Deja vue dans les donnees : ce n'est pas un ajout, c'est une correction.
+  var dejaVue = transponderSummary().some(function(r){ return r.transponder === tp; });
+
+  corrections.transponders[tp] = name;
+  setPilotCorrections(corrections);
+  return {
+    ok: true,
+    dejaVue: dejaVue,
+    message: dejaVue
+      ? 'Puce ' + tp + ' associée à ' + name + '. Elle avait déjà roulé : ses tours existants prendront ce nom.'
+      : 'Puce ' + tp + ' pré-enregistrée pour ' + name + '. Elle apparaîtra dès son premier tour.'
+  };
+}
+
 function adminPilots(){
   var corrections = getPilotCorrections();
-  var rows = transponderSummary();
+  var detected = transponderSummary();
+  var preRegistered = preRegisteredRows(corrections, detected);
+  var rows = preRegistered.concat(detected);
   var q = '';
   var htmlRows = rows.map(function(r){
     var currentName = corrections.transponders[r.transponder] || Object.keys(r.names)[0] || '';
@@ -55,8 +103,8 @@ function adminPilots(){
     var tracks = Object.keys(r.tracks).join(' / ');
     return '<tr data-search="'+escapeHtml((r.transponder+' '+names+' '+currentName).toLowerCase())+'">' +
       '<td data-label="Puce"><strong>'+escapeHtml(r.transponder)+'</strong></td>' +
-      '<td data-label="Noms vus">'+escapeHtml(names)+'</td>' +
-      '<td data-label="Tours">'+r.laps+'</td>' +
+      '<td data-label="Noms vus">'+(r.preRegistered?'<span class="badge badge-warn">Pré-enregistrée</span>':escapeHtml(names))+'</td>' +
+      '<td data-label="Tours">'+(r.preRegistered?'-':r.laps)+'</td>' +
       '<td data-label="Best">'+fmtTimeS(r.best)+'</td>' +
       '<td data-label="Piste"><span class="badge">'+escapeHtml(tracks)+'</span></td>' +
       '<td data-label="Nom officiel"><input class="pilot-name-input" data-tp="'+escapeHtml(r.transponder)+'" value="'+escapeHtml(currentName)+'" placeholder="Nom pilote officiel"></td>' +
@@ -67,9 +115,19 @@ function adminPilots(){
   if(!adminOnly('Pilotes admin',
     '<p class="small">Associe une puce/transpondeur à un nom pilote officiel. Ensuite exporte <strong>corrections.json</strong>, copie-le dans le projet, puis relance <code>python build_data_v2.py</code>.</p>' +
     '<div class="grid">' +
-      '<div class="card"><h3>Transpondeurs détectés</h3><div class="big">'+rows.length+'</div></div>' +
+      '<div class="card"><h3>Transpondeurs détectés</h3><div class="big">'+detected.length+'</div></div>' +
       '<div class="card"><h3>Associations locales</h3><div class="big">'+Object.keys(corrections.transponders).length+'</div></div>' +
+      '<div class="card"><h3>Pré-enregistrées</h3><div class="big">'+preRegistered.length+'</div><div class="small">pas encore roulé</div></div>' +
     '</div>' +
+    '<section class="card"><h3>➕ Ajouter une puce qui n’a pas encore roulé</h3>' +
+      '<p class="small">Pour inscrire un nouveau membre avant sa première sortie : son nom sera appliqué dès son premier tour, sans avoir à y repenser.</p>' +
+      '<div class="admin-add-chip">' +
+        '<input id="newChipTransponder" inputmode="numeric" placeholder="Numéro de puce" autocomplete="off">' +
+        '<input id="newChipName" placeholder="Nom du pilote" autocomplete="off">' +
+        '<button id="addChipBtn" class="btn-primary">Ajouter</button>' +
+      '</div>' +
+      '<div id="addChipStatus" class="admin-status hidden"></div>' +
+    '</section>' +
     adminPreviewHtml() +
     '<p><button id="exportPilotCorrections" class="btn-primary">Exporter corrections.json</button> <button id="applyPilotCorrectionsApi" class="btn-good">Appliquer via API</button> <button id="copyPilotCorrections" class="btn-secondary">Copier JSON</button> <button id="clearPilotCorrections" class="btn-danger">Vider corrections pilotes</button></p>' +
     '<div id="adminPilotsStatus" class="admin-status hidden"></div>' +
@@ -78,6 +136,28 @@ function adminPilots(){
     '<input class="searchBox" id="adminPilotSearch" placeholder="Rechercher transpondeur ou pilote...">' +
     '<div class="table-wrap admin-table-wrap"><table><thead><tr><th>Puce</th><th>Noms vus</th><th>Tours</th><th>Best</th><th>Piste</th><th>Nom officiel</th><th>Action</th></tr></thead><tbody id="adminPilotRows">'+htmlRows+'</tbody></table></div>'
   )) return;
+
+  var chipTp = document.getElementById('newChipTransponder');
+  var chipName = document.getElementById('newChipName');
+  var chipBtn = document.getElementById('addChipBtn');
+  function submitChip(){
+    var res = addPilotChip(chipTp.value, chipName.value);
+    if(!res.ok){
+      setAdminStatus('addChipStatus', 'error', 'Ajout impossible', escapeHtml(res.message));
+      return;
+    }
+    // On re-rend la page pour que la nouvelle puce apparaisse dans le tableau,
+    // puis on reaffiche le message que ce rendu vient d'effacer.
+    adminPilots();
+    setAdminStatus('addChipStatus', res.dejaVue ? 'warn' : 'ok', 'Puce enregistrée', escapeHtml(res.message));
+  }
+  if(chipBtn) chipBtn.onclick = submitChip;
+  [chipTp, chipName].forEach(function(input){
+    if(!input) return;
+    input.addEventListener('keydown', function(ev){
+      if(ev.key === 'Enter'){ ev.preventDefault(); submitChip(); }
+    });
+  });
 
   document.querySelectorAll('.save-pilot-name').forEach(function(btn){
     btn.onclick=function(){
