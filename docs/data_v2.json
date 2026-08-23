@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-08-23T12:09:13+00:00",
+  "generated_at": "2026-08-23T12:12:18+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 227,
     "pilots_count": 76,
-    "laps_count": 11355,
+    "laps_count": 11361,
     "tracks": {
       "TT1/8": {
-        "laps_count": 11180,
+        "laps_count": 11186,
         "activities_count": 227,
         "pilots_count": 76
       },
@@ -4497,7 +4497,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 1,
+        "laps_count": 3,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -4508,7 +4508,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 30,
+        "laps_count": 34,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -6780,7 +6780,7 @@
       "date_fr": "23/08/2026",
       "source_file": "sessions_8210839611.csv",
       "pilot_count": 1,
-      "laps_count": 1,
+      "laps_count": 3,
       "best_lap": 42.156,
       "best_pilot": "MONPLAISI MATHIEU",
       "tracks": [
@@ -6788,7 +6788,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 1
+        "TT1/8": 3
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -6798,16 +6798,16 @@
           "transponder": "6028027",
           "pilot_name": "MONPLAISI MATHIEU",
           "pilot_slug": "monplaisi-mathieu-6028027",
-          "laps_count": 1,
+          "laps_count": 3,
           "best_lap": 42.156,
-          "avg_lap": 42.156,
-          "consistency": 0,
+          "avg_lap": 51.418,
+          "consistency": 6.927,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 3
           },
           "laps": [
             {
@@ -6824,6 +6824,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8210839611|6028027|1|14:06:37|42.156"
+            },
+            {
+              "activity_id": "8210839611",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "14:10:36",
+              "lap_no": 1,
+              "lap_time": 53.288,
+              "speed": "17.565 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8210839611|6028027|1|14:10:36|53.288"
+            },
+            {
+              "activity_id": "8210839611",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "14:11:29",
+              "lap_no": 2,
+              "lap_time": 58.811,
+              "speed": "15.915 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8210839611|6028027|2|14:11:29|58.811"
             }
           ],
           "rank": 1,
@@ -6838,7 +6868,7 @@
       "date_fr": "23/08/2026",
       "source_file": "sessions_8209724841.csv",
       "pilot_count": 1,
-      "laps_count": 30,
+      "laps_count": 34,
       "best_lap": 35.532,
       "best_pilot": "Quentin Blanco",
       "tracks": [
@@ -6846,7 +6876,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 30
+        "TT1/8": 34
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -6856,16 +6886,16 @@
           "transponder": "6462549",
           "pilot_name": "Quentin Blanco",
           "pilot_slug": "quentin-blanco-6462549",
-          "laps_count": 30,
+          "laps_count": 34,
           "best_lap": 35.532,
-          "avg_lap": 42.103,
-          "consistency": 5.968,
+          "avg_lap": 42.37,
+          "consistency": 6.122,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 30
+            "TT1/8": 34
           },
           "laps": [
             {
@@ -7317,6 +7347,66 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8209724841|6462549|3|14:08:37|40.014"
+            },
+            {
+              "activity_id": "8209724841",
+              "transponder": "6462549",
+              "raw_transponder": "6462549",
+              "pilot_name": "Quentin Blanco",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "14:09:17",
+              "lap_no": 4,
+              "lap_time": 42.629,
+              "speed": "21.957 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8209724841|6462549|4|14:09:17|42.629"
+            },
+            {
+              "activity_id": "8209724841",
+              "transponder": "6462549",
+              "raw_transponder": "6462549",
+              "pilot_name": "Quentin Blanco",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "14:09:59",
+              "lap_no": 5,
+              "lap_time": 39.788,
+              "speed": "23.525 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8209724841|6462549|5|14:09:59|39.788"
+            },
+            {
+              "activity_id": "8209724841",
+              "transponder": "6462549",
+              "raw_transponder": "6462549",
+              "pilot_name": "Quentin Blanco",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "14:10:39",
+              "lap_no": 6,
+              "lap_time": 39.061,
+              "speed": "23.963 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8209724841|6462549|6|14:10:39|39.061"
+            },
+            {
+              "activity_id": "8209724841",
+              "transponder": "6462549",
+              "raw_transponder": "6462549",
+              "pilot_name": "Quentin Blanco",
+              "date": "2026-08-23",
+              "date_fr": "23/08/2026",
+              "start_time": "14:11:18",
+              "lap_no": 7,
+              "lap_time": 56.004,
+              "speed": "16.713 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8209724841|6462549|7|14:11:18|56.004"
             }
           ],
           "rank": 1,
@@ -189747,16 +189837,16 @@
           "date": "2026-08-23",
           "date_fr": "23/08/2026",
           "rank": 1,
-          "laps_count": 30,
+          "laps_count": 34,
           "best_lap": 35.532,
-          "avg_lap": 42.103,
-          "consistency": 5.968,
+          "avg_lap": 42.37,
+          "consistency": 6.122,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 30
+            "TT1/8": 34
           }
         },
         {
@@ -189794,13 +189884,13 @@
           }
         }
       ],
-      "total_laps": 172,
+      "total_laps": 176,
       "best_lap": 34.138,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 172
+        "TT1/8": 176
       },
       "activities_count": 3,
       "avg_best_lap": 34.77
@@ -189985,16 +190075,16 @@
           "date": "2026-08-23",
           "date_fr": "23/08/2026",
           "rank": 1,
-          "laps_count": 1,
+          "laps_count": 3,
           "best_lap": 42.156,
-          "avg_lap": 42.156,
-          "consistency": 0,
+          "avg_lap": 51.418,
+          "consistency": 6.927,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 3
           }
         },
         {
@@ -190185,13 +190275,13 @@
           }
         }
       ],
-      "total_laps": 308,
+      "total_laps": 310,
       "best_lap": 34.328,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 308
+        "TT1/8": 310
       },
       "activities_count": 12,
       "avg_best_lap": 38.052
