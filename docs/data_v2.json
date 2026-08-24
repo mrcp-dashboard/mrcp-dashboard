@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-08-24T17:15:12+00:00",
+  "generated_at": "2026-08-24T17:33:39+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -40,9 +40,9 @@
     }
   },
   "data_quality": {
-    "global_score": 90,
+    "global_score": 92,
     "suspicious_laps_count": 240,
-    "unknown_pilots_count": 3,
+    "unknown_pilots_count": 2,
     "ignored_raw_laps_count": 0,
     "overrides": {
       "excluded_count": 134,
@@ -3178,11 +3178,6 @@
         "best_lap": 34.099
       },
       {
-        "transponder": "7423020",
-        "laps_count": 3,
-        "best_lap": 38.013
-      },
-      {
         "transponder": "6282793",
         "laps_count": 3,
         "best_lap": 55.411
@@ -4420,17 +4415,6 @@
         "unknown_pilots_count": 0
       },
       {
-        "id": "8210987700",
-        "date_fr": "23/08/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 3,
-        "quality_score": 97,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 1
-      },
-      {
         "id": "8144229170",
         "date_fr": "09/08/2026",
         "tracks": [
@@ -4547,6 +4531,17 @@
           "TT1/8"
         ],
         "laps_count": 25,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
+        "id": "8210987700",
+        "date_fr": "23/08/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 3,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -9422,7 +9417,7 @@
       "pilot_count": 1,
       "laps_count": 3,
       "best_lap": 38.013,
-      "best_pilot": "Inconnu #7423020",
+      "best_pilot": "tony gomes",
       "tracks": [
         "TT1/8"
       ],
@@ -9430,14 +9425,14 @@
       "track_counts": {
         "TT1/8": 3
       },
-      "quality_score": 97,
+      "quality_score": 100,
       "suspicious_laps_count": 0,
-      "unknown_pilots_count": 1,
+      "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "7423020",
-          "pilot_name": "Inconnu #7423020",
-          "pilot_slug": "inconnu-7423020-7423020",
+          "pilot_name": "tony gomes",
+          "pilot_slug": "tony-gomes-7423020",
           "laps_count": 3,
           "best_lap": 38.013,
           "avg_lap": 43.875,
@@ -9454,7 +9449,7 @@
               "activity_id": "8210987700",
               "transponder": "7423020",
               "raw_transponder": "7423020",
-              "pilot_name": "Inconnu #7423020",
+              "pilot_name": "tony gomes",
               "date": "2026-08-23",
               "date_fr": "23/08/2026",
               "start_time": "14:34:51",
@@ -9469,7 +9464,7 @@
               "activity_id": "8210987700",
               "transponder": "7423020",
               "raw_transponder": "7423020",
-              "pilot_name": "Inconnu #7423020",
+              "pilot_name": "tony gomes",
               "date": "2026-08-23",
               "date_fr": "23/08/2026",
               "start_time": "14:35:44",
@@ -9485,7 +9480,7 @@
               "activity_id": "8210987700",
               "transponder": "7423020",
               "raw_transponder": "7423020",
-              "pilot_name": "Inconnu #7423020",
+              "pilot_name": "tony gomes",
               "date": "2026-08-23",
               "date_fr": "23/08/2026",
               "start_time": "14:36:25",
@@ -199710,8 +199705,8 @@
     },
     {
       "transponder": "7423020",
-      "name": "Inconnu #7423020",
-      "slug": "inconnu-7423020-7423020",
+      "name": "tony gomes",
+      "slug": "tony-gomes-7423020",
       "activities": [
         {
           "activity_id": "8210987700",
