@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-08-30T12:57:13+00:00",
+  "generated_at": "2026-08-30T13:00:17+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 242,
     "pilots_count": 69,
-    "laps_count": 12156,
+    "laps_count": 12157,
     "tracks": {
       "TT1/8": {
-        "laps_count": 11982,
+        "laps_count": 11983,
         "activities_count": 242,
         "pilots_count": 69
       },
@@ -41,7 +41,7 @@
   },
   "data_quality": {
     "global_score": 92,
-    "suspicious_laps_count": 244,
+    "suspicious_laps_count": 245,
     "unknown_pilots_count": 2,
     "ignored_raw_laps_count": 0,
     "overrides": {
@@ -1034,6 +1034,19 @@
         "transponder": "6510573",
         "lap_no": 2,
         "start_time": "11:46:49",
+        "lap_time": 31.484,
+        "track": "TT1/8",
+        "reason": "TT1/8 entre 30 et 32 s : vérifier si TT1/10 lent"
+      },
+      {
+        "lap_id": "8241029436|6510573|6|14:57:14|31.484",
+        "activity_id": "8241029436",
+        "date_fr": "30/08/2026",
+        "pilot_name": "ALEXIS DUFAU CAZENAVE",
+        "pilot_slug": "alexis-dufau-cazenave-6510573",
+        "transponder": "6510573",
+        "lap_no": 6,
+        "start_time": "14:57:14",
         "lap_time": 31.484,
         "track": "TT1/8",
         "reason": "TT1/8 entre 30 et 32 s : vérifier si TT1/10 lent"
@@ -4446,9 +4459,9 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 9,
-        "quality_score": 80,
-        "suspicious_laps_count": 4,
+        "laps_count": 10,
+        "quality_score": 75,
+        "suspicious_laps_count": 5,
         "unknown_pilots_count": 0
       },
       {
@@ -7004,34 +7017,34 @@
       "date_fr": "30/08/2026",
       "source_file": "sessions_8241029436.csv",
       "pilot_count": 1,
-      "laps_count": 9,
-      "best_lap": 31.618,
+      "laps_count": 10,
+      "best_lap": 31.484,
       "best_pilot": "ALEXIS DUFAU CAZENAVE",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 9
+        "TT1/8": 10
       },
-      "quality_score": 80,
-      "suspicious_laps_count": 4,
+      "quality_score": 75,
+      "suspicious_laps_count": 5,
       "unknown_pilots_count": 0,
       "participants": [
         {
           "transponder": "6510573",
           "pilot_name": "ALEXIS DUFAU CAZENAVE",
           "pilot_slug": "alexis-dufau-cazenave-6510573",
-          "laps_count": 9,
-          "best_lap": 31.618,
-          "avg_lap": 35.122,
-          "consistency": 5.969,
+          "laps_count": 10,
+          "best_lap": 31.484,
+          "avg_lap": 34.758,
+          "consistency": 5.767,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 9
+            "TT1/8": 10
           },
           "laps": [
             {
@@ -7168,6 +7181,21 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8241029436|6510573|5|14:56:42|31.711"
+            },
+            {
+              "activity_id": "8241029436",
+              "transponder": "6510573",
+              "raw_transponder": "6686431",
+              "pilot_name": "ALEXIS DUFAU CAZENAVE",
+              "date": "2026-08-30",
+              "date_fr": "30/08/2026",
+              "start_time": "14:57:14",
+              "lap_no": 6,
+              "lap_time": 31.484,
+              "speed": "29.729 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8241029436|6510573|6|14:57:14|31.484"
             }
           ],
           "rank": 1,
@@ -200426,16 +200454,16 @@
           "date": "2026-08-30",
           "date_fr": "30/08/2026",
           "rank": 1,
-          "laps_count": 9,
-          "best_lap": 31.618,
-          "avg_lap": 35.122,
-          "consistency": 5.969,
+          "laps_count": 10,
+          "best_lap": 31.484,
+          "avg_lap": 34.758,
+          "consistency": 5.767,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 9
+            "TT1/8": 10
           }
         },
         {
@@ -200526,18 +200554,18 @@
           }
         }
       ],
-      "total_laps": 290,
+      "total_laps": 291,
       "best_lap": 21.888,
       "tracks": [
         "TT1/10",
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 287,
+        "TT1/8": 288,
         "TT1/10": 3
       },
       "activities_count": 6,
-      "avg_best_lap": 30.004
+      "avg_best_lap": 29.982
     },
     {
       "transponder": "2873646",
