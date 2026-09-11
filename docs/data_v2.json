@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-10T18:30:12+00:00",
+  "generated_at": "2026-09-11T14:45:18+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 252,
+    "activities_count": 253,
     "pilots_count": 70,
-    "laps_count": 12505,
+    "laps_count": 12506,
     "tracks": {
       "TT1/8": {
-        "laps_count": 12331,
-        "activities_count": 252,
+        "laps_count": 12332,
+        "activities_count": 253,
         "pilots_count": 70
       },
       "TT1/10": {
@@ -35,7 +35,7 @@
     "most_active": {
       "pilot": "GREGOIRE BARROSO",
       "transponder": "8046737",
-      "laps": 1079,
+      "laps": 1080,
       "slug": "gregoire-barroso-8046737"
     }
   },
@@ -4953,6 +4953,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8287443171",
+        "date_fr": "11/09/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 1,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8283877902",
         "date_fr": "10/09/2026",
         "tracks": [
@@ -7498,6 +7509,64 @@
     ]
   },
   "activities": [
+    {
+      "id": "8287443171",
+      "date": "2026-09-11",
+      "date_fr": "11/09/2026",
+      "source_file": "sessions_8287443171.csv",
+      "pilot_count": 1,
+      "laps_count": 1,
+      "best_lap": 35.425,
+      "best_pilot": "GREGOIRE BARROSO",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 1
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "8046737",
+          "pilot_name": "GREGOIRE BARROSO",
+          "pilot_slug": "gregoire-barroso-8046737",
+          "laps_count": 1,
+          "best_lap": 35.425,
+          "avg_lap": 35.425,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          },
+          "laps": [
+            {
+              "activity_id": "8287443171",
+              "transponder": "8046737",
+              "raw_transponder": "8046737",
+              "pilot_name": "GREGOIRE BARROSO",
+              "date": "2026-09-11",
+              "date_fr": "11/09/2026",
+              "start_time": "16:43:55",
+              "lap_no": 1,
+              "lap_time": 35.425,
+              "speed": "26.422 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8287443171|8046737|1|16:43:55|35.425"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8283877902",
       "date": "2026-09-10",
@@ -207759,6 +207828,23 @@
       "slug": "gregoire-barroso-8046737",
       "activities": [
         {
+          "activity_id": "8287443171",
+          "date": "2026-09-11",
+          "date_fr": "11/09/2026",
+          "rank": 1,
+          "laps_count": 1,
+          "best_lap": 35.425,
+          "avg_lap": 35.425,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          }
+        },
+        {
           "activity_id": "8209664391",
           "date": "2026-08-23",
           "date_fr": "23/08/2026",
@@ -208150,16 +208236,16 @@
           }
         }
       ],
-      "total_laps": 1079,
+      "total_laps": 1080,
       "best_lap": 32.268,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 1079
+        "TT1/8": 1080
       },
-      "activities_count": 23,
-      "avg_best_lap": 33.342
+      "activities_count": 24,
+      "avg_best_lap": 33.429
     },
     {
       "transponder": "3185669",
