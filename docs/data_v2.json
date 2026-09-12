@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-11T16:39:12+00:00",
+  "generated_at": "2026-09-12T09:33:17+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 253,
+    "activities_count": 254,
     "pilots_count": 70,
-    "laps_count": 12522,
+    "laps_count": 12524,
     "tracks": {
       "TT1/8": {
-        "laps_count": 12348,
-        "activities_count": 253,
+        "laps_count": 12350,
+        "activities_count": 254,
         "pilots_count": 70
       },
       "TT1/10": {
@@ -4953,6 +4953,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8292437151",
+        "date_fr": "12/09/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 2,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8287443171",
         "date_fr": "11/09/2026",
         "tracks": [
@@ -7509,6 +7520,79 @@
     ]
   },
   "activities": [
+    {
+      "id": "8292437151",
+      "date": "2026-09-12",
+      "date_fr": "12/09/2026",
+      "source_file": "sessions_8292437151.csv",
+      "pilot_count": 1,
+      "laps_count": 2,
+      "best_lap": 40.707,
+      "best_pilot": "Gwenael Marques",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 2
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "8209271",
+          "pilot_name": "Gwenael Marques",
+          "pilot_slug": "gwenael-marques-8209271",
+          "laps_count": 2,
+          "best_lap": 40.707,
+          "avg_lap": 42.206,
+          "consistency": 1.498,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 2
+          },
+          "laps": [
+            {
+              "activity_id": "8292437151",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-09-12",
+              "date_fr": "12/09/2026",
+              "start_time": "11:30:30",
+              "lap_no": 1,
+              "lap_time": 43.704,
+              "speed": "21.417 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8292437151|8209271|1|11:30:30|43.704"
+            },
+            {
+              "activity_id": "8292437151",
+              "transponder": "8209271",
+              "raw_transponder": "8209271",
+              "pilot_name": "Gwenael Marques",
+              "date": "2026-09-12",
+              "date_fr": "12/09/2026",
+              "start_time": "11:31:14",
+              "lap_no": 2,
+              "lap_time": 40.707,
+              "speed": "22.994 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8292437151|8209271|2|11:31:14|40.707"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8287443171",
       "date": "2026-09-11",
@@ -211978,6 +212062,23 @@
       "slug": "gwenael-marques-8209271",
       "activities": [
         {
+          "activity_id": "8292437151",
+          "date": "2026-09-12",
+          "date_fr": "12/09/2026",
+          "rank": 1,
+          "laps_count": 2,
+          "best_lap": 40.707,
+          "avg_lap": 42.206,
+          "consistency": 1.498,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 2
+          }
+        },
+        {
           "activity_id": "7894890772",
           "date": "2026-06-07",
           "date_fr": "07/06/2026",
@@ -212046,16 +212147,16 @@
           }
         }
       ],
-      "total_laps": 85,
+      "total_laps": 87,
       "best_lap": 39.356,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 85
+        "TT1/8": 87
       },
-      "activities_count": 4,
-      "avg_best_lap": 40.984
+      "activities_count": 5,
+      "avg_best_lap": 40.928
     },
     {
       "transponder": "7306876",
