@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-12T09:36:12+00:00",
+  "generated_at": "2026-09-12T13:42:13+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 254,
+    "activities_count": 255,
     "pilots_count": 70,
-    "laps_count": 12525,
+    "laps_count": 12529,
     "tracks": {
       "TT1/8": {
-        "laps_count": 12351,
-        "activities_count": 254,
+        "laps_count": 12355,
+        "activities_count": 255,
         "pilots_count": 70
       },
       "TT1/10": {
@@ -4953,6 +4953,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8294895216",
+        "date_fr": "12/09/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 4,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8292437151",
         "date_fr": "12/09/2026",
         "tracks": [
@@ -7520,6 +7531,109 @@
     ]
   },
   "activities": [
+    {
+      "id": "8294895216",
+      "date": "2026-09-12",
+      "date_fr": "12/09/2026",
+      "source_file": "sessions_8294895216.csv",
+      "pilot_count": 1,
+      "laps_count": 4,
+      "best_lap": 39.91,
+      "best_pilot": "CYRILLE MAJESTE LABOURDENNE",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 4
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "5362908",
+          "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+          "pilot_slug": "cyrille-majeste-labourdenne-5362908",
+          "laps_count": 4,
+          "best_lap": 39.91,
+          "avg_lap": 41.271,
+          "consistency": 1.295,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 4
+          },
+          "laps": [
+            {
+              "activity_id": "8294895216",
+              "transponder": "5362908",
+              "raw_transponder": "5362908",
+              "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+              "date": "2026-09-12",
+              "date_fr": "12/09/2026",
+              "start_time": "15:39:39",
+              "lap_no": 1,
+              "lap_time": 42.486,
+              "speed": "22.031 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8294895216|5362908|1|15:39:39|42.486"
+            },
+            {
+              "activity_id": "8294895216",
+              "transponder": "5362908",
+              "raw_transponder": "5362908",
+              "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+              "date": "2026-09-12",
+              "date_fr": "12/09/2026",
+              "start_time": "15:40:22",
+              "lap_no": 2,
+              "lap_time": 42.642,
+              "speed": "21.950 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8294895216|5362908|2|15:40:22|42.642"
+            },
+            {
+              "activity_id": "8294895216",
+              "transponder": "5362908",
+              "raw_transponder": "5362908",
+              "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+              "date": "2026-09-12",
+              "date_fr": "12/09/2026",
+              "start_time": "15:41:04",
+              "lap_no": 3,
+              "lap_time": 40.045,
+              "speed": "23.374 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8294895216|5362908|3|15:41:04|40.045"
+            },
+            {
+              "activity_id": "8294895216",
+              "transponder": "5362908",
+              "raw_transponder": "5362908",
+              "pilot_name": "CYRILLE MAJESTE LABOURDENNE",
+              "date": "2026-09-12",
+              "date_fr": "12/09/2026",
+              "start_time": "15:41:44",
+              "lap_no": 4,
+              "lap_time": 39.91,
+              "speed": "23.453 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8294895216|5362908|4|15:41:44|39.910"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8292437151",
       "date": "2026-09-12",
@@ -210088,6 +210202,23 @@
       "slug": "cyrille-majeste-labourdenne-5362908",
       "activities": [
         {
+          "activity_id": "8294895216",
+          "date": "2026-09-12",
+          "date_fr": "12/09/2026",
+          "rank": 1,
+          "laps_count": 4,
+          "best_lap": 39.91,
+          "avg_lap": 41.271,
+          "consistency": 1.295,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 4
+          }
+        },
+        {
           "activity_id": "7780862394",
           "date": "2026-05-10",
           "date_fr": "10/05/2026",
@@ -210173,16 +210304,16 @@
           }
         }
       ],
-      "total_laps": 307,
+      "total_laps": 311,
       "best_lap": 34.661,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 307
+        "TT1/8": 311
       },
-      "activities_count": 5,
-      "avg_best_lap": 38.003
+      "activities_count": 6,
+      "avg_best_lap": 38.321
     },
     {
       "transponder": "6412153",
