@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-12T17:42:14+00:00",
+  "generated_at": "2026-09-13T11:48:12+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 257,
+    "activities_count": 258,
     "pilots_count": 70,
-    "laps_count": 12682,
+    "laps_count": 12683,
     "tracks": {
       "TT1/8": {
-        "laps_count": 12508,
-        "activities_count": 257,
+        "laps_count": 12509,
+        "activities_count": 258,
         "pilots_count": 70
       },
       "TT1/10": {
@@ -4953,6 +4953,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8304475779",
+        "date_fr": "13/09/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 1,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8295182706",
         "date_fr": "12/09/2026",
         "tracks": [
@@ -7553,6 +7564,64 @@
     ]
   },
   "activities": [
+    {
+      "id": "8304475779",
+      "date": "2026-09-13",
+      "date_fr": "13/09/2026",
+      "source_file": "sessions_8304475779.csv",
+      "pilot_count": 1,
+      "laps_count": 1,
+      "best_lap": 49.094,
+      "best_pilot": "Maxence Pardo",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 1
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "6282793",
+          "pilot_name": "Maxence Pardo",
+          "pilot_slug": "maxence-pardo-6282793",
+          "laps_count": 1,
+          "best_lap": 49.094,
+          "avg_lap": 49.094,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          },
+          "laps": [
+            {
+              "activity_id": "8304475779",
+              "transponder": "6282793",
+              "raw_transponder": "6282793",
+              "pilot_name": "Maxence Pardo",
+              "date": "2026-09-13",
+              "date_fr": "13/09/2026",
+              "start_time": "13:47:15",
+              "lap_no": 1,
+              "lap_time": 49.094,
+              "speed": "19.065 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8304475779|6282793|1|13:47:15|49.094"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8295182706",
       "date": "2026-09-12",
@@ -214986,6 +215055,23 @@
       "slug": "maxence-pardo-6282793",
       "activities": [
         {
+          "activity_id": "8304475779",
+          "date": "2026-09-13",
+          "date_fr": "13/09/2026",
+          "rank": 1,
+          "laps_count": 1,
+          "best_lap": 49.094,
+          "avg_lap": 49.094,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          }
+        },
+        {
           "activity_id": "8245140879",
           "date": "2026-08-31",
           "date_fr": "31/08/2026",
@@ -215020,16 +215106,16 @@
           }
         }
       ],
-      "total_laps": 21,
+      "total_laps": 22,
       "best_lap": 46.361,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 21
+        "TT1/8": 22
       },
-      "activities_count": 2,
-      "avg_best_lap": 50.886
+      "activities_count": 3,
+      "avg_best_lap": 50.289
     },
     {
       "transponder": "4404661",
