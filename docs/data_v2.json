@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-13T16:09:19+00:00",
+  "generated_at": "2026-09-13T16:12:20+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 263,
     "pilots_count": 70,
-    "laps_count": 12823,
+    "laps_count": 12826,
     "tracks": {
       "TT1/8": {
-        "laps_count": 12649,
+        "laps_count": 12652,
         "activities_count": 263,
         "pilots_count": 70
       },
@@ -5123,7 +5123,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 11,
+        "laps_count": 14,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -7768,7 +7768,7 @@
       "date_fr": "13/09/2026",
       "source_file": "sessions_8306189064.csv",
       "pilot_count": 1,
-      "laps_count": 11,
+      "laps_count": 14,
       "best_lap": 38.192,
       "best_pilot": "LAURENT HUSTE",
       "tracks": [
@@ -7776,7 +7776,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 11
+        "TT1/8": 14
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -7786,16 +7786,16 @@
           "transponder": "7066205",
           "pilot_name": "LAURENT HUSTE",
           "pilot_slug": "laurent-huste-7066205",
-          "laps_count": 11,
+          "laps_count": 14,
           "best_lap": 38.192,
-          "avg_lap": 39.616,
-          "consistency": 1.244,
+          "avg_lap": 40.549,
+          "consistency": 2.283,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 11
+            "TT1/8": 14
           },
           "laps": [
             {
@@ -7962,6 +7962,51 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8306189064|7066205|5|18:05:15|42.697"
+            },
+            {
+              "activity_id": "8306189064",
+              "transponder": "7066205",
+              "raw_transponder": "7066205",
+              "pilot_name": "LAURENT HUSTE",
+              "date": "2026-09-13",
+              "date_fr": "13/09/2026",
+              "start_time": "18:09:10",
+              "lap_no": 1,
+              "lap_time": 41.795,
+              "speed": "22.395 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8306189064|7066205|1|18:09:10|41.795"
+            },
+            {
+              "activity_id": "8306189064",
+              "transponder": "7066205",
+              "raw_transponder": "7066205",
+              "pilot_name": "LAURENT HUSTE",
+              "date": "2026-09-13",
+              "date_fr": "13/09/2026",
+              "start_time": "18:09:52",
+              "lap_no": 2,
+              "lap_time": 46.487,
+              "speed": "20.135 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8306189064|7066205|2|18:09:52|46.487"
+            },
+            {
+              "activity_id": "8306189064",
+              "transponder": "7066205",
+              "raw_transponder": "7066205",
+              "pilot_name": "LAURENT HUSTE",
+              "date": "2026-09-13",
+              "date_fr": "13/09/2026",
+              "start_time": "18:10:38",
+              "lap_no": 3,
+              "lap_time": 43.633,
+              "speed": "21.452 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8306189064|7066205|3|18:10:38|43.633"
             }
           ],
           "rank": 1,
@@ -216995,16 +217040,16 @@
           "date": "2026-09-13",
           "date_fr": "13/09/2026",
           "rank": 1,
-          "laps_count": 11,
+          "laps_count": 14,
           "best_lap": 38.192,
-          "avg_lap": 39.616,
-          "consistency": 1.244,
+          "avg_lap": 40.549,
+          "consistency": 2.283,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 11
+            "TT1/8": 14
           }
         },
         {
@@ -217093,13 +217138,13 @@
           }
         }
       ],
-      "total_laps": 166,
+      "total_laps": 169,
       "best_lap": 37.262,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 166
+        "TT1/8": 169
       },
       "activities_count": 6,
       "avg_best_lap": 38.361
