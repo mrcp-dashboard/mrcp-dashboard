@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-13T12:15:12+00:00",
+  "generated_at": "2026-09-13T12:42:12+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 258,
     "pilots_count": 70,
-    "laps_count": 12691,
+    "laps_count": 12693,
     "tracks": {
       "TT1/8": {
-        "laps_count": 12517,
+        "laps_count": 12519,
         "activities_count": 258,
         "pilots_count": 70
       },
@@ -4958,7 +4958,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 9,
+        "laps_count": 11,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -7570,15 +7570,15 @@
       "date_fr": "13/09/2026",
       "source_file": "sessions_8304475779.csv",
       "pilot_count": 1,
-      "laps_count": 9,
-      "best_lap": 48.635,
+      "laps_count": 11,
+      "best_lap": 44.778,
       "best_pilot": "Maxence Pardo",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 9
+        "TT1/8": 11
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -7588,16 +7588,16 @@
           "transponder": "6282793",
           "pilot_name": "Maxence Pardo",
           "pilot_slug": "maxence-pardo-6282793",
-          "laps_count": 9,
-          "best_lap": 48.635,
-          "avg_lap": 51.78,
-          "consistency": 2.623,
+          "laps_count": 11,
+          "best_lap": 44.778,
+          "avg_lap": 50.955,
+          "consistency": 3.13,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 9
+            "TT1/8": 11
           },
           "laps": [
             {
@@ -7734,11 +7734,42 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8304475779|6282793|1|14:12:11|48.635"
+            },
+            {
+              "activity_id": "8304475779",
+              "transponder": "6282793",
+              "raw_transponder": "6282793",
+              "pilot_name": "Maxence Pardo",
+              "date": "2026-09-13",
+              "date_fr": "13/09/2026",
+              "start_time": "14:39:27",
+              "lap_no": 1,
+              "lap_time": 49.713,
+              "speed": "18.828 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8304475779|6282793|1|14:39:27|49.713"
+            },
+            {
+              "activity_id": "8304475779",
+              "transponder": "6282793",
+              "raw_transponder": "6282793",
+              "pilot_name": "Maxence Pardo",
+              "date": "2026-09-13",
+              "date_fr": "13/09/2026",
+              "start_time": "14:40:16",
+              "lap_no": 2,
+              "lap_time": 44.778,
+              "speed": "20.903 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8304475779|6282793|2|14:40:16|44.778",
+              "personal_record": true
             }
           ],
           "rank": 1,
-          "personal_records_count": 0,
-          "has_personal_record": false
+          "personal_records_count": 1,
+          "has_personal_record": true
         }
       ]
     },
@@ -215179,16 +215210,16 @@
           "date": "2026-09-13",
           "date_fr": "13/09/2026",
           "rank": 1,
-          "laps_count": 9,
-          "best_lap": 48.635,
-          "avg_lap": 51.78,
-          "consistency": 2.623,
+          "laps_count": 11,
+          "best_lap": 44.778,
+          "avg_lap": 50.955,
+          "consistency": 3.13,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 9
+            "TT1/8": 11
           }
         },
         {
@@ -215226,16 +215257,16 @@
           }
         }
       ],
-      "total_laps": 30,
-      "best_lap": 46.361,
+      "total_laps": 32,
+      "best_lap": 44.778,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 30
+        "TT1/8": 32
       },
       "activities_count": 3,
-      "avg_best_lap": 50.136
+      "avg_best_lap": 48.85
     },
     {
       "transponder": "4404661",
