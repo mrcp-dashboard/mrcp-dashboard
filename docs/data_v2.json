@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-27T11:57:20+00:00",
+  "generated_at": "2026-09-27T12:00:21+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 287,
     "pilots_count": 72,
-    "laps_count": 13506,
+    "laps_count": 13509,
     "tracks": {
       "TT1/8": {
-        "laps_count": 13332,
+        "laps_count": 13335,
         "activities_count": 287,
         "pilots_count": 72
       },
@@ -5423,7 +5423,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 5,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8310,15 +8310,15 @@
       "date_fr": "27/09/2026",
       "source_file": "sessions_8373379462.csv",
       "pilot_count": 1,
-      "laps_count": 2,
-      "best_lap": 36.827,
+      "laps_count": 5,
+      "best_lap": 35.558,
       "best_pilot": "TONY GOMES",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 5
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8328,16 +8328,16 @@
           "transponder": "2221691",
           "pilot_name": "TONY GOMES",
           "pilot_slug": "tony-gomes-2221691",
-          "laps_count": 2,
-          "best_lap": 36.827,
-          "avg_lap": 37.868,
-          "consistency": 1.041,
+          "laps_count": 5,
+          "best_lap": 35.558,
+          "avg_lap": 40.232,
+          "consistency": 6.549,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 5
           },
           "laps": [
             {
@@ -8369,6 +8369,51 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8373379462|2221691|1|13:53:23|36.827"
+            },
+            {
+              "activity_id": "8373379462",
+              "transponder": "2221691",
+              "raw_transponder": "2221691",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-09-27",
+              "date_fr": "27/09/2026",
+              "start_time": "13:57:35",
+              "lap_no": 1,
+              "lap_time": 35.558,
+              "speed": "26.323 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8373379462|2221691|1|13:57:35|35.558"
+            },
+            {
+              "activity_id": "8373379462",
+              "transponder": "2221691",
+              "raw_transponder": "2221691",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-09-27",
+              "date_fr": "27/09/2026",
+              "start_time": "13:58:10",
+              "lap_no": 2,
+              "lap_time": 53.151,
+              "speed": "17.610 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8373379462|2221691|2|13:58:10|53.151"
+            },
+            {
+              "activity_id": "8373379462",
+              "transponder": "2221691",
+              "raw_transponder": "2221691",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-09-27",
+              "date_fr": "27/09/2026",
+              "start_time": "13:59:03",
+              "lap_no": 3,
+              "lap_time": 36.716,
+              "speed": "25.493 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8373379462|2221691|3|13:59:03|36.716"
             }
           ],
           "rank": 1,
@@ -226357,16 +226402,16 @@
           "date": "2026-09-27",
           "date_fr": "27/09/2026",
           "rank": 1,
-          "laps_count": 2,
-          "best_lap": 36.827,
-          "avg_lap": 37.868,
-          "consistency": 1.041,
+          "laps_count": 5,
+          "best_lap": 35.558,
+          "avg_lap": 40.232,
+          "consistency": 6.549,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 5
           }
         },
         {
@@ -226421,16 +226466,16 @@
           }
         }
       ],
-      "total_laps": 79,
+      "total_laps": 82,
       "best_lap": 33.697,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 79
+        "TT1/8": 82
       },
       "activities_count": 4,
-      "avg_best_lap": 36.021
+      "avg_best_lap": 35.703
     },
     {
       "transponder": "8522451",
