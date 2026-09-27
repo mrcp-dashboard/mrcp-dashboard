@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-09-27T11:45:20+00:00",
+  "generated_at": "2026-09-27T11:51:21+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,14 +9,14 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 285,
-    "pilots_count": 71,
-    "laps_count": 13497,
+    "activities_count": 286,
+    "pilots_count": 72,
+    "laps_count": 13501,
     "tracks": {
       "TT1/8": {
-        "laps_count": 13323,
-        "activities_count": 285,
-        "pilots_count": 71
+        "laps_count": 13327,
+        "activities_count": 286,
+        "pilots_count": 72
       },
       "TT1/10": {
         "laps_count": 174,
@@ -40,9 +40,9 @@
     }
   },
   "data_quality": {
-    "global_score": 91,
+    "global_score": 89,
     "suspicious_laps_count": 306,
-    "unknown_pilots_count": 2,
+    "unknown_pilots_count": 3,
     "ignored_raw_laps_count": 0,
     "overrides": {
       "excluded_count": 135,
@@ -4036,6 +4036,11 @@
         "best_lap": 34.099
       },
       {
+        "transponder": "2689316",
+        "laps_count": 2,
+        "best_lap": 36.968
+      },
+      {
         "transponder": "4404661",
         "laps_count": 3,
         "best_lap": 50.246
@@ -5325,6 +5330,17 @@
         "unknown_pilots_count": 0
       },
       {
+        "id": "8373343138",
+        "date_fr": "27/09/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 2,
+        "quality_score": 97,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 1
+      },
+      {
         "id": "8269980177",
         "date_fr": "06/09/2026",
         "tracks": [
@@ -5407,7 +5423,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 4,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8278,20 +8294,94 @@
   },
   "activities": [
     {
-      "id": "8373252310",
+      "id": "8373343138",
       "date": "2026-09-27",
       "date_fr": "27/09/2026",
-      "source_file": "sessions_8373252310.csv",
+      "source_file": "sessions_8373343138.csv",
       "pilot_count": 1,
       "laps_count": 2,
-      "best_lap": 38.763,
-      "best_pilot": "STEPHNE AUDIFAX",
+      "best_lap": 36.968,
+      "best_pilot": "Inconnu #2689316",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
         "TT1/8": 2
+      },
+      "quality_score": 97,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 1,
+      "participants": [
+        {
+          "transponder": "2689316",
+          "pilot_name": "Inconnu #2689316",
+          "pilot_slug": "inconnu-2689316-2689316",
+          "laps_count": 2,
+          "best_lap": 36.968,
+          "avg_lap": 47.624,
+          "consistency": 10.656,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 2
+          },
+          "laps": [
+            {
+              "activity_id": "8373343138",
+              "transponder": "2689316",
+              "raw_transponder": "2689316",
+              "pilot_name": "Inconnu #2689316",
+              "date": "2026-09-27",
+              "date_fr": "27/09/2026",
+              "start_time": "13:47:38",
+              "lap_no": 1,
+              "lap_time": 58.28,
+              "speed": "16.060 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8373343138|2689316|1|13:47:38|58.280"
+            },
+            {
+              "activity_id": "8373343138",
+              "transponder": "2689316",
+              "raw_transponder": "2689316",
+              "pilot_name": "Inconnu #2689316",
+              "date": "2026-09-27",
+              "date_fr": "27/09/2026",
+              "start_time": "13:50:36",
+              "lap_no": 1,
+              "lap_time": 36.968,
+              "speed": "25.319 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8373343138|2689316|1|13:50:36|36.968",
+              "personal_record": true
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 1,
+          "has_personal_record": true
+        }
+      ]
+    },
+    {
+      "id": "8373252310",
+      "date": "2026-09-27",
+      "date_fr": "27/09/2026",
+      "source_file": "sessions_8373252310.csv",
+      "pilot_count": 1,
+      "laps_count": 4,
+      "best_lap": 38.113,
+      "best_pilot": "STEPHNE AUDIFAX",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 4
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8301,16 +8391,16 @@
           "transponder": "7196952",
           "pilot_name": "STEPHNE AUDIFAX",
           "pilot_slug": "stephne-audifax-7196952",
-          "laps_count": 2,
-          "best_lap": 38.763,
-          "avg_lap": 44.793,
-          "consistency": 6.03,
+          "laps_count": 4,
+          "best_lap": 38.113,
+          "avg_lap": 43.548,
+          "consistency": 5.339,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 4
           },
           "laps": [
             {
@@ -8342,6 +8432,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8373252310|7196952|2|13:39:48|38.763"
+            },
+            {
+              "activity_id": "8373252310",
+              "transponder": "7196952",
+              "raw_transponder": "7196952",
+              "pilot_name": "STEPHNE AUDIFAX",
+              "date": "2026-09-27",
+              "date_fr": "27/09/2026",
+              "start_time": "13:47:49",
+              "lap_no": 1,
+              "lap_time": 46.491,
+              "speed": "20.133 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8373252310|7196952|1|13:47:49|46.491"
+            },
+            {
+              "activity_id": "8373252310",
+              "transponder": "7196952",
+              "raw_transponder": "7196952",
+              "pilot_name": "STEPHNE AUDIFAX",
+              "date": "2026-09-27",
+              "date_fr": "27/09/2026",
+              "start_time": "13:48:35",
+              "lap_no": 2,
+              "lap_time": 38.113,
+              "speed": "24.559 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8373252310|7196952|2|13:48:35|38.113"
             }
           ],
           "rank": 1,
@@ -226499,16 +226619,16 @@
           "date": "2026-09-27",
           "date_fr": "27/09/2026",
           "rank": 1,
-          "laps_count": 2,
-          "best_lap": 38.763,
-          "avg_lap": 44.793,
-          "consistency": 6.03,
+          "laps_count": 4,
+          "best_lap": 38.113,
+          "avg_lap": 43.548,
+          "consistency": 5.339,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 4
           }
         },
         {
@@ -226563,16 +226683,16 @@
           }
         }
       ],
-      "total_laps": 129,
+      "total_laps": 131,
       "best_lap": 34.108,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 129
+        "TT1/8": 131
       },
       "activities_count": 4,
-      "avg_best_lap": 36.966
+      "avg_best_lap": 36.804
     },
     {
       "transponder": "6462549",
@@ -228579,6 +228699,40 @@
       },
       "activities_count": 10,
       "avg_best_lap": 40.332
+    },
+    {
+      "transponder": "2689316",
+      "name": "Inconnu #2689316",
+      "slug": "inconnu-2689316-2689316",
+      "activities": [
+        {
+          "activity_id": "8373343138",
+          "date": "2026-09-27",
+          "date_fr": "27/09/2026",
+          "rank": 1,
+          "laps_count": 2,
+          "best_lap": 36.968,
+          "avg_lap": 47.624,
+          "consistency": 10.656,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 2
+          }
+        }
+      ],
+      "total_laps": 2,
+      "best_lap": 36.968,
+      "tracks": [
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/8": 2
+      },
+      "activities_count": 1,
+      "avg_best_lap": 36.968
     },
     {
       "transponder": "7568622",
