@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-10T13:00:14+00:00",
+  "generated_at": "2026-10-10T13:06:18+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 297,
     "pilots_count": 73,
-    "laps_count": 13902,
+    "laps_count": 13905,
     "tracks": {
       "TT1/8": {
-        "laps_count": 13725,
+        "laps_count": 13728,
         "activities_count": 297,
         "pilots_count": 73
       },
@@ -5344,7 +5344,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 4,
+        "laps_count": 7,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8421,7 +8421,7 @@
       "date_fr": "10/10/2026",
       "source_file": "sessions_8437650139.csv",
       "pilot_count": 1,
-      "laps_count": 4,
+      "laps_count": 7,
       "best_lap": 35.059,
       "best_pilot": "OLIVIER SAUX",
       "tracks": [
@@ -8429,7 +8429,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 4
+        "TT1/8": 7
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8439,16 +8439,16 @@
           "transponder": "7264035",
           "pilot_name": "OLIVIER SAUX",
           "pilot_slug": "olivier-saux-7264035",
-          "laps_count": 4,
+          "laps_count": 7,
           "best_lap": 35.059,
-          "avg_lap": 35.879,
-          "consistency": 0.49,
+          "avg_lap": 38.22,
+          "consistency": 3.79,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 4
+            "TT1/8": 7
           },
           "laps": [
             {
@@ -8510,6 +8510,51 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8437650139|7264035|4|14:59:09|36.355"
+            },
+            {
+              "activity_id": "8437650139",
+              "transponder": "7264035",
+              "raw_transponder": "7264035",
+              "pilot_name": "OLIVIER SAUX",
+              "date": "2026-10-10",
+              "date_fr": "10/10/2026",
+              "start_time": "15:02:36",
+              "lap_no": 1,
+              "lap_time": 45.744,
+              "speed": "20.462 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8437650139|7264035|1|15:02:36|45.744"
+            },
+            {
+              "activity_id": "8437650139",
+              "transponder": "7264035",
+              "raw_transponder": "7264035",
+              "pilot_name": "OLIVIER SAUX",
+              "date": "2026-10-10",
+              "date_fr": "10/10/2026",
+              "start_time": "15:03:22",
+              "lap_no": 2,
+              "lap_time": 42.252,
+              "speed": "22.153 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8437650139|7264035|2|15:03:22|42.252"
+            },
+            {
+              "activity_id": "8437650139",
+              "transponder": "7264035",
+              "raw_transponder": "7264035",
+              "pilot_name": "OLIVIER SAUX",
+              "date": "2026-10-10",
+              "date_fr": "10/10/2026",
+              "start_time": "15:04:04",
+              "lap_no": 3,
+              "lap_time": 36.024,
+              "speed": "25.983 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8437650139|7264035|3|15:04:04|36.024"
             }
           ],
           "rank": 1,
@@ -230387,16 +230432,16 @@
           "date": "2026-10-10",
           "date_fr": "10/10/2026",
           "rank": 1,
-          "laps_count": 4,
+          "laps_count": 7,
           "best_lap": 35.059,
-          "avg_lap": 35.879,
-          "consistency": 0.49,
+          "avg_lap": 38.22,
+          "consistency": 3.79,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 4
+            "TT1/8": 7
           }
         },
         {
@@ -230712,14 +230757,14 @@
           }
         }
       ],
-      "total_laps": 304,
+      "total_laps": 307,
       "best_lap": 17.222,
       "tracks": [
         "TT1/10",
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 301,
+        "TT1/8": 304,
         "TT1/10": 3
       },
       "activities_count": 19,
