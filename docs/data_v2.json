@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-11T12:06:14+00:00",
+  "generated_at": "2026-10-11T12:12:18+00:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 299,
     "pilots_count": 73,
-    "laps_count": 13963,
+    "laps_count": 13965,
     "tracks": {
       "TT1/8": {
-        "laps_count": 13786,
+        "laps_count": 13788,
         "activities_count": 299,
         "pilots_count": 73
       },
@@ -5381,7 +5381,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 4,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8469,15 +8469,15 @@
       "date_fr": "11/10/2026",
       "source_file": "sessions_8447140621.csv",
       "pilot_count": 1,
-      "laps_count": 2,
-      "best_lap": 42.84,
+      "laps_count": 4,
+      "best_lap": 40.314,
       "best_pilot": "TONY GOMES",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 4
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8487,16 +8487,16 @@
           "transponder": "3601271",
           "pilot_name": "TONY GOMES",
           "pilot_slug": "tony-gomes-3601271",
-          "laps_count": 2,
-          "best_lap": 42.84,
-          "avg_lap": 45.808,
-          "consistency": 2.968,
+          "laps_count": 4,
+          "best_lap": 40.314,
+          "avg_lap": 43.366,
+          "consistency": 3.249,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 4
           },
           "laps": [
             {
@@ -8528,6 +8528,36 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8447140621|3601271|2|14:03:30|42.840"
+            },
+            {
+              "activity_id": "8447140621",
+              "transponder": "3601271",
+              "raw_transponder": "3601271",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-10-11",
+              "date_fr": "11/10/2026",
+              "start_time": "14:09:41",
+              "lap_no": 1,
+              "lap_time": 41.534,
+              "speed": "22.536 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8447140621|3601271|1|14:09:41|41.534"
+            },
+            {
+              "activity_id": "8447140621",
+              "transponder": "3601271",
+              "raw_transponder": "3601271",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-10-11",
+              "date_fr": "11/10/2026",
+              "start_time": "14:10:23",
+              "lap_no": 2,
+              "lap_time": 40.314,
+              "speed": "23.218 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8447140621|3601271|2|14:10:23|40.314"
             }
           ],
           "rank": 1,
@@ -234638,16 +234668,16 @@
           "date": "2026-10-11",
           "date_fr": "11/10/2026",
           "rank": 1,
-          "laps_count": 2,
-          "best_lap": 42.84,
-          "avg_lap": 45.808,
-          "consistency": 2.968,
+          "laps_count": 4,
+          "best_lap": 40.314,
+          "avg_lap": 43.366,
+          "consistency": 3.249,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 4
           }
         },
         {
@@ -234668,16 +234698,16 @@
           }
         }
       ],
-      "total_laps": 31,
+      "total_laps": 33,
       "best_lap": 34.231,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 31
+        "TT1/8": 33
       },
       "activities_count": 2,
-      "avg_best_lap": 38.535
+      "avg_best_lap": 37.273
     },
     {
       "transponder": "5344333",
