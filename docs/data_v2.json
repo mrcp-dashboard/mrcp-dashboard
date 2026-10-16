@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-14T11:15:12+02:00",
+  "generated_at": "2026-10-16T18:57:12+02:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 303,
+    "activities_count": 304,
     "pilots_count": 73,
-    "laps_count": 14294,
+    "laps_count": 14297,
     "tracks": {
       "TT1/8": {
-        "laps_count": 14117,
-        "activities_count": 303,
+        "laps_count": 14120,
+        "activities_count": 304,
         "pilots_count": 73
       },
       "TT1/10": {
@@ -35,7 +35,7 @@
     "most_active": {
       "pilot": "GREGOIRE BARROSO",
       "transponder": "8046737",
-      "laps": 1386,
+      "laps": 1389,
       "slug": "gregoire-barroso-8046737"
     }
   },
@@ -5400,6 +5400,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8471634271",
+        "date_fr": "16/10/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 3,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8448821110",
         "date_fr": "11/10/2026",
         "tracks": [
@@ -8472,21 +8483,98 @@
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7674873222",
-        "date_fr": "18/04/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 62,
-        "quality_score": 100,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 0
       }
     ]
   },
   "activities": [
+    {
+      "id": "8471634271",
+      "date": "2026-10-16",
+      "date_fr": "16/10/2026",
+      "source_file": "sessions_8471634271.csv",
+      "pilot_count": 1,
+      "laps_count": 3,
+      "best_lap": 33.027,
+      "best_pilot": "GREGOIRE BARROSO",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 3
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "8046737",
+          "pilot_name": "GREGOIRE BARROSO",
+          "pilot_slug": "gregoire-barroso-8046737",
+          "laps_count": 3,
+          "best_lap": 33.027,
+          "avg_lap": 33.924,
+          "consistency": 1.195,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 3
+          },
+          "laps": [
+            {
+              "activity_id": "8471634271",
+              "transponder": "8046737",
+              "raw_transponder": "8046737",
+              "pilot_name": "GREGOIRE BARROSO",
+              "date": "2026-10-16",
+              "date_fr": "16/10/2026",
+              "start_time": "18:54:11",
+              "lap_no": 1,
+              "lap_time": 35.613,
+              "speed": "26.283 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8471634271|8046737|1|18:54:11|35.613"
+            },
+            {
+              "activity_id": "8471634271",
+              "transponder": "8046737",
+              "raw_transponder": "8046737",
+              "pilot_name": "GREGOIRE BARROSO",
+              "date": "2026-10-16",
+              "date_fr": "16/10/2026",
+              "start_time": "18:54:47",
+              "lap_no": 2,
+              "lap_time": 33.133,
+              "speed": "28.250 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8471634271|8046737|2|18:54:47|33.133"
+            },
+            {
+              "activity_id": "8471634271",
+              "transponder": "8046737",
+              "raw_transponder": "8046737",
+              "pilot_name": "GREGOIRE BARROSO",
+              "date": "2026-10-16",
+              "date_fr": "16/10/2026",
+              "start_time": "18:55:20",
+              "lap_no": 3,
+              "lap_time": 33.027,
+              "speed": "28.340 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8471634271|8046737|3|18:55:20|33.027"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8448821110",
       "date": "2026-10-11",
@@ -238031,6 +238119,23 @@
       "slug": "gregoire-barroso-8046737",
       "activities": [
         {
+          "activity_id": "8471634271",
+          "date": "2026-10-16",
+          "date_fr": "16/10/2026",
+          "rank": 1,
+          "laps_count": 3,
+          "best_lap": 33.027,
+          "avg_lap": 33.924,
+          "consistency": 1.195,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 3
+          }
+        },
+        {
           "activity_id": "8448156796",
           "date": "2026-10-11",
           "date_fr": "11/10/2026",
@@ -238541,16 +238646,16 @@
           }
         }
       ],
-      "total_laps": 1386,
+      "total_laps": 1389,
       "best_lap": 31.883,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 1386
+        "TT1/8": 1389
       },
-      "activities_count": 30,
-      "avg_best_lap": 33.246
+      "activities_count": 31,
+      "avg_best_lap": 33.239
     },
     {
       "transponder": "3517113",
