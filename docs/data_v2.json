@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-18T14:24:14+02:00",
+  "generated_at": "2026-10-18T14:27:14+02:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,7 +11,7 @@
   "summary": {
     "activities_count": 309,
     "pilots_count": 74,
-    "laps_count": 14538,
+    "laps_count": 14539,
     "tracks": {
       "TT1/8": {
         "laps_count": 14361,
@@ -19,8 +19,8 @@
         "pilots_count": 74
       },
       "TT1/10": {
-        "laps_count": 177,
-        "activities_count": 17,
+        "laps_count": 178,
+        "activities_count": 18,
         "pilots_count": 11
       }
     }
@@ -5441,9 +5441,10 @@
         "id": "8485029646",
         "date_fr": "18/10/2026",
         "tracks": [
+          "TT1/10",
           "TT1/8"
         ],
-        "laps_count": 40,
+        "laps_count": 41,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -9245,15 +9246,17 @@
       "date_fr": "18/10/2026",
       "source_file": "sessions_8485029646.csv",
       "pilot_count": 1,
-      "laps_count": 40,
-      "best_lap": 35.208,
+      "laps_count": 41,
+      "best_lap": 23.874,
       "best_pilot": "AMAURY MOX",
       "tracks": [
+        "TT1/10",
         "TT1/8"
       ],
-      "track": "TT1/8",
+      "track": "mixte",
       "track_counts": {
-        "TT1/8": 40
+        "TT1/8": 40,
+        "TT1/10": 1
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -9263,15 +9266,17 @@
           "transponder": "4703065",
           "pilot_name": "AMAURY MOX",
           "pilot_slug": "amaury-mox-4703065",
-          "laps_count": 40,
-          "best_lap": 35.208,
-          "avg_lap": 43.094,
-          "consistency": 6.171,
+          "laps_count": 41,
+          "best_lap": 23.874,
+          "avg_lap": 42.625,
+          "consistency": 6.778,
           "tracks": [
+            "TT1/10",
             "TT1/8"
           ],
-          "track": "TT1/8",
+          "track": "mixte",
           "track_counts": {
+            "TT1/10": 1,
             "TT1/8": 40
           },
           "laps": [
@@ -9874,11 +9879,27 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8485029646|4703065|2|14:23:20|42.544"
+            },
+            {
+              "activity_id": "8485029646",
+              "transponder": "4703065",
+              "raw_transponder": "4703065",
+              "pilot_name": "AMAURY MOX",
+              "date": "2026-10-18",
+              "date_fr": "18/10/2026",
+              "start_time": "14:24:07",
+              "lap_no": 3,
+              "lap_time": 23.874,
+              "speed": "39.206 km/h",
+              "track": "TT1/10",
+              "base_track": "TT1/10",
+              "lap_id": "8485029646|4703065|3|14:24:07|23.874",
+              "personal_record": true
             }
           ],
           "rank": 1,
-          "personal_records_count": 0,
-          "has_personal_record": false
+          "personal_records_count": 1,
+          "has_personal_record": true
         }
       ]
     },
@@ -241364,6 +241385,63 @@
       "avg_best_lap": 27.46
     },
     {
+      "transponder": "4703065",
+      "name": "AMAURY MOX",
+      "slug": "amaury-mox-4703065",
+      "activities": [
+        {
+          "activity_id": "8485029646",
+          "date": "2026-10-18",
+          "date_fr": "18/10/2026",
+          "rank": 1,
+          "laps_count": 41,
+          "best_lap": 23.874,
+          "avg_lap": 42.625,
+          "consistency": 6.778,
+          "tracks": [
+            "TT1/10",
+            "TT1/8"
+          ],
+          "track": "mixte",
+          "track_counts": {
+            "TT1/10": 1,
+            "TT1/8": 40
+          }
+        },
+        {
+          "activity_id": "7716464445",
+          "date": "2026-04-26",
+          "date_fr": "26/04/2026",
+          "rank": 1,
+          "laps_count": 124,
+          "best_lap": 26.896,
+          "avg_lap": 40.957,
+          "consistency": 6.581,
+          "tracks": [
+            "TT1/10",
+            "TT1/8"
+          ],
+          "track": "mixte",
+          "track_counts": {
+            "TT1/10": 2,
+            "TT1/8": 122
+          }
+        }
+      ],
+      "total_laps": 165,
+      "best_lap": 23.874,
+      "tracks": [
+        "TT1/10",
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/10": 3,
+        "TT1/8": 162
+      },
+      "activities_count": 2,
+      "avg_best_lap": 25.385
+    },
+    {
       "transponder": "7064819",
       "name": "MATTHIEU GREGOIRE",
       "slug": "matthieu-gregoire-7064819",
@@ -241595,61 +241673,6 @@
       },
       "activities_count": 2,
       "avg_best_lap": 30.271
-    },
-    {
-      "transponder": "4703065",
-      "name": "AMAURY MOX",
-      "slug": "amaury-mox-4703065",
-      "activities": [
-        {
-          "activity_id": "8485029646",
-          "date": "2026-10-18",
-          "date_fr": "18/10/2026",
-          "rank": 1,
-          "laps_count": 40,
-          "best_lap": 35.208,
-          "avg_lap": 43.094,
-          "consistency": 6.171,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 40
-          }
-        },
-        {
-          "activity_id": "7716464445",
-          "date": "2026-04-26",
-          "date_fr": "26/04/2026",
-          "rank": 1,
-          "laps_count": 124,
-          "best_lap": 26.896,
-          "avg_lap": 40.957,
-          "consistency": 6.581,
-          "tracks": [
-            "TT1/10",
-            "TT1/8"
-          ],
-          "track": "mixte",
-          "track_counts": {
-            "TT1/10": 2,
-            "TT1/8": 122
-          }
-        }
-      ],
-      "total_laps": 164,
-      "best_lap": 26.896,
-      "tracks": [
-        "TT1/10",
-        "TT1/8"
-      ],
-      "track_counts": {
-        "TT1/10": 2,
-        "TT1/8": 162
-      },
-      "activities_count": 2,
-      "avg_best_lap": 31.052
     },
     {
       "transponder": "4120178",
