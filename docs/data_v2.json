@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-24T14:27:14+02:00",
+  "generated_at": "2026-10-24T14:36:14+02:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 314,
     "pilots_count": 75,
-    "laps_count": 14714,
+    "laps_count": 14715,
     "tracks": {
       "TT1/8": {
-        "laps_count": 14532,
+        "laps_count": 14533,
         "activities_count": 314,
         "pilots_count": 75
       },
@@ -5506,7 +5506,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 1,
+        "laps_count": 2,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8947,15 +8947,15 @@
       "date_fr": "24/10/2026",
       "source_file": "sessions_8512370793.csv",
       "pilot_count": 1,
-      "laps_count": 1,
-      "best_lap": 50.913,
+      "laps_count": 2,
+      "best_lap": 49.458,
       "best_pilot": "BENJAMIN TEICH",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 1
+        "TT1/8": 2
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8965,16 +8965,16 @@
           "transponder": "8610318",
           "pilot_name": "BENJAMIN TEICH",
           "pilot_slug": "benjamin-teich-8610318",
-          "laps_count": 1,
-          "best_lap": 50.913,
-          "avg_lap": 50.913,
-          "consistency": 0,
+          "laps_count": 2,
+          "best_lap": 49.458,
+          "avg_lap": 50.185,
+          "consistency": 0.727,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 2
           },
           "laps": [
             {
@@ -8991,6 +8991,21 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8512370793|8610318|1|13:32:32|50.913"
+            },
+            {
+              "activity_id": "8512370793",
+              "transponder": "8610318",
+              "raw_transponder": "8610318",
+              "pilot_name": "BENJAMIN TEICH",
+              "date": "2026-10-24",
+              "date_fr": "24/10/2026",
+              "start_time": "14:32:54",
+              "lap_no": 1,
+              "lap_time": 49.458,
+              "speed": "18.925 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8512370793|8610318|1|14:32:54|49.458"
             }
           ],
           "rank": 1,
@@ -248325,16 +248340,16 @@
           "date": "2026-10-24",
           "date_fr": "24/10/2026",
           "rank": 1,
-          "laps_count": 1,
-          "best_lap": 50.913,
-          "avg_lap": 50.913,
-          "consistency": 0,
+          "laps_count": 2,
+          "best_lap": 49.458,
+          "avg_lap": 50.185,
+          "consistency": 0.727,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 2
           }
         },
         {
@@ -248372,16 +248387,16 @@
           }
         }
       ],
-      "total_laps": 92,
+      "total_laps": 93,
       "best_lap": 36.165,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 92
+        "TT1/8": 93
       },
       "activities_count": 3,
-      "avg_best_lap": 42.158
+      "avg_best_lap": 41.673
     },
     {
       "transponder": "7409591",
