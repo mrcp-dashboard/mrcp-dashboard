@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-24T15:27:16+02:00",
+  "generated_at": "2026-10-24T15:33:15+02:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 317,
+    "activities_count": 318,
     "pilots_count": 75,
-    "laps_count": 14831,
+    "laps_count": 14832,
     "tracks": {
       "TT1/8": {
-        "laps_count": 14649,
-        "activities_count": 317,
+        "laps_count": 14650,
+        "activities_count": 318,
         "pilots_count": 75
       },
       "TT1/10": {
@@ -5468,6 +5468,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8513515794",
+        "date_fr": "24/10/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 1,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8513244555",
         "date_fr": "24/10/2026",
         "tracks": [
@@ -8497,21 +8508,68 @@
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7675356210",
-        "date_fr": "18/04/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 122,
-        "quality_score": 100,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 0
       }
     ]
   },
   "activities": [
+    {
+      "id": "8513515794",
+      "date": "2026-10-24",
+      "date_fr": "24/10/2026",
+      "source_file": "sessions_8513515794.csv",
+      "pilot_count": 1,
+      "laps_count": 1,
+      "best_lap": 42.579,
+      "best_pilot": "LOUIS FOURNIOLS",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 1
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "3754809",
+          "pilot_name": "LOUIS FOURNIOLS",
+          "pilot_slug": "louis-fourniols-3754809",
+          "laps_count": 1,
+          "best_lap": 42.579,
+          "avg_lap": 42.579,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          },
+          "laps": [
+            {
+              "activity_id": "8513515794",
+              "transponder": "3754809",
+              "raw_transponder": "3754809",
+              "pilot_name": "LOUIS FOURNIOLS",
+              "date": "2026-10-24",
+              "date_fr": "24/10/2026",
+              "start_time": "15:32:12",
+              "lap_no": 1,
+              "lap_time": 42.579,
+              "speed": "21.983 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8513515794|3754809|1|15:32:12|42.579"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8513244555",
       "date": "2026-10-24",
@@ -249985,6 +250043,23 @@
       "slug": "louis-fourniols-3754809",
       "activities": [
         {
+          "activity_id": "8513515794",
+          "date": "2026-10-24",
+          "date_fr": "24/10/2026",
+          "rank": 1,
+          "laps_count": 1,
+          "best_lap": 42.579,
+          "avg_lap": 42.579,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          }
+        },
+        {
           "activity_id": "7895569693",
           "date": "2026-06-07",
           "date_fr": "07/06/2026",
@@ -250087,16 +250162,16 @@
           }
         }
       ],
-      "total_laps": 191,
+      "total_laps": 192,
       "best_lap": 35.897,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 191
+        "TT1/8": 192
       },
-      "activities_count": 6,
-      "avg_best_lap": 38.075
+      "activities_count": 7,
+      "avg_best_lap": 38.718
     },
     {
       "transponder": "6108107",
