@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-24T14:15:19+02:00",
+  "generated_at": "2026-10-24T14:24:19+02:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 313,
+    "activities_count": 314,
     "pilots_count": 75,
-    "laps_count": 14707,
+    "laps_count": 14711,
     "tracks": {
       "TT1/8": {
-        "laps_count": 14525,
-        "activities_count": 313,
+        "laps_count": 14529,
+        "activities_count": 314,
         "pilots_count": 75
       },
       "TT1/10": {
@@ -5468,6 +5468,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8512785333",
+        "date_fr": "24/10/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 4,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8512606536",
         "date_fr": "24/10/2026",
         "tracks": [
@@ -8497,21 +8508,113 @@
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7675136010",
-        "date_fr": "18/04/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 39,
-        "quality_score": 100,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 0
       }
     ]
   },
   "activities": [
+    {
+      "id": "8512785333",
+      "date": "2026-10-24",
+      "date_fr": "24/10/2026",
+      "source_file": "sessions_8512785333.csv",
+      "pilot_count": 1,
+      "laps_count": 4,
+      "best_lap": 39.598,
+      "best_pilot": "MICKAEL DESGRANGES",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 4
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "8079667",
+          "pilot_name": "MICKAEL DESGRANGES",
+          "pilot_slug": "mickael-desgranges-8079667",
+          "laps_count": 4,
+          "best_lap": 39.598,
+          "avg_lap": 42.119,
+          "consistency": 1.971,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 4
+          },
+          "laps": [
+            {
+              "activity_id": "8512785333",
+              "transponder": "8079667",
+              "raw_transponder": "8079667",
+              "pilot_name": "MICKAEL DESGRANGES",
+              "date": "2026-10-24",
+              "date_fr": "24/10/2026",
+              "start_time": "14:20:47",
+              "lap_no": 1,
+              "lap_time": 43.61,
+              "speed": "21.463 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8512785333|8079667|1|14:20:47|43.610"
+            },
+            {
+              "activity_id": "8512785333",
+              "transponder": "8079667",
+              "raw_transponder": "8079667",
+              "pilot_name": "MICKAEL DESGRANGES",
+              "date": "2026-10-24",
+              "date_fr": "24/10/2026",
+              "start_time": "14:21:31",
+              "lap_no": 2,
+              "lap_time": 44.428,
+              "speed": "21.068 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8512785333|8079667|2|14:21:31|44.428"
+            },
+            {
+              "activity_id": "8512785333",
+              "transponder": "8079667",
+              "raw_transponder": "8079667",
+              "pilot_name": "MICKAEL DESGRANGES",
+              "date": "2026-10-24",
+              "date_fr": "24/10/2026",
+              "start_time": "14:22:15",
+              "lap_no": 3,
+              "lap_time": 40.84,
+              "speed": "22.919 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8512785333|8079667|3|14:22:15|40.840"
+            },
+            {
+              "activity_id": "8512785333",
+              "transponder": "8079667",
+              "raw_transponder": "8079667",
+              "pilot_name": "MICKAEL DESGRANGES",
+              "date": "2026-10-24",
+              "date_fr": "24/10/2026",
+              "start_time": "14:22:56",
+              "lap_no": 4,
+              "lap_time": 39.598,
+              "speed": "23.638 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8512785333|8079667|4|14:22:56|39.598"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8512606536",
       "date": "2026-10-24",
@@ -244497,6 +244600,23 @@
       "slug": "mickael-desgranges-8079667",
       "activities": [
         {
+          "activity_id": "8512785333",
+          "date": "2026-10-24",
+          "date_fr": "24/10/2026",
+          "rank": 1,
+          "laps_count": 4,
+          "best_lap": 39.598,
+          "avg_lap": 42.119,
+          "consistency": 1.971,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 4
+          }
+        },
+        {
           "activity_id": "7681818558",
           "date": "2026-04-19",
           "date_fr": "19/04/2026",
@@ -244533,7 +244653,7 @@
           }
         }
       ],
-      "total_laps": 158,
+      "total_laps": 162,
       "best_lap": 26.316,
       "tracks": [
         "TT1/10",
@@ -244541,10 +244661,10 @@
       ],
       "track_counts": {
         "TT1/10": 1,
-        "TT1/8": 157
+        "TT1/8": 161
       },
-      "activities_count": 2,
-      "avg_best_lap": 30.271
+      "activities_count": 3,
+      "avg_best_lap": 33.38
     },
     {
       "transponder": "4120178",
