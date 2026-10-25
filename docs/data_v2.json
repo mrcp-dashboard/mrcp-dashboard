@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-25T08:42:16+01:00",
+  "generated_at": "2026-10-25T08:45:15+01:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 349,
+    "activities_count": 350,
     "pilots_count": 82,
-    "laps_count": 15366,
+    "laps_count": 15391,
     "tracks": {
       "TT1/8": {
-        "laps_count": 15184,
-        "activities_count": 349,
+        "laps_count": 15209,
+        "activities_count": 350,
         "pilots_count": 82
       },
       "TT1/10": {
@@ -4108,14 +4108,14 @@
         "best_lap": 38.04
       },
       {
+        "transponder": "2735470",
+        "laps_count": 7,
+        "best_lap": 40.344
+      },
+      {
         "transponder": "6452844",
         "laps_count": 9,
         "best_lap": 40.61
-      },
-      {
-        "transponder": "2735470",
-        "laps_count": 2,
-        "best_lap": 43.813
       },
       {
         "transponder": "3809732",
@@ -5459,7 +5459,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 7,
         "quality_score": 97,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 1
@@ -5591,7 +5591,18 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 1,
+        "laps_count": 5,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
+        "id": "8518876746",
+        "date_fr": "25/10/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 3,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -5602,7 +5613,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 6,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -5613,7 +5624,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 7,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -5624,7 +5635,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 4,
+        "laps_count": 8,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8527,17 +8538,6 @@
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7681781172",
-        "date_fr": "19/04/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 99,
-        "quality_score": 100,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 0
       }
     ]
   },
@@ -8548,7 +8548,7 @@
       "date_fr": "25/10/2026",
       "source_file": "sessions_8518883472.csv",
       "pilot_count": 1,
-      "laps_count": 1,
+      "laps_count": 5,
       "best_lap": 38.894,
       "best_pilot": "MONPLAISI MATHIEU",
       "tracks": [
@@ -8556,7 +8556,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 1
+        "TT1/8": 5
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8566,16 +8566,16 @@
           "transponder": "6028027",
           "pilot_name": "MONPLAISI MATHIEU",
           "pilot_slug": "monplaisi-mathieu-6028027",
-          "laps_count": 1,
+          "laps_count": 5,
           "best_lap": 38.894,
-          "avg_lap": 38.894,
-          "consistency": 0,
+          "avg_lap": 42.673,
+          "consistency": 3.297,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 5
           },
           "laps": [
             {
@@ -8592,6 +8592,154 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8518883472|6028027|1|07:41:10|38.894"
+            },
+            {
+              "activity_id": "8518883472",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:41:49",
+              "lap_no": 2,
+              "lap_time": 47.519,
+              "speed": "19.697 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518883472|6028027|2|07:41:49|47.519"
+            },
+            {
+              "activity_id": "8518883472",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:37",
+              "lap_no": 3,
+              "lap_time": 44.459,
+              "speed": "21.053 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518883472|6028027|3|07:42:37|44.459"
+            },
+            {
+              "activity_id": "8518883472",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:43:21",
+              "lap_no": 4,
+              "lap_time": 43.406,
+              "speed": "21.564 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518883472|6028027|4|07:43:21|43.406"
+            },
+            {
+              "activity_id": "8518883472",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:44:05",
+              "lap_no": 5,
+              "lap_time": 39.086,
+              "speed": "23.947 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518883472|6028027|5|07:44:05|39.086"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
+    {
+      "id": "8518876746",
+      "date": "2026-10-25",
+      "date_fr": "25/10/2026",
+      "source_file": "sessions_8518876746.csv",
+      "pilot_count": 1,
+      "laps_count": 3,
+      "best_lap": 48.2,
+      "best_pilot": "PHILIPPE DUCHEN",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 3
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "6868468",
+          "pilot_name": "PHILIPPE DUCHEN",
+          "pilot_slug": "philippe-duchen-6868468",
+          "laps_count": 3,
+          "best_lap": 48.2,
+          "avg_lap": 50.317,
+          "consistency": 2.501,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 3
+          },
+          "laps": [
+            {
+              "activity_id": "8518876746",
+              "transponder": "6868468",
+              "raw_transponder": "6868468",
+              "pilot_name": "PHILIPPE DUCHEN",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:41:18",
+              "lap_no": 1,
+              "lap_time": 53.829,
+              "speed": "17.388 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518876746|6868468|1|07:41:18|53.829"
+            },
+            {
+              "activity_id": "8518876746",
+              "transponder": "6868468",
+              "raw_transponder": "6868468",
+              "pilot_name": "PHILIPPE DUCHEN",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:12",
+              "lap_no": 2,
+              "lap_time": 48.922,
+              "speed": "19.132 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518876746|6868468|2|07:42:12|48.922"
+            },
+            {
+              "activity_id": "8518876746",
+              "transponder": "6868468",
+              "raw_transponder": "6868468",
+              "pilot_name": "PHILIPPE DUCHEN",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:43:01",
+              "lap_no": 3,
+              "lap_time": 48.2,
+              "speed": "19.419 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518876746|6868468|3|07:43:01|48.200"
             }
           ],
           "rank": 1,
@@ -8606,15 +8754,15 @@
       "date_fr": "25/10/2026",
       "source_file": "sessions_8518874262.csv",
       "pilot_count": 1,
-      "laps_count": 2,
-      "best_lap": 47.407,
+      "laps_count": 6,
+      "best_lap": 40.756,
       "best_pilot": "PIERRE MONPLAISI",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 6
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8624,16 +8772,16 @@
           "transponder": "3321418",
           "pilot_name": "PIERRE MONPLAISI",
           "pilot_slug": "pierre-monplaisi-3321418",
-          "laps_count": 2,
-          "best_lap": 47.407,
-          "avg_lap": 49.728,
-          "consistency": 2.321,
+          "laps_count": 6,
+          "best_lap": 40.756,
+          "avg_lap": 47.524,
+          "consistency": 5.266,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 6
           },
           "laps": [
             {
@@ -8665,6 +8813,66 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8518874262|3321418|2|07:40:43|52.049"
+            },
+            {
+              "activity_id": "8518874262",
+              "transponder": "3321418",
+              "raw_transponder": "3321418",
+              "pilot_name": "PIERRE MONPLAISI",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:41:35",
+              "lap_no": 3,
+              "lap_time": 55.358,
+              "speed": "16.908 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518874262|3321418|3|07:41:35|55.358"
+            },
+            {
+              "activity_id": "8518874262",
+              "transponder": "3321418",
+              "raw_transponder": "3321418",
+              "pilot_name": "PIERRE MONPLAISI",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:31",
+              "lap_no": 4,
+              "lap_time": 48.231,
+              "speed": "19.407 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518874262|3321418|4|07:42:31|48.231"
+            },
+            {
+              "activity_id": "8518874262",
+              "transponder": "3321418",
+              "raw_transponder": "3321418",
+              "pilot_name": "PIERRE MONPLAISI",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:43:19",
+              "lap_no": 5,
+              "lap_time": 40.756,
+              "speed": "22.966 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518874262|3321418|5|07:43:19|40.756"
+            },
+            {
+              "activity_id": "8518874262",
+              "transponder": "3321418",
+              "raw_transponder": "3321418",
+              "pilot_name": "PIERRE MONPLAISI",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:44:00",
+              "lap_no": 6,
+              "lap_time": 41.341,
+              "speed": "22.641 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518874262|3321418|6|07:44:00|41.341"
             }
           ],
           "rank": 1,
@@ -8679,15 +8887,15 @@
       "date_fr": "25/10/2026",
       "source_file": "sessions_8518873863.csv",
       "pilot_count": 1,
-      "laps_count": 2,
-      "best_lap": 43.813,
+      "laps_count": 7,
+      "best_lap": 40.344,
       "best_pilot": "Inconnu #2735470",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 7
       },
       "quality_score": 97,
       "suspicious_laps_count": 0,
@@ -8697,16 +8905,16 @@
           "transponder": "2735470",
           "pilot_name": "Inconnu #2735470",
           "pilot_slug": "inconnu-2735470-2735470",
-          "laps_count": 2,
-          "best_lap": 43.813,
-          "avg_lap": 46.603,
-          "consistency": 2.79,
+          "laps_count": 7,
+          "best_lap": 40.344,
+          "avg_lap": 42.893,
+          "consistency": 2.829,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 7
           },
           "laps": [
             {
@@ -8739,10 +8947,88 @@
               "base_track": "TT1/8",
               "lap_id": "8518873863|2735470|2|07:40:42|43.813",
               "personal_record": true
+            },
+            {
+              "activity_id": "8518873863",
+              "transponder": "2735470",
+              "raw_transponder": "2735470",
+              "pilot_name": "Inconnu #2735470",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:41:26",
+              "lap_no": 3,
+              "lap_time": 41.729,
+              "speed": "22.430 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518873863|2735470|3|07:41:26|41.729",
+              "personal_record": true
+            },
+            {
+              "activity_id": "8518873863",
+              "transponder": "2735470",
+              "raw_transponder": "2735470",
+              "pilot_name": "Inconnu #2735470",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:08",
+              "lap_no": 4,
+              "lap_time": 41.744,
+              "speed": "22.422 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518873863|2735470|4|07:42:08|41.744"
+            },
+            {
+              "activity_id": "8518873863",
+              "transponder": "2735470",
+              "raw_transponder": "2735470",
+              "pilot_name": "Inconnu #2735470",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:49",
+              "lap_no": 5,
+              "lap_time": 41.129,
+              "speed": "22.758 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518873863|2735470|5|07:42:49|41.129",
+              "personal_record": true
+            },
+            {
+              "activity_id": "8518873863",
+              "transponder": "2735470",
+              "raw_transponder": "2735470",
+              "pilot_name": "Inconnu #2735470",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:43:31",
+              "lap_no": 6,
+              "lap_time": 40.344,
+              "speed": "23.200 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518873863|2735470|6|07:43:31|40.344",
+              "personal_record": true
+            },
+            {
+              "activity_id": "8518873863",
+              "transponder": "2735470",
+              "raw_transponder": "2735470",
+              "pilot_name": "Inconnu #2735470",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:44:11",
+              "lap_no": 7,
+              "lap_time": 42.098,
+              "speed": "22.234 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518873863|2735470|7|07:44:11|42.098"
             }
           ],
           "rank": 1,
-          "personal_records_count": 1,
+          "personal_records_count": 4,
           "has_personal_record": true
         }
       ]
@@ -8753,15 +9039,15 @@
       "date_fr": "25/10/2026",
       "source_file": "sessions_8518872708.csv",
       "pilot_count": 1,
-      "laps_count": 2,
-      "best_lap": 47.295,
+      "laps_count": 7,
+      "best_lap": 37.51,
       "best_pilot": "PHILIPPE BEGARDS",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 7
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8771,16 +9057,16 @@
           "transponder": "9855985",
           "pilot_name": "PHILIPPE BEGARDS",
           "pilot_slug": "philippe-begards-9855985",
-          "laps_count": 2,
-          "best_lap": 47.295,
-          "avg_lap": 49.439,
-          "consistency": 2.144,
+          "laps_count": 7,
+          "best_lap": 37.51,
+          "avg_lap": 45.117,
+          "consistency": 4.898,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 7
           },
           "laps": [
             {
@@ -8812,6 +9098,81 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8518872708|9855985|2|07:40:35|47.295"
+            },
+            {
+              "activity_id": "8518872708",
+              "transponder": "9855985",
+              "raw_transponder": "9855985",
+              "pilot_name": "PHILIPPE BEGARDS",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:41:22",
+              "lap_no": 3,
+              "lap_time": 41.376,
+              "speed": "22.622 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518872708|9855985|3|07:41:22|41.376"
+            },
+            {
+              "activity_id": "8518872708",
+              "transponder": "9855985",
+              "raw_transponder": "9855985",
+              "pilot_name": "PHILIPPE BEGARDS",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:04",
+              "lap_no": 4,
+              "lap_time": 42.645,
+              "speed": "21.949 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518872708|9855985|4|07:42:04|42.645"
+            },
+            {
+              "activity_id": "8518872708",
+              "transponder": "9855985",
+              "raw_transponder": "9855985",
+              "pilot_name": "PHILIPPE BEGARDS",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:46",
+              "lap_no": 5,
+              "lap_time": 43.83,
+              "speed": "21.355 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518872708|9855985|5|07:42:46|43.830"
+            },
+            {
+              "activity_id": "8518872708",
+              "transponder": "9855985",
+              "raw_transponder": "9855985",
+              "pilot_name": "PHILIPPE BEGARDS",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:43:30",
+              "lap_no": 6,
+              "lap_time": 37.51,
+              "speed": "24.953 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518872708|9855985|6|07:43:30|37.510"
+            },
+            {
+              "activity_id": "8518872708",
+              "transponder": "9855985",
+              "raw_transponder": "9855985",
+              "pilot_name": "PHILIPPE BEGARDS",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:44:08",
+              "lap_no": 7,
+              "lap_time": 51.579,
+              "speed": "18.147 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518872708|9855985|7|07:44:08|51.579"
             }
           ],
           "rank": 1,
@@ -8826,7 +9187,7 @@
       "date_fr": "25/10/2026",
       "source_file": "sessions_8518868481.csv",
       "pilot_count": 1,
-      "laps_count": 4,
+      "laps_count": 8,
       "best_lap": 37.107,
       "best_pilot": "TONY GOMES",
       "tracks": [
@@ -8834,7 +9195,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 4
+        "TT1/8": 8
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8844,16 +9205,16 @@
           "transponder": "3601271",
           "pilot_name": "TONY GOMES",
           "pilot_slug": "tony-gomes-3601271",
-          "laps_count": 4,
+          "laps_count": 8,
           "best_lap": 37.107,
-          "avg_lap": 41.283,
-          "consistency": 2.605,
+          "avg_lap": 39.625,
+          "consistency": 2.492,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 4
+            "TT1/8": 8
           },
           "laps": [
             {
@@ -8915,6 +9276,66 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8518868481|3601271|4|07:41:18|37.107"
+            },
+            {
+              "activity_id": "8518868481",
+              "transponder": "3601271",
+              "raw_transponder": "3601271",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:41:55",
+              "lap_no": 5,
+              "lap_time": 38.555,
+              "speed": "24.277 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518868481|3601271|5|07:41:55|38.555"
+            },
+            {
+              "activity_id": "8518868481",
+              "transponder": "3601271",
+              "raw_transponder": "3601271",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:42:34",
+              "lap_no": 6,
+              "lap_time": 37.959,
+              "speed": "24.658 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518868481|3601271|6|07:42:34|37.959"
+            },
+            {
+              "activity_id": "8518868481",
+              "transponder": "3601271",
+              "raw_transponder": "3601271",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:43:12",
+              "lap_no": 7,
+              "lap_time": 37.763,
+              "speed": "24.786 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518868481|3601271|7|07:43:12|37.763"
+            },
+            {
+              "activity_id": "8518868481",
+              "transponder": "3601271",
+              "raw_transponder": "3601271",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-10-25",
+              "date_fr": "25/10/2026",
+              "start_time": "07:43:49",
+              "lap_no": 8,
+              "lap_time": 37.59,
+              "speed": "24.900 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8518868481|3601271|8|07:43:49|37.590"
             }
           ],
           "rank": 1,
@@ -257365,16 +257786,16 @@
           "date": "2026-10-25",
           "date_fr": "25/10/2026",
           "rank": 1,
-          "laps_count": 1,
+          "laps_count": 5,
           "best_lap": 38.894,
-          "avg_lap": 38.894,
-          "consistency": 0,
+          "avg_lap": 42.673,
+          "consistency": 3.297,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 1
+            "TT1/8": 5
           }
         },
         {
@@ -257684,13 +258105,13 @@
           }
         }
       ],
-      "total_laps": 596,
+      "total_laps": 600,
       "best_lap": 32.981,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 596
+        "TT1/8": 600
       },
       "activities_count": 19,
       "avg_best_lap": 36.494
@@ -257756,16 +258177,16 @@
           "date": "2026-10-25",
           "date_fr": "25/10/2026",
           "rank": 1,
-          "laps_count": 4,
+          "laps_count": 8,
           "best_lap": 37.107,
-          "avg_lap": 41.283,
-          "consistency": 2.605,
+          "avg_lap": 39.625,
+          "consistency": 2.492,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 4
+            "TT1/8": 8
           }
         },
         {
@@ -257820,13 +258241,13 @@
           }
         }
       ],
-      "total_laps": 175,
+      "total_laps": 179,
       "best_lap": 33.379,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 175
+        "TT1/8": 179
       },
       "activities_count": 4,
       "avg_best_lap": 34.992
@@ -260391,16 +260812,16 @@
           "date": "2026-10-25",
           "date_fr": "25/10/2026",
           "rank": 1,
-          "laps_count": 2,
-          "best_lap": 47.295,
-          "avg_lap": 49.439,
-          "consistency": 2.144,
+          "laps_count": 7,
+          "best_lap": 37.51,
+          "avg_lap": 45.117,
+          "consistency": 4.898,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 7
           }
         },
         {
@@ -260421,16 +260842,16 @@
           }
         }
       ],
-      "total_laps": 77,
+      "total_laps": 82,
       "best_lap": 36.52,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 77
+        "TT1/8": 82
       },
       "activities_count": 2,
-      "avg_best_lap": 41.907
+      "avg_best_lap": 37.015
     },
     {
       "transponder": "7612218",
@@ -260697,16 +261118,16 @@
           "date": "2026-10-25",
           "date_fr": "25/10/2026",
           "rank": 1,
-          "laps_count": 2,
-          "best_lap": 47.407,
-          "avg_lap": 49.728,
-          "consistency": 2.321,
+          "laps_count": 6,
+          "best_lap": 40.756,
+          "avg_lap": 47.524,
+          "consistency": 5.266,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 6
           }
         },
         {
@@ -260761,16 +261182,16 @@
           }
         }
       ],
-      "total_laps": 60,
+      "total_laps": 64,
       "best_lap": 37.103,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 60
+        "TT1/8": 64
       },
       "activities_count": 4,
-      "avg_best_lap": 40.267
+      "avg_best_lap": 38.605
     },
     {
       "transponder": "7568622",
@@ -261759,6 +262180,40 @@
       "avg_best_lap": 40.047
     },
     {
+      "transponder": "2735470",
+      "name": "Inconnu #2735470",
+      "slug": "inconnu-2735470-2735470",
+      "activities": [
+        {
+          "activity_id": "8518873863",
+          "date": "2026-10-25",
+          "date_fr": "25/10/2026",
+          "rank": 1,
+          "laps_count": 7,
+          "best_lap": 40.344,
+          "avg_lap": 42.893,
+          "consistency": 2.829,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 7
+          }
+        }
+      ],
+      "total_laps": 7,
+      "best_lap": 40.344,
+      "tracks": [
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/8": 7
+      },
+      "activities_count": 1,
+      "avg_best_lap": 40.344
+    },
+    {
       "transponder": "6452844",
       "name": "Inconnu #6452844",
       "slug": "inconnu-6452844-6452844",
@@ -261900,6 +262355,23 @@
       "slug": "philippe-duchen-6868468",
       "activities": [
         {
+          "activity_id": "8518876746",
+          "date": "2026-10-25",
+          "date_fr": "25/10/2026",
+          "rank": 1,
+          "laps_count": 3,
+          "best_lap": 48.2,
+          "avg_lap": 50.317,
+          "consistency": 2.501,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 3
+          }
+        },
+        {
           "activity_id": "7681889202",
           "date": "2026-04-19",
           "date_fr": "19/04/2026",
@@ -261917,16 +262389,16 @@
           }
         }
       ],
-      "total_laps": 33,
+      "total_laps": 36,
       "best_lap": 43.299,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 33
+        "TT1/8": 36
       },
-      "activities_count": 1,
-      "avg_best_lap": 43.299
+      "activities_count": 2,
+      "avg_best_lap": 45.749
     },
     {
       "transponder": "5682350",
@@ -261978,40 +262450,6 @@
       },
       "activities_count": 2,
       "avg_best_lap": 44.597
-    },
-    {
-      "transponder": "2735470",
-      "name": "Inconnu #2735470",
-      "slug": "inconnu-2735470-2735470",
-      "activities": [
-        {
-          "activity_id": "8518873863",
-          "date": "2026-10-25",
-          "date_fr": "25/10/2026",
-          "rank": 1,
-          "laps_count": 2,
-          "best_lap": 43.813,
-          "avg_lap": 46.603,
-          "consistency": 2.79,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 2
-          }
-        }
-      ],
-      "total_laps": 2,
-      "best_lap": 43.813,
-      "tracks": [
-        "TT1/8"
-      ],
-      "track_counts": {
-        "TT1/8": 2
-      },
-      "activities_count": 1,
-      "avg_best_lap": 43.813
     },
     {
       "transponder": "6282793",
