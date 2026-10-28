@@ -175,8 +175,8 @@ function bestProgression(period){
   });
   return rows.sort(function(a,b){return b.gain-a.gain;})[0]||null;
 }
-function seriesTable(rows,limit){
-  if(!rows.length)return '<p class="small">Aucune série de '+SERIES_LAP_COUNT+' tours enchaînés pour l’instant.</p>';
+function seriesTable(rows,limit,n){
+  if(!rows.length)return '<p class="small">Aucune série de '+(n||SERIES_LAP_COUNT)+' tours enchaînés pour l’instant.</p>';
   return '<div class="table-wrap"><table><thead><tr><th>#</th><th>Pilote</th><th>Moyenne</th><th>Meilleur</th><th>Session</th></tr></thead><tbody>'+
     rows.slice(0,limit||10).map(function(s,i){
       var fastest=s.laps.reduce(function(a,b){return b._time<a._time?b:a;});
@@ -208,8 +208,11 @@ function clubProgressHtml(){
 
 function clubRecordsPage(){
   var all=getAllLaps(), month=periodFilteredLaps('month');
-  var series18=bestSeriesByPilot(all.filter(function(l){return l._track==='TT1/8';}));
-  var series10=bestSeriesByPilot(all.filter(function(l){return l._track==='TT1/10';}));
+  // 10 tours est plus selectif que 5 (88% des pilotes en ont une contre 96%)
+  // mais mesure un rythme tenu deux fois plus longtemps.
+  var serieLen=hashParam('serie','')==='10'?10:SERIES_LAP_COUNT;
+  var series18=bestSeriesByPilot(all.filter(function(l){return l._track==='TT1/8';}),serieLen);
+  var series10=bestSeriesByPilot(all.filter(function(l){return l._track==='TT1/10';}),serieLen);
   var topSeries18=series18[0]||null, topSeries10=series10[0]||null;
   var best18=bestByPilot(all.filter(function(l){return l._track==='TT1/8';}))[0]||null;
   var best10=bestByPilot(all.filter(function(l){return l._track==='TT1/10';}))[0]||null;
@@ -224,15 +227,18 @@ function clubRecordsPage(){
       clubRecordBox('Record du mois TT1/10',fmtTimeS(month10&&month10._time),month10?month10._pilot+' · '+dateFrFromValue(month10._date):'',month10?'#/pilote/'+encodeURIComponent(month10._pilot):'')+
       clubRecordBox('Gros rouleur du mois',rider?rider.laps+' tours':'-',rider?rider.pilot+' · '+fmtKm(rider.km)+' km':'',rider?'#/pilote/'+encodeURIComponent(rider.pilot):'')+
       clubRecordBox('Progression du mois',progress?'+'+progress.gain.toFixed(3)+' s':'-',progress?progress.pilot+' · '+progress.track+' · '+fmtTimeS(progress.best):'')+
-      clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/8',fmtTimeS(topSeries18&&topSeries18.avg),topSeries18?topSeries18.pilot+' · '+dateFrFromValue(topSeries18.date):'',topSeries18?'#/pilote/'+encodeURIComponent(topSeries18.pilot):'')+
-      clubRecordBox('Série '+SERIES_LAP_COUNT+' tours TT1/10',fmtTimeS(topSeries10&&topSeries10.avg),topSeries10?topSeries10.pilot+' · '+dateFrFromValue(topSeries10.date):'',topSeries10?'#/pilote/'+encodeURIComponent(topSeries10.pilot):'')+
+      clubRecordBox('Série '+serieLen+' tours TT1/8',fmtTimeS(topSeries18&&topSeries18.avg),topSeries18?topSeries18.pilot+' · '+dateFrFromValue(topSeries18.date):'',topSeries18?'#/pilote/'+encodeURIComponent(topSeries18.pilot):'')+
+      clubRecordBox('Série '+serieLen+' tours TT1/10',fmtTimeS(topSeries10&&topSeries10.avg),topSeries10?topSeries10.pilot+' · '+dateFrFromValue(topSeries10.date):'',topSeries10?'#/pilote/'+encodeURIComponent(topSeries10.pilot):'')+
     '</section>'+
     '<section class="report-columns"><div class="card"><h2>Top TT1/8</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/8';})),5)+'</div><div class="card"><h2>Top TT1/10</h2>'+recordsTable(bestByPilot(all.filter(function(l){return l._track==='TT1/10';})),5)+'</div></section>'+
-    '<section class="card"><h2>🔥 Meilleures séries de '+SERIES_LAP_COUNT+' tours</h2>'+
-      '<p class="small">Moyenne sur '+SERIES_LAP_COUNT+' tours qui s’enchaînent, sans relance. Le meilleur tour récompense un tour isolé : la série montre le rythme réellement tenu.</p>'+
-      '<div class="report-columns"><div><h3>TT1/8</h3>'+seriesTable(series18,5)+'</div><div><h3>TT1/10</h3>'+seriesTable(series10,5)+'</div></div>'+
+    '<section class="card"><div class="panel-title"><div><h2>🔥 Meilleures séries de '+serieLen+' tours</h2>'+
+      '<p class="small">Moyenne sur '+serieLen+' tours qui s’enchaînent, sans relance. Le meilleur tour récompense un tour isolé : la série montre le rythme réellement tenu.</p></div>'+
+      '<select id="seriesLen"><option value="5" '+(serieLen===5?'selected':'')+'>5 tours</option><option value="10" '+(serieLen===10?'selected':'')+'>10 tours</option></select></div>'+
+      '<div class="report-columns"><div><h3>TT1/8</h3>'+seriesTable(series18,5,serieLen)+'</div><div><h3>TT1/10</h3>'+seriesTable(series10,5,serieLen)+'</div></div>'+
     '</section>'+
     clubProgressHtml();
+  var serieSelect=document.getElementById('seriesLen');
+  if(serieSelect)serieSelect.onchange=function(){location.hash='#/records-club?serie='+serieSelect.value;};
 }
 
 function riderRows(laps){
