@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mrcp-dashboard-v2026-05-28-install-1';
+const CACHE_NAME = 'mrcp-dashboard-v2026-10-28-modules-1';
 
 const ASSETS = [
   './index_v2.html',
@@ -47,8 +47,27 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (url.pathname.endsWith('app_v2.js') || url.pathname.endsWith('styles_v2.css') || url.pathname.endsWith('pilot_links_v53.js') || url.pathname.endsWith('mrcp_v55_widgets.js')) {
-    event.respondWith(fetch(event.request, {cache: 'no-store'}).catch(() => caches.match(event.request)));
+  // Tout le code, reseau d'abord. La regle listait des noms de fichiers en dur
+  // et ne connaissait que l'ancien app_v2.js : depuis son decoupage, les onze
+  // modules app_v2_*.js tombaient dans la regle generique ci-dessous, qui sert
+  // le cache en priorite - du vieux JavaScript a vie des qu'un ?v= n'est pas
+  // incremente.
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    event.respondWith(
+      fetch(event.request, {cache: 'no-store'})
+        .then(response => {
+          // On garde une copie, sinon le repli hors ligne ci-dessous ne trouve
+          // que les rares fichiers pre-charges a l'installation.
+          // shortcut: les anciennes versions (?v=) s'accumulent sans purge,
+          // quelques dizaines de Ko par deploiement ; a nettoyer si la taille
+          // du cache devient genante.
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          return response;
+        })
+        // ignoreSearch : hors ligne, mieux vaut la version precedente que rien.
+        .catch(() => caches.match(event.request, {ignoreSearch: true}))
+    );
     return;
   }
 
