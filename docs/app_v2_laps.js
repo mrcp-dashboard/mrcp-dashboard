@@ -76,6 +76,54 @@ function applyRecordFilters(laps){
 function bestByPilot(laps){var m=new Map();laps.forEach(function(l){if(!m.has(l._pilot)||l._time<m.get(l._pilot)._time)m.set(l._pilot,l);});return Array.from(m.values()).sort(function(a,b){return a._time-b._time;});}
 function allPilots(){return bestByPilot(getAllLaps()).map(function(l){return l._pilot;}).sort(function(a,b){return a.localeCompare(b);});}
 
+// Tours propres / incidents.
+// Une sortie de piste ou un tonneau produit un tour tres au-dessus du rythme ;
+// le garder fausse moyenne et ecart-type. Reference = mediane de la session du
+// pilote : robuste, et adaptee aux conditions du jour - se caler sur le record
+// de la saison classerait tous les tours d'avril comme incidents.
+var INCIDENT_FACTOR = 1.12;
+
+function splitCleanLaps(laps){
+  var clean = [], incidents = [];
+  // Reference = la relance, pas la journee : sur une journee entiere la mediane
+  // melange echauffement et conditions changeantes, et signalait 15% des tours.
+  lapSeriesRuns(laps).forEach(function(run){
+    var times = run.map(function(l){ return l._time; }).sort(function(a, b){ return a - b; });
+    var limit = times[Math.floor(times.length / 2)] * INCIDENT_FACTOR;
+    run.forEach(function(l){ (l._time <= limit ? clean : incidents).push(l); });
+  });
+  return { clean: clean, incidents: incidents };
+}
+
+function lapsStdDev(laps){
+  if(!laps.length) return null;
+  var avg = laps.reduce(function(s, l){ return s + l._time; }, 0) / laps.length;
+  return Math.sqrt(laps.reduce(function(s, l){ return s + Math.pow(l._time - avg, 2); }, 0) / laps.length);
+}
+
+// Ecart-type sur les seuls tours propres : c'est la regularite affichee partout.
+function cleanStdDev(laps){
+  return lapsStdDev(splitCleanLaps(laps).clean);
+}
+
+// Part des tours propres a moins de 2% du meilleur tour de LEUR relance. Plus
+// parlant qu'un ecart-type en secondes, et compare au rythme du moment plutot
+// qu'au record de la saison.
+function sharpLapRate(laps){
+  var total = 0, near = 0;
+  lapSeriesRuns(laps).forEach(function(run){
+    var best = Math.min.apply(null, run.map(function(l){ return l._time; }));
+    var times = run.map(function(l){ return l._time; }).sort(function(a, b){ return a - b; });
+    var limit = times[Math.floor(times.length / 2)] * INCIDENT_FACTOR;
+    run.forEach(function(l){
+      if(l._time > limit) return;            // incident : hors statistique
+      total++;
+      if(l._time <= best * 1.02) near++;
+    });
+  });
+  return total ? near / total * 100 : null;
+}
+
 // Series de tours consecutifs.
 // Le best lap recompense un tour isole : la moyenne sur N tours qui s'enchainent
 // mesure le rythme reellement tenu. Dans les CSV SpeedHive, lap_no repart a 1 a

@@ -158,10 +158,7 @@ function pilotSessions(stats){
 }
 
 function pilotConsistency(stats){
-  if(!stats.laps.length) return null;
-  var avg = stats.avg;
-  var variance = stats.laps.reduce(function(sum,l){return sum + Math.pow(l._time - avg, 2);}, 0) / stats.laps.length;
-  return Math.sqrt(variance);
+  return cleanStdDev(stats.laps);
 }
 
 function lapSortValue(l){
@@ -196,7 +193,7 @@ function pilotSessionDetailHtml(name, sessionKey){
     return '<section class="card"><h2>Session introuvable</h2><p class="small">Impossible de retrouver cette session pour '+escapeHtml(name)+'.</p><p><a class="btn-secondary" href="#/pilote/'+encodeURIComponent(name)+'">Retour fiche pilote</a></p></section>';
   }
   var laps=sortedSessionLaps(session);
-  var consistency=session.laps>1?Math.sqrt(laps.reduce(function(sum,l){return sum+Math.pow(l._time-session.avg,2);},0)/laps.length):0;
+  var consistency=cleanStdDev(laps);
   var points=laps.map(function(l,i){return{lapNo:i+1,time:l._time};});
   return '<section class="card session-detail-hero">' +
     '<div><a class="mini-button" href="#/pilote/'+encodeURIComponent(name)+'">Retour pilote</a><h1>'+escapeHtml(session.name)+'</h1><p class="small">'+escapeHtml(name)+' · '+escapeHtml(Object.keys(session.tracks).join(' / ')||'-')+'</p></div>' +
@@ -223,7 +220,7 @@ function pilotTrackTarget(stats, track){
   var gain = gap > 1 ? 0.5 : (gap > 0.35 ? 0.2 : 0.1);
   var target = gap <= 0 ? best._time : Math.max(club._time, best._time - gain);
   var avg = laps.reduce(function(sum,l){return sum+l._time;},0)/laps.length;
-  var consistency = Math.sqrt(laps.reduce(function(sum,l){return sum+Math.pow(l._time-avg,2);},0)/laps.length);
+  var consistency = cleanStdDev(laps);
   var message = gap <= 0 ? 'Record club actuel' : (gap <= 0.35 ? 'Objectif record a portee' : 'Prochain palier realiste');
 
   return {track:track,best:best,club:club,gap:gap,target:target,avg:avg,consistency:consistency,laps:laps.length,message:message};
@@ -360,6 +357,8 @@ function pilotFullProfileHtml(name){
   var progress10 = pilotProgressData(s, 'TT1/10');
   var insights = pilotAiInsights(s);
   var consistency = pilotConsistency(s);
+  var sharp = sharpLapRate(s.laps);
+  var incidents = splitCleanLaps(s.laps).incidents.length;
   var badges = pilotBadges(s);
   var series18 = bestLapSeries(s.laps.filter(function(l){return l._track==='TT1/8';}));
   var series10 = bestLapSeries(s.laps.filter(function(l){return l._track==='TT1/10';}));
@@ -374,6 +373,8 @@ function pilotFullProfileHtml(name){
         '<div class="goal-pill"><span class="small">Best TT1/10</span><strong>'+fmtTimeS(best10&&best10._time)+'</strong></div>' +
         '<div class="goal-pill"><span class="small">Moyenne</span><strong>'+fmtTimeS(s.avg)+'</strong></div>' +
         '<div class="goal-pill"><span class="small">Régularité</span><strong>'+fmtTimeS(consistency)+'</strong></div>' +
+        '<div class="goal-pill"><span class="small">Tours nets</span><strong>'+(sharp===null?'-':Math.round(sharp)+' %')+'</strong></div>' +
+        '<div class="goal-pill"><span class="small">Incidents</span><strong>'+incidents+'</strong></div>' +
         '<div class="goal-pill"><span class="small">Série '+SERIES_LAP_COUNT+' tours TT1/8</span><strong>'+fmtTimeS(series18&&series18.avg)+'</strong></div>' +
         '<div class="goal-pill"><span class="small">Série '+SERIES_LAP_COUNT+' tours TT1/10</span><strong>'+fmtTimeS(series10&&series10.avg)+'</strong></div>' +
       '</div>' +
