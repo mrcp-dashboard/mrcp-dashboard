@@ -47,7 +47,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (url.pathname.endsWith('app_v2.js') || url.pathname.endsWith('styles_v2.css') || url.pathname.endsWith('pilot_links_v53.js') || url.pathname.endsWith('mrcp_v55_widgets.js') || url.pathname.endsWith('mrcp_v54_intelligence.js')) {
+  if (url.pathname.endsWith('app_v2.js') || url.pathname.endsWith('styles_v2.css') || url.pathname.endsWith('pilot_links_v53.js') || url.pathname.endsWith('mrcp_v55_widgets.js')) {
     event.respondWith(fetch(event.request, {cache: 'no-store'}).catch(() => caches.match(event.request)));
     return;
   }
