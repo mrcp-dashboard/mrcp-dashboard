@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-28T21:57:18+01:00",
+  "generated_at": "2026-10-29T16:18:16+01:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 354,
+    "activities_count": 355,
     "pilots_count": 82,
-    "laps_count": 18047,
+    "laps_count": 18049,
     "tracks": {
       "TT1/8": {
-        "laps_count": 17864,
-        "activities_count": 354,
+        "laps_count": 17866,
+        "activities_count": 355,
         "pilots_count": 82
       },
       "TT1/10": {
@@ -5443,6 +5443,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8535733860",
+        "date_fr": "29/10/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 2,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8527166535",
         "date_fr": "27/10/2026",
         "tracks": [
@@ -8496,21 +8507,83 @@
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7681812618",
-        "date_fr": "19/04/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 93,
-        "quality_score": 100,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 0
       }
     ]
   },
   "activities": [
+    {
+      "id": "8535733860",
+      "date": "2026-10-29",
+      "date_fr": "29/10/2026",
+      "source_file": "sessions_8535733860.csv",
+      "pilot_count": 1,
+      "laps_count": 2,
+      "best_lap": 37.424,
+      "best_pilot": "clovis vincent",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 2
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "3523441",
+          "pilot_name": "clovis vincent",
+          "pilot_slug": "clovis-vincent-3523441",
+          "laps_count": 2,
+          "best_lap": 37.424,
+          "avg_lap": 48.278,
+          "consistency": 10.854,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 2
+          },
+          "laps": [
+            {
+              "activity_id": "8535733860",
+              "transponder": "3523441",
+              "raw_transponder": "3523441",
+              "pilot_name": "clovis vincent",
+              "date": "2026-10-29",
+              "date_fr": "29/10/2026",
+              "start_time": "16:16:06",
+              "lap_no": 1,
+              "lap_time": 59.131,
+              "speed": "15.829 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8535733860|3523441|1|16:16:06|59.131"
+            },
+            {
+              "activity_id": "8535733860",
+              "transponder": "3523441",
+              "raw_transponder": "3523441",
+              "pilot_name": "clovis vincent",
+              "date": "2026-10-29",
+              "date_fr": "29/10/2026",
+              "start_time": "16:17:05",
+              "lap_no": 2,
+              "lap_time": 37.424,
+              "speed": "25.011 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8535733860|3523441|2|16:17:05|37.424"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8527166535",
       "date": "2026-10-27",
@@ -299547,6 +299620,23 @@
       "slug": "clovis-vincent-3523441",
       "activities": [
         {
+          "activity_id": "8535733860",
+          "date": "2026-10-29",
+          "date_fr": "29/10/2026",
+          "rank": 1,
+          "laps_count": 2,
+          "best_lap": 37.424,
+          "avg_lap": 48.278,
+          "consistency": 10.854,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 2
+          }
+        },
+        {
           "activity_id": "8527166535",
           "date": "2026-10-27",
           "date_fr": "27/10/2026",
@@ -299598,16 +299688,16 @@
           }
         }
       ],
-      "total_laps": 189,
+      "total_laps": 191,
       "best_lap": 34.641,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 189
+        "TT1/8": 191
       },
-      "activities_count": 3,
-      "avg_best_lap": 35.967
+      "activities_count": 4,
+      "avg_best_lap": 36.331
     },
     {
       "transponder": "5552458",
