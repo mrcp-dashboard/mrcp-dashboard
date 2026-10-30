@@ -167,6 +167,50 @@ variables les plus importantes sont :
   vide pour desactiver.
 - `MRCP_GITHUB_REPO` : depot cible pour ce declenchement, `mrcp-dashboard/mrcp-dashboard` par defaut.
 
+## Rapports WhatsApp aux pilotes
+
+Un pilote qui le demande recoit un rapport de son roulage (tours, meilleur
+tour, serie de 5 tours, comparaison a son record) quelques minutes apres avoir
+quitte la piste.
+
+Trois morceaux :
+
+1. **Inscription** : la fiche pilote affiche un bouton qui ouvre WhatsApp avec
+   `INSCRIPTION <nom>` deja ecrit. Renseigner le numero du bot dans
+   `WHATSAPP_BOT_NUMBER` (`docs/app_v2_core.js`), au format international sans
+   `+` ni espaces. Laisse vide, le bouton ne s'affiche pas.
+2. **Reception** : WAHA pousse les messages entrants sur
+   `POST http://<lxc>:5055/waha-webhook?token=<MRCP_WAHA_WEBHOOK_TOKEN>`
+   (route de `admin_api.py`). Le numero de l'expediteur sert d'identifiant, il
+   n'y a rien a saisir. `STOP` desinscrit.
+3. **Envoi** : `docs/notify_pilots.py`, appele a chaque passage de
+   `update_dashboard.sh`. Un rapport quand le pilote n'a plus passe de tour
+   depuis 15 min, et un resume le soir s'il a fait plusieurs relances.
+
+Variables :
+
+- `MRCP_WAHA_URL` : ex. `http://192.168.1.50:3000`. Vide = aucun envoi, les
+  messages sont seulement affiches dans le journal.
+- `MRCP_WAHA_SESSION` : session WAHA, `default` par defaut.
+- `MRCP_WAHA_API_KEY` : cle `X-Api-Key` de WAHA.
+- `MRCP_WAHA_WEBHOOK_TOKEN` : secret partage avec le webhook WAHA. Vide = la
+  route refuse tout, personne ne peut s'inscrire.
+- `MRCP_PUBLIC_BASE_URL` : base des liens vers la fiche pilote.
+- `MRCP_NOTIFY_IDLE_MINUTES` : silence qui marque la fin d'un roulage, `15`.
+- `MRCP_NOTIFY_DAY_HOUR` : heure du resume du soir, `20`.
+- `MRCP_NOTIFY_DRY_RUN=1` : affiche les messages sans les envoyer.
+
+Les contacts vivent dans `docs/pilot_notifications.json` et l'anti-doublon dans
+`docs/daily_summary_sent.json`. **Ces deux fichiers sont ignores par Git** :
+ce sont des donnees personnelles et le depot est public. Les sauvegarder a part
+sur le serveur, ils ne sont pas repliques par le depot.
+
+Essai a blanc, sans rien envoyer :
+
+```bash
+MRCP_NOTIFY_DRY_RUN=1 python docs/notify_pilots.py --date 2026-10-25 --now 23:00
+```
+
 ## Tests
 
 Un test de generation minimal couvre `build_data_v2.py` dans `docs/tests/`.

@@ -30,6 +30,9 @@ import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import notify_pilots  # waha_send() et match_key(), partages avec l'envoi des rapports
+
 PROJECT_ROOT = Path(os.environ.get("MRCP_PROJECT_ROOT", "/opt/mrcp-dashboard"))
 DOCS_DIR = Path(os.environ.get("MRCP_DOCS_DIR", str(PROJECT_ROOT / "docs")))
 TOKEN = os.environ.get("MRCP_ADMIN_TOKEN", "")
@@ -47,6 +50,12 @@ MANAGED_JSON_FILES = ("lap_overrides.json", "corrections.json", "data_v2.json")
 GITHUB_REPO = os.environ.get("MRCP_GITHUB_REPO", "mrcp-dashboard/mrcp-dashboard")
 GITHUB_TOKEN = os.environ.get("MRCP_GITHUB_TOKEN", "")
 GITHUB_PAGES_WORKFLOW = os.environ.get("MRCP_GITHUB_PAGES_WORKFLOW", "pages.yml")
+
+# Inscription des pilotes aux rapports WhatsApp (webhook WAHA). Les contacts
+# vivent dans un fichier ignore par Git : ce sont des donnees personnelles et
+# le depot est public.
+NOTIFICATIONS_FILE = DOCS_DIR / "pilot_notifications.json"
+WAHA_WEBHOOK_TOKEN = os.environ.get("MRCP_WAHA_WEBHOOK_TOKEN", "")
 
 if not TOKEN:
     print("ATTENTION: MRCP_ADMIN_TOKEN non défini. Définis un token avant usage en production.")
@@ -593,6 +602,91 @@ def restore_backup():
         "message": "Sauvegarde restauree, data_v2.json regenere et GitHub mis a jour.",
         "commands": commands,
     })
+
+
+@app.route("/waha-webhook", methods=["POST"])
+def waha_webhook():
+    """Inscription des pilotes par message WhatsApp.
+
+    WAHA pousse ici chaque message recu (configurer l'URL du webhook avec
+    ?token=MRCP_WAHA_WEBHOOK_TOKEN). Le numero de l'expediteur sert
+    d'identifiant : le pilote n'a rien a saisir, et le fait qu'il ecrive le
+    premier vaut consentement.
+    """
+    if not WAHA_WEBHOOK_TOKEN or request.args.get("token", "") != WAHA_WEBHOOK_TOKEN:
+        return jsonify({"ok": False, "error": "Token invalide"}), 403
+
+    body = request.get_json(silent=True) or {}
+    payload = body.get("payload") if isinstance(body.get("payload"), dict) else {}
+    if body.get("event") not in (None, "message") or payload.get("fromMe"):
+        return jsonify({"ok": True, "ignored": True})
+
+    chat_id = str(payload.get("from") or "").strip()
+    text = " ".join(str(payload.get("body") or "").split())
+    if not chat_id or not text:
+        return jsonify({"ok": True, "ignored": True})
+
+    reply = handle_whatsapp_command(chat_id, text)
+    notify_pilots.waha_send(chat_id, reply)
+    return jsonify({"ok": True, "reply": reply})
+
+
+def known_pilot_names():
+    data = load_json_file(DOCS_DIR / "data_v2.json", {})
+    return [str(p.get("name") or "") for p in data.get("pilots", []) if p.get("name")]
+
+
+def handle_whatsapp_command(chat_id, text):
+    """Interprete un message entrant et met a jour pilot_notifications.json."""
+    store = load_json_file(NOTIFICATIONS_FILE, {"pilots": {}})
+    pilots = store.setdefault("pilots", {})
+    word = text.split(" ", 1)[0].upper()
+
+    if word == "STOP":
+        stopped = [name for name, cfg in pilots.items()
+                   if isinstance(cfg, dict) and cfg.get("whatsapp") == chat_id and cfg.get("enabled", True)]
+        for name in stopped:
+            pilots[name]["enabled"] = False
+            pilots[name]["updated_at"] = datetime.now().isoformat(timespec="seconds")
+        save_notifications(store)
+        if not stopped:
+            return "Tu n'etais pas inscrit. Envoie INSCRIPTION suivi de ton nom pour recevoir tes chronos."
+        return "C'est note, tu ne recevras plus de message. Envoie INSCRIPTION pour revenir."
+
+    if word == "INSCRIPTION":
+        wanted = text[len(word):].strip()
+        if not wanted:
+            return "Envoie : INSCRIPTION suivi de ton nom de pilote, par exemple INSCRIPTION Jean Dupont."
+        matches = [name for name in known_pilot_names()
+                   if notify_pilots.match_key(name) == notify_pilots.match_key(wanted)]
+        if not matches:
+            # Repli sur "contient" : beaucoup de pilotes tapent leur prenom seul.
+            matches = [name for name in known_pilot_names()
+                       if notify_pilots.match_key(wanted) in notify_pilots.match_key(name)]
+        if not matches:
+            return f"Je ne trouve pas de pilote nomme \"{wanted}\". Verifie l'orthographe sur le dashboard."
+        if len(matches) > 1:
+            return "Plusieurs pilotes correspondent : " + ", ".join(matches[:5]) + ". Precise ton nom complet."
+
+        name = matches[0]
+        pilots[name] = {
+            "pilot": name,
+            "whatsapp": chat_id,
+            "enabled": True,
+            "updated_at": datetime.now().isoformat(timespec="seconds"),
+        }
+        save_notifications(store)
+        return (f"Inscription confirmee pour {name}. Tu recevras un rapport a la fin de chaque roulage.\n"
+                "Reponds STOP a tout moment pour arreter.")
+
+    return "Commandes : INSCRIPTION <ton nom> pour recevoir tes chronos, STOP pour arreter."
+
+
+def save_notifications(store):
+    """Ecriture atomique : le script d'envoi lit ce fichier toutes les 3 min."""
+    tmp = NOTIFICATIONS_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(store, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(NOTIFICATIONS_FILE)
 
 
 if __name__ == "__main__":

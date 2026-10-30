@@ -10,6 +10,10 @@ var THEME_KEY = 'mrcp_dashboard_theme';
 var LIVE_DECODER_URL = 'live_decoder_state.json';
 var DEFAULT_LAP_DISTANCE_METERS = 250;
 var TRACK_LAP_DISTANCE_METERS = {'TT1/8':250,'TT1/10':180};
+// Numero WhatsApp du bot d'inscription aux rapports de roulage, au format
+// international sans + ni espaces (ex. '33612345678'). Laisse vide, le bloc
+// d'inscription ne s'affiche pas : le site reste correct sans bot.
+var WHATSAPP_BOT_NUMBER = '';
 var state = { track:'all', recordPeriod:'total', isAdmin: !!getAdminConfig().token };
 var lapsCache = null;
 var liveVoiceLastKey = '';

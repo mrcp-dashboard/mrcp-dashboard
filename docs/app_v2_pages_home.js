@@ -342,6 +342,22 @@ function pilotProgressSentenceHtml(name){
     '<ul class="progress-list">' + lines + '</ul></section>';
 }
 
+// Inscription aux rapports de roulage : le pilote envoie un message pre-rempli
+// au bot WhatsApp du club. Rien a stocker cote site - il est statique - et son
+// numero est capture par WAHA, sans saisie ni faute de frappe possible.
+function whatsappOptinHtml(name){
+  // typeof : si un visiteur a ce fichier a jour mais app_v2_core.js encore en
+  // cache, la constante n'existe pas et toute la fiche pilote plantait.
+  if(typeof WHATSAPP_BOT_NUMBER === 'undefined' || !WHATSAPP_BOT_NUMBER) return '';
+  var link='https://wa.me/'+WHATSAPP_BOT_NUMBER+'?text='+encodeURIComponent('INSCRIPTION '+name);
+  return '<div class="whatsapp-optin">' +
+    '<h3>📲 Recevoir mes chronos sur WhatsApp</h3>' +
+    '<p class="small">Un rapport à la fin de chaque roulage : tours, meilleur tour, série de '+SERIES_LAP_COUNT+' tours et comparaison à ton record.</p>' +
+    '<a class="btn-primary" href="'+link+'" target="_blank" rel="noopener">M’inscrire sur WhatsApp</a>' +
+    '<p class="small">Le message est déjà écrit, tu n’as qu’à l’envoyer. Réponds STOP à tout moment pour arrêter.</p>' +
+  '</div>';
+}
+
 function pilotFullProfileHtml(name){
   var s = pilotStats(name);
   var best18 = pilotBestByTrack(s,'TT1/8');
@@ -384,6 +400,7 @@ function pilotFullProfileHtml(name){
         '<button id="sharePilotImage" class="btn-secondary">Image partageable</button>' +
         '<button id="printPilotProfile" class="btn-secondary">Imprimer fiche</button>' +
       '</div>' +
+      whatsappOptinHtml(name) +
     '</div>' +
     '<div class="card qr-card">' +
       '<h3>📱 QR code pilote</h3>' +

@@ -21,27 +21,27 @@ if [ -f "$PROJECT_ROOT/venv/bin/activate" ]; then
 fi
 
 cd "$PROJECT_ROOT"
-echo "[0/5] Synchronisation Git"
+echo "[0/6] Synchronisation Git"
 git pull --rebase origin "$GIT_BRANCH"
 
 cd "$PROJECT_DIR"
-echo "[1/5] Synchronisation SpeedHive"
+echo "[1/6] Synchronisation SpeedHive"
 "$PYTHON" speedhive_sync_linux.py --limit "$SPEEDHIVE_LIMIT"
 
-echo "[2/5] Generation data_v2.json"
+echo "[2/6] Generation data_v2.json"
 "$PYTHON" build_data_v2.py
 
-echo "[3/5] Validation data_v2.json"
+echo "[3/6] Validation data_v2.json"
 "$PYTHON" validate_dashboard_data.py
 
 cd "$PROJECT_ROOT"
-echo "[4/5] Y a-t-il du nouveau a publier ?"
+echo "[4/6] Y a-t-il du nouveau a publier ?"
 # data_v2.json change a chaque passage a cause de generated_at, meme quand
 # personne n'a roule : sans ce filtre on commitait ~480 fois par jour pour
 # rien (mesure du 20/08/2026 : 119 commits d'affilee sans aucune donnee
 # nouvelle). Voir docs/tools/data_changed.py.
 if "$PYTHON" "$PROJECT_DIR/tools/data_changed.py" --verbose; then
-  echo "[5/5] Git commit / push"
+  echo "[5/6] Git commit / push"
   git add docs
   if git diff --cached --quiet; then
     echo "Aucun changement a publier"
@@ -51,10 +51,17 @@ if "$PYTHON" "$PROJECT_DIR/tools/data_changed.py" --verbose; then
     git push origin "$GIT_BRANCH"
   fi
 else
-  echo "[5/5] Rien de neuf : commit ignore"
+  echo "[5/6] Rien de neuf : commit ignore"
   # L'arbre doit rester propre, sinon le "git pull --rebase" du prochain
   # passage echouerait sur des modifications locales non commitees.
   git checkout -- docs/data_v2.json docs/speedhive_sync_meta.json 2>/dev/null || true
 fi
+
+# Apres le commit, et surtout a chaque passage : la fin d'un roulage se
+# reconnait a l'absence de nouveaux tours, donc le script doit tourner meme
+# quand la synchro n'a rien ramene. Il n'ecrit que des fichiers ignores par
+# Git, l'arbre reste propre pour le prochain "git pull --rebase".
+echo "[6/6] Rapports WhatsApp pilotes"
+"$PYTHON" "$PROJECT_DIR/notify_pilots.py" || echo "ATTENTION: envoi des rapports en echec (la synchro, elle, est passee)"
 
 echo "Termine"
