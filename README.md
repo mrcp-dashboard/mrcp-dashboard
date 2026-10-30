@@ -187,9 +187,12 @@ Trois morceaux :
    `update_dashboard.sh`. Un rapport quand le pilote n'a plus passe de tour
    depuis 15 min, et un resume le soir s'il est sorti rouler plusieurs fois.
 
-Variables, a ajouter dans `/etc/systemd/system/mrcp-admin-api.service` sur le
-LXC (lignes `Environment=`, comme `MRCP_ADMIN_TOKEN`), puis
-`systemctl daemon-reload && systemctl restart mrcp-admin-api` :
+Variables, a mettre dans `/opt/mrcp-dashboard/.env` sur le LXC - et pas en
+`Environment=` dans l'unite systemd : `update_dashboard.sh` en a besoin aussi,
+or lance par cron il ne voit rien de ce qui est declare dans l'unite. Le
+service admin lit ce meme fichier via `EnvironmentFile=`. Apres modification :
+`systemctl restart mrcp-admin-api` (le cron, lui, relit le fichier a chaque
+passage).
 
 - `MRCP_WAHA_URL` : ex. `http://192.168.1.50:3000`. Vide = aucun envoi, les
   messages sont seulement affiches dans le journal.

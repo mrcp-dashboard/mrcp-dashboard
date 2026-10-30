@@ -2,6 +2,17 @@
 set -euo pipefail
 
 PROJECT_ROOT="${MRCP_PROJECT_ROOT:-/opt/mrcp-dashboard}"
+
+# notify_pilots.py a besoin de la configuration WAHA, mais ce script tourne
+# depuis cron, qui n'hérite d'aucune variable d'environnement : sans ce
+# fichier les rapports partiraient en mode simulation, sans rien envoyer.
+# C'est le meme .env que celui du service admin (EnvironmentFile).
+if [ -f "$PROJECT_ROOT/.env" ]; then
+  set -a
+  . "$PROJECT_ROOT/.env"
+  set +a
+fi
+
 PROJECT_DIR="${MRCP_DOCS_DIR:-$PROJECT_ROOT/docs}"
 PYTHON="${MRCP_PYTHON:-$PROJECT_ROOT/venv/bin/python}"
 GIT_BRANCH="${MRCP_GIT_BRANCH:-main}"

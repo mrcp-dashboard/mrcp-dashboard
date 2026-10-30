@@ -17,13 +17,11 @@ Environment=MRCP_ADMIN_TOKEN=CHANGE_MOI_TOKEN_SECRET
 # Laisser vide pour desactiver (comportement precedent : deploiement planifie).
 Environment=MRCP_GITHUB_REPO=mrcp-dashboard/mrcp-dashboard
 Environment=MRCP_GITHUB_TOKEN=
-# Inscription des pilotes aux rapports WhatsApp (voir README.md). Tant que
-# MRCP_WAHA_WEBHOOK_TOKEN est vide, la route /waha-webhook refuse tout et
-# personne ne peut s'inscrire.
-Environment=MRCP_WAHA_URL=
-Environment=MRCP_WAHA_SESSION=default
-Environment=MRCP_WAHA_API_KEY=
-Environment=MRCP_WAHA_WEBHOOK_TOKEN=
+# Configuration WAHA des rapports WhatsApp (voir README.md). Elle vit dans un
+# fichier a part, et non en Environment= ici, parce que update_dashboard.sh en
+# a besoin aussi : lance par cron, il ne voit rien de ce qui est declare dans
+# cette unite. Le "-" rend le fichier facultatif.
+EnvironmentFile=-/opt/mrcp-dashboard/.env
 ExecStart=/opt/mrcp-dashboard/venv/bin/python /opt/mrcp-dashboard/docs/admin_api.py
 Restart=always
 RestartSec=5
