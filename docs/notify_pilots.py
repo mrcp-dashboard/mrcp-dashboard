@@ -137,6 +137,29 @@ def split_runs(laps: list[dict]) -> list[list[dict]]:
     return runs
 
 
+def split_sessions(laps: list[dict], idle_minutes: int | None = None) -> list[list[dict]]:
+    """Decoupe la journee en roulages : des blocs separes par un vrai silence.
+
+    A ne pas confondre avec les relances : un pilote enchaine une vingtaine de
+    packs dans la journee, mais ne range la voiture que deux ou trois fois.
+    C'est ce silence-la qui declenche un rapport.
+    """
+    gap = timedelta(minutes=IDLE_MINUTES if idle_minutes is None else idle_minutes)
+    sessions: list[list[dict]] = []
+    current: list[dict] = []
+    for lap in laps:
+        if current:
+            end = last_lap_moment(current)
+            start = lap_start(lap)
+            if end and start and start - end >= gap:
+                sessions.append(current)
+                current = []
+        current.append(lap)
+    if current:
+        sessions.append(current)
+    return sessions
+
+
 def best_series(laps: list[dict], n: int = SERIES_LAP_COUNT) -> float | None:
     """Meilleure moyenne sur n tours qui s'enchainent, sans relance."""
     best = None
@@ -154,13 +177,18 @@ def best_series(laps: list[dict], n: int = SERIES_LAP_COUNT) -> float | None:
     return best
 
 
+def lap_start(lap: dict) -> datetime | None:
+    try:
+        return datetime.strptime(f"{lap.get('date')} {lap.get('start_time')}", "%Y-%m-%d %H:%M:%S")
+    except (ValueError, TypeError):
+        return None
+
+
 def last_lap_moment(laps: list[dict]) -> datetime | None:
     """Horodatage de fin du dernier tour, pour juger si le pilote roule encore."""
     for lap in reversed(laps):
-        stamp = f"{lap.get('date')} {lap.get('start_time')}"
-        try:
-            started = datetime.strptime(stamp, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
+        started = lap_start(lap)
+        if started is None:
             continue
         # start_time est le debut du tour : la voiture est encore en piste
         # pendant sa duree.
@@ -190,8 +218,9 @@ def profile_url(pilot: str) -> str:
     return f"{PUBLIC_BASE_URL}#/pilote/{requests.utils.quote(pilot)}"
 
 
-def summarize(data: dict, pilot: str, day: str) -> dict | None:
-    all_laps = pilot_laps(data, pilot, day)
+def summarize(data: dict, pilot: str, day: str, laps: list[dict] | None = None) -> dict | None:
+    """Stats d'une journee, ou d'un seul roulage si `laps` est fourni."""
+    all_laps = pilot_laps(data, pilot, day) if laps is None else laps
     if not all_laps:
         return None
 
@@ -213,6 +242,7 @@ def summarize(data: dict, pilot: str, day: str) -> dict | None:
         "date": day,
         "laps": len(laps),
         "runs": len(split_runs(laps)),
+        "sessions": len(split_sessions(all_laps)),
         "best": best,
         "avg": sum(times) / len(times),
         "series": best_series(laps),
@@ -227,10 +257,12 @@ def summarize(data: dict, pilot: str, day: str) -> dict | None:
 def build_message(summary: dict, kind: str) -> str:
     day_fr = datetime.strptime(summary["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
     title = "ton roulage" if kind == "run" else "ta journee"
+    detail = f" en {summary['sessions']} roulages" if kind == "day" else (
+        f" en {summary['runs']} relances" if summary["runs"] > 1 else "")
     lines = [
         f"\U0001f3c1 MRCP - {title} du {day_fr}",
         "",
-        f"Tours : {summary['laps']}" + (f" en {summary['runs']} relances" if summary["runs"] > 1 else ""),
+        f"Tours : {summary['laps']}{detail}",
         f"Meilleur tour : {fmt_time(summary['best'])}",
         f"Moyenne : {fmt_time(summary['avg'])}",
     ]
@@ -312,22 +344,34 @@ def main() -> int:
         chat_id = str(cfg.get("whatsapp") or "").strip()
         if not chat_id:
             continue
-        summary = summarize(data, pilot, args.date)
-        if not summary:
+        day_laps = pilot_laps(data, pilot, args.date)
+        sessions = split_sessions(day_laps)
+        if not sessions:
             continue
 
         messages = []
-        # 1. Fin de roulage : plus rien depuis IDLE_MINUTES.
-        if summary["last_moment"] and now - summary["last_moment"] >= timedelta(minutes=IDLE_MINUTES):
+        # 1. Fin de roulage : le dernier bloc est clos depuis IDLE_MINUTES. Le
+        #    rapport ne porte que sur ce roulage-la.
+        end = last_lap_moment(sessions[-1])
+        if end and now - end >= timedelta(minutes=IDLE_MINUTES):
             # La cle contient l'heure du dernier tour : s'il repart en piste,
-            # elle change et un nouveau rapport part a la fin de la relance.
-            messages.append(("run", f"{args.date}|{pilot}|run|{summary['last_moment']:%H:%M:%S}"))
-        # 2. Resume du soir, seulement s'il a fait plusieurs relances.
-        if now.hour >= DAY_HOUR and summary["runs"] > 1:
-            messages.append(("day", f"{args.date}|{pilot}|jour"))
+            # elle change et un nouveau rapport part a la fin du roulage suivant.
+            messages.append((
+                "run",
+                f"{args.date}|{pilot}|run|{end:%H:%M:%S}",
+                summarize(data, pilot, args.date, sessions[-1]),
+            ))
+        # 2. Resume du soir. Seulement a partir de deux roulages : avec un seul,
+        #    il serait mot pour mot le rapport envoye plus tot.
+        if now.hour >= DAY_HOUR and len(sessions) > 1:
+            messages.append((
+                "day",
+                f"{args.date}|{pilot}|jour",
+                summarize(data, pilot, args.date, day_laps),
+            ))
 
-        for kind, key in messages:
-            if sent_map.get(key):
+        for kind, key, summary in messages:
+            if sent_map.get(key) or not summary:
                 continue
             if waha_send(chat_id, build_message(summary, kind), dry_run):
                 sent_map[key] = now.isoformat(timespec="seconds")

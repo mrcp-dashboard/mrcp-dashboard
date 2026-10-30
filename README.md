@@ -185,7 +185,7 @@ Trois morceaux :
    n'y a rien a saisir. `STOP` desinscrit.
 3. **Envoi** : `docs/notify_pilots.py`, appele a chaque passage de
    `update_dashboard.sh`. Un rapport quand le pilote n'a plus passe de tour
-   depuis 15 min, et un resume le soir s'il a fait plusieurs relances.
+   depuis 15 min, et un resume le soir s'il est sorti rouler plusieurs fois.
 
 Variables :
 

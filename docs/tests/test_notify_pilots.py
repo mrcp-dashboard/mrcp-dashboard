@@ -45,6 +45,19 @@ def test_split_runs_coupe_au_changement_de_piste():
     assert [len(r) for r in notify_pilots.split_runs(laps)] == [2, 1]
 
 
+def test_split_sessions_ne_coupe_pas_entre_deux_packs():
+    """Une relance n'est pas un roulage : le pilote recharge et repart."""
+    laps = [lap(1, 40, "10:00:00"), lap(2, 40, "10:00:40"),
+            lap(1, 40, "10:05:00"), lap(2, 40, "10:05:40")]
+    assert len(notify_pilots.split_sessions(laps)) == 1
+
+
+def test_split_sessions_coupe_apres_un_vrai_silence():
+    laps = [lap(1, 40, "10:00:00"), lap(2, 40, "10:00:40"),
+            lap(1, 40, "11:00:00"), lap(2, 40, "11:00:40")]
+    assert [len(s) for s in notify_pilots.split_sessions(laps)] == [2, 2]
+
+
 def test_best_series_prend_la_meilleure_fenetre_glissante():
     laps = [lap(i + 1, t, f"10:0{i}:00") for i, t in enumerate([40, 39, 38, 37, 36, 30, 30, 30])]
     # Les 5 derniers (37+36+30+30+30)/5 = 32.6 battent les 5 premiers.
@@ -147,14 +160,29 @@ def test_une_nouvelle_relance_redonne_droit_a_un_rapport(envoi):
     assert len(envoi(laps, "11:30")) == 2
 
 
-def test_resume_du_soir_seulement_si_plusieurs_relances(envoi):
-    une_relance = [lap(i + 1, 40, f"10:0{i}:00") for i in range(5)]
-    assert len(envoi(une_relance, "21:00")) == 1  # le rapport de fin de roulage, pas de resume
+def test_pas_de_resume_du_soir_apres_un_seul_roulage(envoi):
+    """Il serait mot pour mot le rapport deja envoye."""
+    un_roulage = [lap(i + 1, 40, f"10:0{i}:00") for i in range(5)]
+    assert len(envoi(un_roulage, "21:00")) == 1
 
-    deux_relances = une_relance + [lap(1, 39, "11:00:00"), lap(2, 39, "11:00:39")]
-    messages = envoi(deux_relances, "21:30")
+
+def test_resume_du_soir_apres_deux_roulages(envoi):
+    laps = [lap(i + 1, 40, f"10:0{i}:00") for i in range(5)]
+    envoi(laps, "10:30")
+    laps += [lap(1, 39, "14:00:00"), lap(2, 39, "14:00:39")]
+    messages = envoi(laps, "21:30")
     assert len(messages) == 3
     assert "ta journee" in messages[-1][1]
+    assert "Tours : 7 en 2 roulages" in messages[-1][1]
+
+
+def test_rapport_de_fin_ne_couvre_que_le_dernier_roulage(envoi):
+    matin = [lap(i + 1, 40, f"10:0{i}:00") for i in range(5)]
+    envoi(matin, "10:30")
+    apresmidi = matin + [lap(1, 39, "14:00:00"), lap(2, 39, "14:00:39")]
+    messages = envoi(apresmidi, "14:30")
+    assert "Tours : 5" in messages[0][1]
+    assert "Tours : 2" in messages[1][1]
 
 
 def test_pilote_desinscrit_ne_recoit_rien(envoi, tmp_path):
