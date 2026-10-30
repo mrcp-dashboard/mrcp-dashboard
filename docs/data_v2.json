@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-10-30T16:42:16+01:00",
+  "generated_at": "2026-10-30T17:39:12+01:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 356,
+    "activities_count": 357,
     "pilots_count": 82,
-    "laps_count": 18054,
+    "laps_count": 18059,
     "tracks": {
       "TT1/8": {
-        "laps_count": 17871,
-        "activities_count": 356,
+        "laps_count": 17876,
+        "activities_count": 357,
         "pilots_count": 82
       },
       "TT1/10": {
@@ -5443,6 +5443,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8539357782",
+        "date_fr": "30/10/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 5,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8539188576",
         "date_fr": "30/10/2026",
         "tracks": [
@@ -8496,21 +8507,128 @@
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7681814184",
-        "date_fr": "19/04/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 68,
-        "quality_score": 100,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 0
       }
     ]
   },
   "activities": [
+    {
+      "id": "8539357782",
+      "date": "2026-10-30",
+      "date_fr": "30/10/2026",
+      "source_file": "sessions_8539357782.csv",
+      "pilot_count": 1,
+      "laps_count": 5,
+      "best_lap": 34.785,
+      "best_pilot": "MONPLAISI MATHIEU",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 5
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "6028027",
+          "pilot_name": "MONPLAISI MATHIEU",
+          "pilot_slug": "monplaisi-mathieu-6028027",
+          "laps_count": 5,
+          "best_lap": 34.785,
+          "avg_lap": 36.546,
+          "consistency": 1.607,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 5
+          },
+          "laps": [
+            {
+              "activity_id": "8539357782",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-30",
+              "date_fr": "30/10/2026",
+              "start_time": "17:35:36",
+              "lap_no": 1,
+              "lap_time": 36.633,
+              "speed": "25.551 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8539357782|6028027|1|17:35:36|36.633"
+            },
+            {
+              "activity_id": "8539357782",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-30",
+              "date_fr": "30/10/2026",
+              "start_time": "17:36:13",
+              "lap_no": 2,
+              "lap_time": 34.924,
+              "speed": "26.801 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8539357782|6028027|2|17:36:13|34.924"
+            },
+            {
+              "activity_id": "8539357782",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-30",
+              "date_fr": "30/10/2026",
+              "start_time": "17:36:48",
+              "lap_no": 3,
+              "lap_time": 39.127,
+              "speed": "23.922 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8539357782|6028027|3|17:36:48|39.127"
+            },
+            {
+              "activity_id": "8539357782",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-30",
+              "date_fr": "30/10/2026",
+              "start_time": "17:37:27",
+              "lap_no": 4,
+              "lap_time": 34.785,
+              "speed": "26.908 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8539357782|6028027|4|17:37:27|34.785"
+            },
+            {
+              "activity_id": "8539357782",
+              "transponder": "6028027",
+              "raw_transponder": "6028027",
+              "pilot_name": "MONPLAISI MATHIEU",
+              "date": "2026-10-30",
+              "date_fr": "30/10/2026",
+              "start_time": "17:38:02",
+              "lap_no": 5,
+              "lap_time": 37.259,
+              "speed": "25.121 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8539357782|6028027|5|17:38:02|37.259"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8539188576",
       "date": "2026-10-30",
@@ -298004,6 +298122,23 @@
       "slug": "monplaisi-mathieu-6028027",
       "activities": [
         {
+          "activity_id": "8539357782",
+          "date": "2026-10-30",
+          "date_fr": "30/10/2026",
+          "rank": 1,
+          "laps_count": 5,
+          "best_lap": 34.785,
+          "avg_lap": 36.546,
+          "consistency": 1.607,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 5
+          }
+        },
+        {
           "activity_id": "8518883472",
           "date": "2026-10-25",
           "date_fr": "25/10/2026",
@@ -298327,16 +298462,16 @@
           }
         }
       ],
-      "total_laps": 689,
+      "total_laps": 694,
       "best_lap": 32.981,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 689
+        "TT1/8": 694
       },
-      "activities_count": 19,
-      "avg_best_lap": 36.33
+      "activities_count": 20,
+      "avg_best_lap": 36.253
     },
     {
       "transponder": "8944439",
