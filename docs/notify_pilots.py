@@ -241,6 +241,7 @@ def summarize(data: dict, pilot: str, day: str, laps: list[dict] | None = None) 
         "pilot": pilot,
         "date": day,
         "laps": len(laps),
+        "laps_rows": laps,
         "runs": len(split_runs(laps)),
         "sessions": len(split_sessions(all_laps)),
         "best": best,
@@ -252,6 +253,27 @@ def summarize(data: dict, pilot: str, day: str, laps: list[dict] | None = None) 
         # Sur tous les tours : un tour sur l'autre piste prouve qu'il roule encore.
         "last_moment": last_lap_moment(all_laps),
     }
+
+
+def lap_by_lap(laps: list[dict]) -> list[str]:
+    """Les temps tour par tour, une ligne par relance, meilleur tour en gras.
+
+    Un roulage fait 11 tours en mediane et 94 au pire sur l'historique : la
+    liste complete tient dans un message, inutile de la tronquer.
+    """
+    times_all = [float(l.get("lap_time") or 0) for l in laps]
+    if not times_all:
+        return []
+    best = min(times_all)
+    lines = []
+    for index, run in enumerate(split_runs(laps), 1):
+        shown = []
+        for lap in run:
+            value = float(lap.get("lap_time") or 0)
+            # Les asterisques mettent le texte en gras dans WhatsApp.
+            shown.append(f"*{value:.3f}*" if value == best else f"{value:.3f}")
+        lines.append(f"Relance {index} : " + "  ".join(shown))
+    return lines
 
 
 def build_message(summary: dict, kind: str) -> str:
@@ -276,6 +298,14 @@ def build_message(summary: dict, kind: str) -> str:
         ecart = summary["best"] - summary["previous_best"]
         lines.append("")
         lines.append(f"Record perso : {fmt_time(summary['previous_best'])} ({ecart:+.3f} s aujourd'hui)")
+    # Le detail tour par tour sur le rapport de roulage seulement : dans le
+    # resume du soir il reprendrait des temps deja envoyes.
+    if kind == "run":
+        detail_laps = lap_by_lap(summary["laps_rows"])
+        if detail_laps:
+            lines.append("")
+            lines.append("Tes tours :")
+            lines += detail_laps
     lines += [
         "",
         f"Ta fiche : {profile_url(summary['pilot'])}",

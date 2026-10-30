@@ -100,6 +100,22 @@ def test_summarize_detecte_le_record_battu():
     assert "Record perso battu" in notify_pilots.build_message(summary, "run")
 
 
+def test_lap_by_lap_groupe_par_relance_et_met_le_meilleur_en_gras():
+    laps = [lap(1, 34.5, "10:00:00"), lap(2, 33.25, "10:00:35"),
+            lap(1, 35.0, "10:10:00")]
+    assert notify_pilots.lap_by_lap(laps) == [
+        "Relance 1 : 34.500  *33.250*",
+        "Relance 2 : 35.000",
+    ]
+
+
+def test_detail_des_tours_dans_le_rapport_de_roulage_pas_dans_le_resume():
+    laps = [lap(i + 1, 34.0 + i, f"10:0{i}:00") for i in range(3)]
+    summary = notify_pilots.summarize(data_with(laps), "PILOTE UN", "2026-10-25")
+    assert "Tes tours :" in notify_pilots.build_message(summary, "run")
+    assert "Tes tours :" not in notify_pilots.build_message(summary, "day")
+
+
 def test_summarize_trouve_le_pilote_sans_accent_ni_majuscule():
     laps = [lap(1, 33.0, "10:00:00")]
     data = data_with(laps, pilot="JÉRÔME VAQUERO")
