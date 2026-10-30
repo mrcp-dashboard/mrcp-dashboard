@@ -187,7 +187,9 @@ Trois morceaux :
    `update_dashboard.sh`. Un rapport quand le pilote n'a plus passe de tour
    depuis 15 min, et un resume le soir s'il est sorti rouler plusieurs fois.
 
-Variables :
+Variables, a ajouter dans `/etc/systemd/system/mrcp-admin-api.service` sur le
+LXC (lignes `Environment=`, comme `MRCP_ADMIN_TOKEN`), puis
+`systemctl daemon-reload && systemctl restart mrcp-admin-api` :
 
 - `MRCP_WAHA_URL` : ex. `http://192.168.1.50:3000`. Vide = aucun envoi, les
   messages sont seulement affiches dans le journal.
