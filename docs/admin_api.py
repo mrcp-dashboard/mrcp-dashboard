@@ -626,6 +626,13 @@ def waha_webhook():
     if not chat_id or not text:
         return jsonify({"ok": True, "ignored": True})
 
+    # Une inscription se fait en message prive. Sans ce filtre le bot repondait
+    # son aide a chaque message du groupe du club (constate le 31/10/2026 sur
+    # "MRCP adherents 2026"), et une inscription envoyee la aurait enregistre
+    # l'identifiant du groupe au lieu du numero du pilote.
+    if chat_id.endswith("@g.us") or chat_id.endswith("@broadcast"):
+        return jsonify({"ok": True, "ignored": "conversation de groupe"})
+
     reply = handle_whatsapp_command(chat_id, text)
     notify_pilots.waha_send(chat_id, reply)
     return jsonify({"ok": True, "reply": reply})
