@@ -288,35 +288,35 @@ def build_message(summary: dict, kind: str) -> str:
     detail = f" en {summary['sessions']} roulages" if kind == "day" else (
         f" en {summary['runs']} relances" if summary["runs"] > 1 else "")
     lines = [
-        f"\U0001f3c1 MRCP - {title} du {day_fr}",
+        f"🏁 MRCP - {title} du {day_fr}",
         "",
-        f"Tours : {summary['laps']}{detail}",
-        f"Meilleur tour : {fmt_time(summary['best'])}",
-        f"Moyenne : {fmt_time(summary['avg'])}",
+        f"🏎️ Tours : {summary['laps']}{detail}",
+        f"⏱️ Meilleur tour : {fmt_time(summary['best'])}",
+        f"📊 Moyenne : {fmt_time(summary['avg'])}",
     ]
     if summary["series"] is not None:
-        lines.append(f"Meilleure serie de {SERIES_LAP_COUNT} tours : {fmt_time(summary['series'])}")
-    lines.append(f"Piste : {summary['track']}")
+        lines.append(f"⚡ Meilleure serie de {SERIES_LAP_COUNT} tours : {fmt_time(summary['series'])}")
+    lines.append(f"🛣️ Piste : {summary['track']}")
     if summary["gain"] is not None:
         lines.append("")
-        lines.append(f"\U0001f525 Record perso battu de {summary['gain']:.3f} s (avant : {fmt_time(summary['previous_best'])})")
+        lines.append(f"🔥 Record perso battu de {summary['gain']:.3f} s (avant : {fmt_time(summary['previous_best'])})")
     elif summary["previous_best"] is not None:
         ecart = summary["best"] - summary["previous_best"]
         lines.append("")
-        lines.append(f"Record perso : {fmt_time(summary['previous_best'])} ({ecart:+.3f} s aujourd'hui)")
+        lines.append(f"🎯 Record perso : {fmt_time(summary['previous_best'])} ({ecart:+.3f} s aujourd'hui)")
     # Le detail tour par tour sur le rapport de roulage seulement : dans le
     # resume du soir il reprendrait des temps deja envoyes.
     if kind == "run":
         detail_laps = lap_by_lap(summary["laps_rows"])
         if detail_laps:
             lines.append("")
-            lines.append("Tes tours :")
+            lines.append("📋 Tes tours :")
             lines += detail_laps
     lines += [
         "",
-        f"Ta fiche : {profile_url(summary['pilot'])}",
+        f"🔗 Ta fiche : {profile_url(summary['pilot'])}",
         "",
-        "Reponds STOP pour ne plus recevoir ces messages.",
+        "✋ Reponds STOP pour ne plus recevoir ces messages.",
     ]
     return "\n".join(lines)
 
