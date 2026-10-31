@@ -58,6 +58,12 @@ PUBLIC_BASE_URL = os.environ.get(
 IDLE_MINUTES = int(os.environ.get("MRCP_NOTIFY_IDLE_MINUTES", "15"))
 DAY_HOUR = int(os.environ.get("MRCP_NOTIFY_DAY_HOUR", "20"))
 
+# Journees sans rapport, au format AAAA-MM-JJ separees par des virgules : les
+# jours de course, les manches s'enchainent et chacun recevrait une dizaine de
+# messages. Declarer les dates a l'avance evite d'avoir a couper puis rallumer
+# le systeme - un oubli au rallumage ne se verrait pas.
+SKIP_DATES = {d.strip() for d in os.environ.get("MRCP_NOTIFY_SKIP_DATES", "").split(",") if d.strip()}
+
 # Meme longueur de serie que le dashboard (SERIES_LAP_COUNT dans app_v2_laps.js).
 SERIES_LAP_COUNT = 5
 # Au-dela, un envoi rate n'a plus d'interet : le pilote est rentre depuis
@@ -361,6 +367,10 @@ def main() -> int:
     now = datetime.now()
     if args.now:
         now = datetime.strptime(f"{args.date} {args.now}", "%Y-%m-%d %H:%M")
+
+    if args.date in SKIP_DATES:
+        print(f"Notifications : {args.date} declare jour de course, aucun rapport envoye")
+        return 0
 
     data = load_json(DATA_FILE, {})
     notifications = load_json(NOTIFICATIONS_FILE, {"pilots": {}})

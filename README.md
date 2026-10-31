@@ -203,6 +203,12 @@ passage).
 - `MRCP_PUBLIC_BASE_URL` : base des liens vers la fiche pilote.
 - `MRCP_NOTIFY_IDLE_MINUTES` : silence qui marque la fin d'un roulage, `15`.
 - `MRCP_NOTIFY_DAY_HOUR` : heure du resume du soir, `20`.
+- `MRCP_NOTIFY_SKIP_DATES` : journees sans aucun rapport, au format
+  `AAAA-MM-JJ` separees par des virgules. Pour les jours de course, ou les
+  manches s'enchainent et chacun recevrait une dizaine de messages. Declarer
+  les dates a l'avance plutot que couper le systeme : il se rallume seul le
+  lendemain. Verifier une saisie :
+  `python docs/notify_pilots.py --date 2026-11-15 --dry-run`.
 - `MRCP_NOTIFY_DRY_RUN=1` : affiche les messages sans les envoyer.
 
 Les contacts vivent dans `docs/pilot_notifications.json` et l'anti-doublon dans

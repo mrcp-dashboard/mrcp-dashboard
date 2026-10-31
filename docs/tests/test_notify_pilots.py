@@ -201,6 +201,18 @@ def test_rapport_de_fin_ne_couvre_que_le_dernier_roulage(envoi):
     assert "Tours : 2" in messages[1][1]
 
 
+def test_aucun_rapport_un_jour_de_course(envoi, monkeypatch):
+    monkeypatch.setattr(notify_pilots, "SKIP_DATES", {"2026-10-25"})
+    laps = [lap(i + 1, 40, f"10:0{i}:00") for i in range(5)]
+    assert envoi(laps, "10:30") == []
+
+
+def test_le_lendemain_d_une_course_les_rapports_repartent(envoi, monkeypatch):
+    monkeypatch.setattr(notify_pilots, "SKIP_DATES", {"2026-10-24"})
+    laps = [lap(i + 1, 40, f"10:0{i}:00") for i in range(5)]
+    assert len(envoi(laps, "10:30")) == 1
+
+
 def test_pilote_desinscrit_ne_recoit_rien(envoi, tmp_path):
     (tmp_path / "notifications.json").write_text(json.dumps({
         "pilots": {"PILOTE UN": {"whatsapp": "33600000000@c.us", "enabled": False}}
