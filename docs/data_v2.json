@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-11-01T14:27:13+01:00",
+  "generated_at": "2026-11-01T14:30:17+01:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 363,
     "pilots_count": 82,
-    "laps_count": 18268,
+    "laps_count": 18275,
     "tracks": {
       "TT1/8": {
-        "laps_count": 18085,
+        "laps_count": 18092,
         "activities_count": 363,
         "pilots_count": 82
       },
@@ -5472,7 +5472,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 2,
+        "laps_count": 3,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -5483,7 +5483,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 12,
+        "laps_count": 18,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8530,7 +8530,7 @@
       "date_fr": "01/11/2026",
       "source_file": "sessions_8553134751.csv",
       "pilot_count": 1,
-      "laps_count": 2,
+      "laps_count": 3,
       "best_lap": 35.464,
       "best_pilot": "TONY GOMES",
       "tracks": [
@@ -8538,7 +8538,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 2
+        "TT1/8": 3
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8548,16 +8548,16 @@
           "transponder": "3601271",
           "pilot_name": "TONY GOMES",
           "pilot_slug": "tony-gomes-3601271",
-          "laps_count": 2,
+          "laps_count": 3,
           "best_lap": 35.464,
-          "avg_lap": 35.868,
-          "consistency": 0.405,
+          "avg_lap": 36.375,
+          "consistency": 0.789,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 3
           },
           "laps": [
             {
@@ -8589,6 +8589,21 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8553134751|3601271|2|14:26:10|35.464"
+            },
+            {
+              "activity_id": "8553134751",
+              "transponder": "3601271",
+              "raw_transponder": "3601271",
+              "pilot_name": "TONY GOMES",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "14:26:45",
+              "lap_no": 3,
+              "lap_time": 37.388,
+              "speed": "25.035 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553134751|3601271|3|14:26:45|37.388"
             }
           ],
           "rank": 1,
@@ -8603,7 +8618,7 @@
       "date_fr": "01/11/2026",
       "source_file": "sessions_8553023748.csv",
       "pilot_count": 1,
-      "laps_count": 12,
+      "laps_count": 18,
       "best_lap": 34.428,
       "best_pilot": "MICHEL FATOUX",
       "tracks": [
@@ -8611,7 +8626,7 @@
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 12
+        "TT1/8": 18
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8621,16 +8636,16 @@
           "transponder": "3185669",
           "pilot_name": "MICHEL FATOUX",
           "pilot_slug": "michel-fatoux-3185669",
-          "laps_count": 12,
+          "laps_count": 18,
           "best_lap": 34.428,
-          "avg_lap": 36.177,
-          "consistency": 2.168,
+          "avg_lap": 35.859,
+          "consistency": 1.855,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 12
+            "TT1/8": 18
           },
           "laps": [
             {
@@ -8812,6 +8827,96 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8553023748|3185669|3|14:26:03|35.173"
+            },
+            {
+              "activity_id": "8553023748",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "14:26:38",
+              "lap_no": 4,
+              "lap_time": 34.689,
+              "speed": "26.983 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553023748|3185669|4|14:26:38|34.689"
+            },
+            {
+              "activity_id": "8553023748",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "14:27:13",
+              "lap_no": 5,
+              "lap_time": 34.465,
+              "speed": "27.158 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553023748|3185669|5|14:27:13|34.465"
+            },
+            {
+              "activity_id": "8553023748",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "14:27:47",
+              "lap_no": 6,
+              "lap_time": 36.107,
+              "speed": "25.923 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553023748|3185669|6|14:27:47|36.107"
+            },
+            {
+              "activity_id": "8553023748",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "14:28:23",
+              "lap_no": 7,
+              "lap_time": 35.552,
+              "speed": "26.328 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553023748|3185669|7|14:28:23|35.552"
+            },
+            {
+              "activity_id": "8553023748",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "14:28:59",
+              "lap_no": 8,
+              "lap_time": 34.978,
+              "speed": "26.760 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553023748|3185669|8|14:28:59|34.978"
+            },
+            {
+              "activity_id": "8553023748",
+              "transponder": "3185669",
+              "raw_transponder": "3185669",
+              "pilot_name": "MICHEL FATOUX",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "14:29:34",
+              "lap_no": 9,
+              "lap_time": 35.55,
+              "speed": "26.329 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553023748|3185669|9|14:29:34|35.550"
             }
           ],
           "rank": 1,
@@ -301330,16 +301435,16 @@
           "date": "2026-11-01",
           "date_fr": "01/11/2026",
           "rank": 1,
-          "laps_count": 12,
+          "laps_count": 18,
           "best_lap": 34.428,
-          "avg_lap": 36.177,
-          "consistency": 2.168,
+          "avg_lap": 35.859,
+          "consistency": 1.855,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 12
+            "TT1/8": 18
           }
         },
         {
@@ -301479,13 +301584,13 @@
           }
         }
       ],
-      "total_laps": 512,
+      "total_laps": 518,
       "best_lap": 32.411,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 512
+        "TT1/8": 518
       },
       "activities_count": 9,
       "avg_best_lap": 34.272
@@ -302027,16 +302132,16 @@
           "date": "2026-11-01",
           "date_fr": "01/11/2026",
           "rank": 1,
-          "laps_count": 2,
+          "laps_count": 3,
           "best_lap": 35.464,
-          "avg_lap": 35.868,
-          "consistency": 0.405,
+          "avg_lap": 36.375,
+          "consistency": 0.789,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 2
+            "TT1/8": 3
           }
         },
         {
@@ -302108,13 +302213,13 @@
           }
         }
       ],
-      "total_laps": 284,
+      "total_laps": 285,
       "best_lap": 33.379,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 284
+        "TT1/8": 285
       },
       "activities_count": 5,
       "avg_best_lap": 34.793
