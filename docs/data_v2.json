@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-11-01T15:12:12+01:00",
+  "generated_at": "2026-11-01T15:15:13+01:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -9,13 +9,13 @@
     "tt10_limit": 30.0
   },
   "summary": {
-    "activities_count": 363,
+    "activities_count": 364,
     "pilots_count": 82,
-    "laps_count": 18344,
+    "laps_count": 18345,
     "tracks": {
       "TT1/8": {
-        "laps_count": 18161,
-        "activities_count": 363,
+        "laps_count": 18162,
+        "activities_count": 364,
         "pilots_count": 82
       },
       "TT1/10": {
@@ -5467,6 +5467,17 @@
         "unknown_pilots_count": 1
       },
       {
+        "id": "8553463962",
+        "date_fr": "01/11/2026",
+        "tracks": [
+          "TT1/8"
+        ],
+        "laps_count": 1,
+        "quality_score": 100,
+        "suspicious_laps_count": 0,
+        "unknown_pilots_count": 0
+      },
+      {
         "id": "8553134751",
         "date_fr": "01/11/2026",
         "tracks": [
@@ -8509,21 +8520,68 @@
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
-      },
-      {
-        "id": "7681848789",
-        "date_fr": "19/04/2026",
-        "tracks": [
-          "TT1/8"
-        ],
-        "laps_count": 104,
-        "quality_score": 100,
-        "suspicious_laps_count": 0,
-        "unknown_pilots_count": 0
       }
     ]
   },
   "activities": [
+    {
+      "id": "8553463962",
+      "date": "2026-11-01",
+      "date_fr": "01/11/2026",
+      "source_file": "sessions_8553463962.csv",
+      "pilot_count": 1,
+      "laps_count": 1,
+      "best_lap": 39.159,
+      "best_pilot": "DAMIEN IBARGARAY",
+      "tracks": [
+        "TT1/8"
+      ],
+      "track": "TT1/8",
+      "track_counts": {
+        "TT1/8": 1
+      },
+      "quality_score": 100,
+      "suspicious_laps_count": 0,
+      "unknown_pilots_count": 0,
+      "participants": [
+        {
+          "transponder": "8931925",
+          "pilot_name": "DAMIEN IBARGARAY",
+          "pilot_slug": "damien-ibargaray-8931925",
+          "laps_count": 1,
+          "best_lap": 39.159,
+          "avg_lap": 39.159,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          },
+          "laps": [
+            {
+              "activity_id": "8553463962",
+              "transponder": "8931925",
+              "raw_transponder": "8931925",
+              "pilot_name": "DAMIEN IBARGARAY",
+              "date": "2026-11-01",
+              "date_fr": "01/11/2026",
+              "start_time": "15:13:59",
+              "lap_no": 1,
+              "lap_time": 39.159,
+              "speed": "23.903 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8553463962|8931925|1|15:13:59|39.159"
+            }
+          ],
+          "rank": 1,
+          "personal_records_count": 0,
+          "has_personal_record": false
+        }
+      ]
+    },
     {
       "id": "8553134751",
       "date": "2026-11-01",
@@ -306053,6 +306111,23 @@
       "slug": "damien-ibargaray-8931925",
       "activities": [
         {
+          "activity_id": "8553463962",
+          "date": "2026-11-01",
+          "date_fr": "01/11/2026",
+          "rank": 1,
+          "laps_count": 1,
+          "best_lap": 39.159,
+          "avg_lap": 39.159,
+          "consistency": 0,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 1
+          }
+        },
+        {
           "activity_id": "8545630311",
           "date": "2026-10-31",
           "date_fr": "31/10/2026",
@@ -306495,16 +306570,16 @@
           }
         }
       ],
-      "total_laps": 933,
+      "total_laps": 934,
       "best_lap": 36.469,
       "tracks": [
         "TT1/8"
       ],
       "track_counts": {
-        "TT1/8": 933
+        "TT1/8": 934
       },
-      "activities_count": 26,
-      "avg_best_lap": 38.9
+      "activities_count": 27,
+      "avg_best_lap": 38.909
     },
     {
       "transponder": "7841457",
