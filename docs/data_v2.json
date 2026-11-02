@@ -1,6 +1,6 @@
 {
   "schema_version": 3.5,
-  "generated_at": "2026-11-02T13:51:06+01:00",
+  "generated_at": "2026-11-02T13:54:07+01:00",
   "club_name": "Mini Racing Club Palois",
   "source": "SpeedHive Practice 4308",
   "filters": {
@@ -11,10 +11,10 @@
   "summary": {
     "activities_count": 370,
     "pilots_count": 82,
-    "laps_count": 18755,
+    "laps_count": 18758,
     "tracks": {
       "TT1/8": {
-        "laps_count": 18571,
+        "laps_count": 18574,
         "activities_count": 370,
         "pilots_count": 82
       },
@@ -5472,7 +5472,7 @@
         "tracks": [
           "TT1/8"
         ],
-        "laps_count": 20,
+        "laps_count": 23,
         "quality_score": 100,
         "suspicious_laps_count": 0,
         "unknown_pilots_count": 0
@@ -8531,15 +8531,15 @@
       "date_fr": "02/11/2026",
       "source_file": "sessions_8556354039.csv",
       "pilot_count": 1,
-      "laps_count": 20,
-      "best_lap": 36.759,
+      "laps_count": 23,
+      "best_lap": 36.184,
       "best_pilot": "PIERRE MONPLAISI",
       "tracks": [
         "TT1/8"
       ],
       "track": "TT1/8",
       "track_counts": {
-        "TT1/8": 20
+        "TT1/8": 23
       },
       "quality_score": 100,
       "suspicious_laps_count": 0,
@@ -8549,16 +8549,16 @@
           "transponder": "3321418",
           "pilot_name": "PIERRE MONPLAISI",
           "pilot_slug": "pierre-monplaisi-3321418",
-          "laps_count": 20,
-          "best_lap": 36.759,
-          "avg_lap": 40.364,
-          "consistency": 3.579,
+          "laps_count": 23,
+          "best_lap": 36.184,
+          "avg_lap": 39.959,
+          "consistency": 3.522,
           "tracks": [
             "TT1/8"
           ],
           "track": "TT1/8",
           "track_counts": {
-            "TT1/8": 20
+            "TT1/8": 23
           },
           "laps": [
             {
@@ -8861,10 +8861,56 @@
               "track": "TT1/8",
               "base_track": "TT1/8",
               "lap_id": "8556354039|3321418|3|13:50:19|37.274"
+            },
+            {
+              "activity_id": "8556354039",
+              "transponder": "3321418",
+              "raw_transponder": "3321418",
+              "pilot_name": "PIERRE MONPLAISI",
+              "date": "2026-11-02",
+              "date_fr": "02/11/2026",
+              "start_time": "13:50:56",
+              "lap_no": 4,
+              "lap_time": 36.184,
+              "speed": "25.868 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8556354039|3321418|4|13:50:56|36.184",
+              "personal_record": true
+            },
+            {
+              "activity_id": "8556354039",
+              "transponder": "3321418",
+              "raw_transponder": "3321418",
+              "pilot_name": "PIERRE MONPLAISI",
+              "date": "2026-11-02",
+              "date_fr": "02/11/2026",
+              "start_time": "13:51:32",
+              "lap_no": 5,
+              "lap_time": 36.725,
+              "speed": "25.487 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8556354039|3321418|5|13:51:32|36.725"
+            },
+            {
+              "activity_id": "8556354039",
+              "transponder": "3321418",
+              "raw_transponder": "3321418",
+              "pilot_name": "PIERRE MONPLAISI",
+              "date": "2026-11-02",
+              "date_fr": "02/11/2026",
+              "start_time": "13:52:09",
+              "lap_no": 6,
+              "lap_time": 38.863,
+              "speed": "24.085 km/h",
+              "track": "TT1/8",
+              "base_track": "TT1/8",
+              "lap_id": "8556354039|3321418|6|13:52:09|38.863"
             }
           ],
           "rank": 1,
-          "personal_records_count": 1,
+          "personal_records_count": 2,
           "has_personal_record": true
         }
       ]
@@ -312816,6 +312862,108 @@
       "avg_best_lap": 40.356
     },
     {
+      "transponder": "3321418",
+      "name": "PIERRE MONPLAISI",
+      "slug": "pierre-monplaisi-3321418",
+      "activities": [
+        {
+          "activity_id": "8556354039",
+          "date": "2026-11-02",
+          "date_fr": "02/11/2026",
+          "rank": 1,
+          "laps_count": 23,
+          "best_lap": 36.184,
+          "avg_lap": 39.959,
+          "consistency": 3.522,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 23
+          }
+        },
+        {
+          "activity_id": "8518874262",
+          "date": "2026-10-25",
+          "date_fr": "25/10/2026",
+          "rank": 1,
+          "laps_count": 87,
+          "best_lap": 38.017,
+          "avg_lap": 43.984,
+          "consistency": 4.31,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 87
+          }
+        },
+        {
+          "activity_id": "8448821110",
+          "date": "2026-10-11",
+          "date_fr": "11/10/2026",
+          "rank": 1,
+          "laps_count": 34,
+          "best_lap": 37.103,
+          "avg_lap": 42.245,
+          "consistency": 4.978,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 34
+          }
+        },
+        {
+          "activity_id": "8313961969",
+          "date": "2026-09-16",
+          "date_fr": "16/09/2026",
+          "rank": 1,
+          "laps_count": 8,
+          "best_lap": 38.17,
+          "avg_lap": 41.34,
+          "consistency": 3.081,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 8
+          }
+        },
+        {
+          "activity_id": "8306582934",
+          "date": "2026-09-13",
+          "date_fr": "13/09/2026",
+          "rank": 1,
+          "laps_count": 16,
+          "best_lap": 38.39,
+          "avg_lap": 44.177,
+          "consistency": 6.176,
+          "tracks": [
+            "TT1/8"
+          ],
+          "track": "TT1/8",
+          "track_counts": {
+            "TT1/8": 16
+          }
+        }
+      ],
+      "total_laps": 168,
+      "best_lap": 36.184,
+      "tracks": [
+        "TT1/8"
+      ],
+      "track_counts": {
+        "TT1/8": 168
+      },
+      "activities_count": 5,
+      "avg_best_lap": 37.573
+    },
+    {
       "transponder": "7409591",
       "name": "FABIEN DUVERGER",
       "slug": "fabien-duverger-7409591",
@@ -313171,108 +313319,6 @@
       },
       "activities_count": 2,
       "avg_best_lap": 36.581
-    },
-    {
-      "transponder": "3321418",
-      "name": "PIERRE MONPLAISI",
-      "slug": "pierre-monplaisi-3321418",
-      "activities": [
-        {
-          "activity_id": "8556354039",
-          "date": "2026-11-02",
-          "date_fr": "02/11/2026",
-          "rank": 1,
-          "laps_count": 20,
-          "best_lap": 36.759,
-          "avg_lap": 40.364,
-          "consistency": 3.579,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 20
-          }
-        },
-        {
-          "activity_id": "8518874262",
-          "date": "2026-10-25",
-          "date_fr": "25/10/2026",
-          "rank": 1,
-          "laps_count": 87,
-          "best_lap": 38.017,
-          "avg_lap": 43.984,
-          "consistency": 4.31,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 87
-          }
-        },
-        {
-          "activity_id": "8448821110",
-          "date": "2026-10-11",
-          "date_fr": "11/10/2026",
-          "rank": 1,
-          "laps_count": 34,
-          "best_lap": 37.103,
-          "avg_lap": 42.245,
-          "consistency": 4.978,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 34
-          }
-        },
-        {
-          "activity_id": "8313961969",
-          "date": "2026-09-16",
-          "date_fr": "16/09/2026",
-          "rank": 1,
-          "laps_count": 8,
-          "best_lap": 38.17,
-          "avg_lap": 41.34,
-          "consistency": 3.081,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 8
-          }
-        },
-        {
-          "activity_id": "8306582934",
-          "date": "2026-09-13",
-          "date_fr": "13/09/2026",
-          "rank": 1,
-          "laps_count": 16,
-          "best_lap": 38.39,
-          "avg_lap": 44.177,
-          "consistency": 6.176,
-          "tracks": [
-            "TT1/8"
-          ],
-          "track": "TT1/8",
-          "track_counts": {
-            "TT1/8": 16
-          }
-        }
-      ],
-      "total_laps": 165,
-      "best_lap": 36.759,
-      "tracks": [
-        "TT1/8"
-      ],
-      "track_counts": {
-        "TT1/8": 165
-      },
-      "activities_count": 5,
-      "avg_best_lap": 37.688
     },
     {
       "transponder": "8209271",
