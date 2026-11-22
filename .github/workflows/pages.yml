@@ -43,6 +43,24 @@ jobs:
         with:
           path: docs
 
+      # deploy-pages interroge l'index des artefacts juste apres le televersement
+      # et ne l'y trouve pas toujours : "No artifacts named github-pages were
+      # found for this workflow run", alors que l'artefact existe bel et bien
+      # (constate le 22/11/2026 : artefact cree a 16:12:36, deploiement en echec
+      # a 16:12:40). Le defaut est chez GitHub et il est intermittent ; en
+      # poussant toutes les 3 min on le rencontre plusieurs fois par dimanche.
+      # Un second essai 20 s plus tard suffit, et un echec persistant fait
+      # toujours echouer le job.
       - name: Deploy
         id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Attente avant second essai
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 20
+
+      - name: Deploy (second essai)
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
